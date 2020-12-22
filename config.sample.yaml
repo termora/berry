@@ -1,0 +1,8 @@
+auth:
+  token: longDiscordString
+  database_url: postgresql://postgres:postgres@localhost/postgres
+
+bot:
+  prefixes: [t;, t!]
+  bot_owners: ["0", "0"]
+  admin_server: "0"

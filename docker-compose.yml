@@ -1,0 +1,30 @@
+# Reads `config.yaml` from current directory
+
+version: "3"
+
+services:
+  db:
+    image: postgres:12-alpine
+    volumes:
+      - "db_data:/var/lib/postgresql/data"
+      - "/var/run/postgresql:/var/run/postgresql"
+    command: ["postgres",
+              "-c", "max-connections=1000",
+              "-c", "timezone=Etc/UTC",
+              "-c", "max_wal_size=1GB",
+              "-c", "min_wal_size=80MB",
+              "-c", "shared_buffers=128MB"]
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+    restart: unless-stopped
+
+  termbot:
+    build: .
+    environment:
+      - "TERMBOT_DB_URL=postgresql://postgres:postgres@db/postgres"
+    volumes:
+      - "./config.yaml:/go/app/src/config.yaml:ro"
+    restart: unless-stopped
+
+volumes:
+  db_data:
