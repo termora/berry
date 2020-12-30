@@ -1,9 +1,12 @@
 package admin
 
 import (
+	"time"
+
 	"github.com/Starshine113/crouter"
 	"github.com/Starshine113/termbot/db"
 	"github.com/Starshine113/termbot/structs"
+	"github.com/bwmarrin/discordgo"
 )
 
 type commands struct {
@@ -56,7 +59,8 @@ func Init(db *db.Db, conf *structs.BotConfig, r *crouter.Router) {
 		Name:        "SetFlags",
 		Description: "Set a term's flags",
 
-		CustomPermissions: []func(*crouter.Ctx) (string, bool){c.checkOwner},
+		Cooldown:    time.Minute,
+		Permissions: discordgo.PermissionManageMessages,
 
 		Command: c.setFlags,
 	})
