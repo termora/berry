@@ -51,6 +51,15 @@ func Init(db *db.Db, conf *structs.BotConfig, r *crouter.Router) {
 
 		Command: c.addExplanation,
 	})
+
+	r.AddCommand(&crouter.Command{
+		Name:        "SetFlags",
+		Description: "Set a term's flags",
+
+		CustomPermissions: []func(*crouter.Ctx) (string, bool){c.checkOwner},
+
+		Command: c.setFlags,
+	})
 }
 
 func (c *commands) checkOwner(ctx *crouter.Ctx) (string, bool) {

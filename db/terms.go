@@ -3,38 +3,28 @@ package db
 import (
 	"context"
 	"errors"
-	"fmt"
-	"strings"
-	"time"
+	"math/rand"
 
-	"github.com/bwmarrin/discordgo"
 	"github.com/georgysavva/scany/pgxscan"
 )
 
 // EmbedColour is the embed colour used throughout the bot
-const EmbedColour = 0xc1302e
-
-// Term holds info on a single term
-type Term struct {
-	ID           int
-	Category     int
-	CategoryName string
-	Name         string
-	Aliases      []string
-	Description  string
-	Source       string
-	Created      time.Time
-
-	// Rank is only populated with db.Search()
-	Rank float64
-	// Headline is only populated with db.Search()
-	Headline string
-}
+const EmbedColour = 0xe00d7a
 
 // Errors related to database operations
 var (
 	ErrorNoRowsAffected = errors.New("no rows affected")
 )
+
+// GetTerms gets all terms not blocked by the given mask
+func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
+	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags
+	from public.terms as t, public.categories as c
+	where t.flags & $1 = 0
+	order by t.id`, mask)
+	return terms, err
+}
 
 // Search searches the database for terms
 func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
@@ -42,12 +32,13 @@ func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 		limit = 50
 	}
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created,
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags,
 	ts_rank_cd(t.searchtext, websearch_to_tsquery('english', $1), 32) as rank,
 	ts_headline(t.description, websearch_to_tsquery('english', $1), 'StartSel=**, StopSel=**') as headline
-	from public.terms as t, public.categories as c where t.searchtext @@ websearch_to_tsquery('english', $1) and t.category = c.id
+	from public.terms as t, public.categories as c
+	where t.searchtext @@ websearch_to_tsquery('english', $1) and t.category = c.id and t.flags & $3 = 0
 	order by rank
-	limit $2`, input, limit)
+	limit $2`, input, limit, FlagSearchHidden)
 	return terms, err
 }
 
@@ -73,39 +64,38 @@ func (db *Db) RemoveTerm(id int) (err error) {
 func (db *Db) GetTerm(id int) (t *Term, err error) {
 	t = &Term{}
 	err = pgxscan.Get(context.Background(), db.Pool, t, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created from public.terms as t, public.categories as c where t.id = $1`, id)
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags from public.terms as t, public.categories as c where t.id = $1`, id)
 	return t, err
 }
 
-// TermEmbed creates a Discord embed from a term object
-func (t *Term) TermEmbed() *discordgo.MessageEmbed {
-	if t == nil {
-		return nil
+// RandomTerm gets a random term from the database
+func (db *Db) RandomTerm() (t *Term, err error) {
+	var terms []*Term
+	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags
+	from public.terms as t, public.categories as c
+	where t.flags & $1 = 0
+	order by t.id`, FlagRandomHidden)
+	if err != nil {
+		return
 	}
 
-	fields := make([]*discordgo.MessageEmbedField, 0)
-	if len(t.Aliases) != 0 {
-		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:  "Synonyms",
-			Value: strings.Join(t.Aliases, ", "),
-		})
+	if len(terms) == 1 {
+		return terms[0], nil
 	}
 
-	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:  "Source",
-		Value: t.Source,
-	})
+	n := rand.Intn(len(terms) - 1)
+	return terms[n], nil
+}
 
-	e := &discordgo.MessageEmbed{
-		Title:       t.Name,
-		Description: t.Description,
-		Color:       EmbedColour,
-		Timestamp:   t.Created.Format(time.RFC3339),
-		Fields:      fields,
-		Footer: &discordgo.MessageEmbedFooter{
-			Text: fmt.Sprintf("ID: %v | Category: %v (ID: %v) | Created", t.ID, t.CategoryName, t.Category),
-		},
+// SetFlags sets the flags for a term
+func (db *Db) SetFlags(id int, flags TermFlag) (err error) {
+	commandTag, err := db.Pool.Exec(context.Background(), "update public.terms set flags = $1 where id = $2", flags, id)
+	if err != nil {
+		return
+	}
+	if commandTag.RowsAffected() != 1 {
+		return ErrorNoRowsAffected
 	}
 
-	return e
+	return
 }

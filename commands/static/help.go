@@ -35,7 +35,7 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:  "Terms",
-				Value: "`search`: search the database for a term (alias: `s`)\n`term`: get a term by its ID, useful for mods posting in a channel",
+				Value: "`search`: search the database for a term (alias: `s`)\n`random`: show a random term (alias: `r`)\n`term`: get a term by its ID, useful for mods posting in a channel",
 			},
 			{
 				Name:  "Explanations",
@@ -43,7 +43,7 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:  "For staff",
-				Value: "You can blacklist most commands, with the exception of `explain`, using the following commands:\n`blacklist`: show the current blacklist\n`blacklist add`: add a channel to the blacklist\n`blacklist remove`: remove a channel from the blacklist",
+				Value: fmt.Sprintf("You can blacklist most commands, with the exception of `explain`, using the following commands:\n`blacklist`: show the current blacklist\n`blacklist add`: add a channel to the blacklist\n`blacklist remove`: remove a channel from the blacklist\n\nTo stop %v from responding in a channel completely, deny it the \"Read Messages\" permission in that channel.", ctx.BotUser.Username),
 			},
 		},
 	}

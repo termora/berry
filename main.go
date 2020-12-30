@@ -44,6 +44,8 @@ func main() {
 	r := crouter.NewRouter(dg, c.Bot.BotOwners, c.Bot.Prefixes)
 	// set blacklist function
 	r.Blacklist(d.CtxInBlacklist)
+	// set post-command log function
+	r.PostFunc = postFunc
 
 	// add the message create handler
 	dg.AddHandler(r.MessageCreate)

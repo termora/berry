@@ -15,7 +15,7 @@ func Init(db *db.Db, r *crouter.Router) {
 	c := &commands{db: db}
 
 	g := r.AddGroup(&crouter.Group{
-		Name:        "Blacklist",
+		Name:        "blacklist",
 		Description: "Manage this server's blacklist",
 		Command: &crouter.Command{
 			Name:    "Show",
@@ -27,7 +27,7 @@ func Init(db *db.Db, r *crouter.Router) {
 	})
 
 	g.AddCommand(&crouter.Command{
-		Name:        "Add",
+		Name:        "add",
 		Description: "Add a channel to the blacklist",
 		Usage:       "<channel>",
 
@@ -36,7 +36,7 @@ func Init(db *db.Db, r *crouter.Router) {
 	})
 
 	g.AddCommand(&crouter.Command{
-		Name:        "Remove",
+		Name:        "remove",
 		Description: "Remove a channel from the blacklist",
 		Usage:       "<channel>",
 

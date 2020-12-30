@@ -19,8 +19,8 @@ func Init(db *db.Db, s *zap.SugaredLogger, r *crouter.Router) {
 	c := commands{Db: db, Sugar: s}
 
 	r.AddCommand(&crouter.Command{
-		Name:    "Search",
-		Aliases: []string{"S"},
+		Name:    "search",
+		Aliases: []string{"s"},
 
 		Description: "Search for a term",
 		Usage:       "<search term>",
@@ -32,8 +32,20 @@ func Init(db *db.Db, s *zap.SugaredLogger, r *crouter.Router) {
 	})
 
 	r.AddCommand(&crouter.Command{
-		Name:    "Explain",
-		Aliases: []string{"E", "Ex"},
+		Name:    "random",
+		Aliases: []string{"r"},
+
+		Description: "Show a random term",
+
+		Cooldown:      3 * time.Second,
+		Blacklistable: true,
+
+		Command: c.random,
+	})
+
+	r.AddCommand(&crouter.Command{
+		Name:    "explain",
+		Aliases: []string{"e", "ex"},
 
 		Description: "",
 		Usage:       "[explanation]",
@@ -42,6 +54,15 @@ func Init(db *db.Db, s *zap.SugaredLogger, r *crouter.Router) {
 		Blacklistable: false,
 
 		Command: c.explanation,
+	})
+
+	r.AddCommand(&crouter.Command{
+		Name:        "list",
+		Description: "List all terms",
+
+		Cooldown:      3 * time.Second,
+		Blacklistable: true,
+		Command:       c.list,
 	})
 }
 

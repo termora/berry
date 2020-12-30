@@ -1,10 +1,13 @@
 package db
 
 // DBVersion is the current database version
-const DBVersion = 1
+const DBVersion = 2
 
 // DBVersions is a slice of schemas for every database version
-var DBVersions []string = []string{""}
+var DBVersions []string = []string{
+	`alter table public.terms add column flags integer not null default 0;
+    update public.info set schema_version = 2;`,
+}
 
 // initDBSql is the initial SQL database schema
 var initDBSql = `create table if not exists admins (

@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
-	github.com/Starshine113/crouter v0.5.3
+	github.com/Starshine113/crouter v0.6.0
 	github.com/Starshine113/pkgo v0.1.0
 	github.com/bwmarrin/discordgo v0.22.0
 	github.com/georgysavva/scany v0.2.7

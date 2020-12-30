@@ -27,6 +27,8 @@ github.com/Starshine113/crouter v0.5.2 h1:j7oUU8UdCYsI8gMRYNWTw2krBb/9TovYBHbnEg
 github.com/Starshine113/crouter v0.5.2/go.mod h1:2fRQTX78V3lVOd6h+Q3Kv6BhM+v+n+OQkYP/mMRfuPs=
 github.com/Starshine113/crouter v0.5.3 h1:7GP+JuiFdvJKdXAT6EsDAYmmqpBRH3Cx2AES9i5xxS0=
 github.com/Starshine113/crouter v0.5.3/go.mod h1:2fRQTX78V3lVOd6h+Q3Kv6BhM+v+n+OQkYP/mMRfuPs=
+github.com/Starshine113/crouter v0.6.0 h1:tLlwTFSPMuQ4eFKjK7E3DmmtrbzeGFQ2byxJHi7KF2M=
+github.com/Starshine113/crouter v0.6.0/go.mod h1:2fRQTX78V3lVOd6h+Q3Kv6BhM+v+n+OQkYP/mMRfuPs=
 github.com/Starshine113/pkgo v0.1.0 h1:1G/kqpbsjZO21L7DgR18U3aVl38rmuwqwCDwmfTA5ic=
 github.com/Starshine113/pkgo v0.1.0/go.mod h1:QCVBagv4HQgZJ0lsTnrejfA1er1iEu5DhKq8gtRyIC0=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
