@@ -52,7 +52,7 @@ func (c *commands) about(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Source code",
-				Value:  "[GitHub](https://github.com/Starshine113/covebotnt) / Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
+				Value:  "[GitHub](https://github.com/Starshine113/termbot) / Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
 				Inline: false,
 			},
 		},

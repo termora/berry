@@ -35,7 +35,7 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:  "Terms",
-				Value: "`search`: search the database for a term (alias: `s`)\n`random`: show a random term (alias: `r`)\n`term`: get a term by its ID, useful for mods posting in a channel",
+				Value: "`search`: search the database for a term (alias: `s`)\n`random`: show a random term (alias: `r`)",
 			},
 			{
 				Name:  "Explanations",
