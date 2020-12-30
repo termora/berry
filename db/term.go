@@ -22,7 +22,7 @@ const (
 type Term struct {
 	ID           int       `json:"id"`
 	Category     int       `json:"category"`
-	CategoryName string    `json:"-"`
+	CategoryName string    `json:"category_name"`
 	Name         string    `json:"name"`
 	Aliases      []string  `json:"aliases"`
 	Description  string    `json:"description"`
