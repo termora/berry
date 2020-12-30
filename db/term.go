@@ -18,10 +18,6 @@ const (
 	FlagShowWarning
 )
 
-func init() {
-	fmt.Printf("Search: %v\nRandom: %v\nWarning: %v\nSearch + Random: %v\nSearch + Warning: %v\nRandom + Warning: %v\nAll: %v\n", FlagSearchHidden, FlagRandomHidden, FlagShowWarning, FlagSearchHidden|FlagRandomHidden, FlagSearchHidden|FlagShowWarning, FlagRandomHidden|FlagShowWarning, FlagSearchHidden|FlagRandomHidden|FlagShowWarning)
-}
-
 // Term holds info on a single term
 type Term struct {
 	ID           int
