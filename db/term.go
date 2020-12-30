@@ -20,21 +20,21 @@ const (
 
 // Term holds info on a single term
 type Term struct {
-	ID           int
-	Category     int
-	CategoryName string
-	Name         string
-	Aliases      []string
-	Description  string
-	Source       string
-	Created      time.Time
+	ID           int       `json:"id"`
+	Category     int       `json:"category"`
+	CategoryName string    `json:"-"`
+	Name         string    `json:"name"`
+	Aliases      []string  `json:"aliases"`
+	Description  string    `json:"description"`
+	Source       string    `json:"source"`
+	Created      time.Time `json:"created"`
 
-	Flags TermFlag
+	Flags TermFlag `json:"flags"`
 
 	// Rank is only populated with db.Search()
-	Rank float64
+	Rank float64 `json:"-"`
 	// Headline is only populated with db.Search()
-	Headline string
+	Headline string `json:"-"`
 }
 
 // SearchHidden returns true if the term is hidden from search results

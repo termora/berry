@@ -60,6 +60,16 @@ func Init(db *db.Db, conf *structs.BotConfig, r *crouter.Router) {
 
 		Command: c.setFlags,
 	})
+
+	r.AddCommand(&crouter.Command{
+		Name:        "Export",
+		Description: "Export all terms",
+		Usage:       "[-gz] [-channel <ChannelID/Mention>]",
+
+		CustomPermissions: []func(*crouter.Ctx) (string, bool){c.checkOwner},
+
+		Command: c.export,
+	})
 }
 
 func (c *commands) checkOwner(ctx *crouter.Ctx) (string, bool) {
