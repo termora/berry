@@ -2,3 +2,4 @@ config.yaml
 termbot
 .idea
 *.code-workspace
+api/config.yaml

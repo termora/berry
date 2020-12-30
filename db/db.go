@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
-	"github.com/Starshine113/termbot/structs"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
 )
@@ -19,12 +18,12 @@ type Db struct {
 }
 
 // Init ...
-func Init(c *structs.BotConfig, sugar *zap.SugaredLogger) (db *Db, err error) {
+func Init(url string, sugar *zap.SugaredLogger) (db *Db, err error) {
 	guildCache := ttlcache.NewCache()
 	guildCache.SetCacheSizeLimit(100)
 	guildCache.SetTTL(10 * time.Minute)
 
-	pool, err := initDB(c)
+	pool, err := initDB(url)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +37,8 @@ func Init(c *structs.BotConfig, sugar *zap.SugaredLogger) (db *Db, err error) {
 	return
 }
 
-func initDB(config *structs.BotConfig) (*pgxpool.Pool, error) {
-	db, err := pgxpool.Connect(context.Background(), config.Auth.DatabaseURL)
+func initDB(url string) (*pgxpool.Pool, error) {
+	db, err := pgxpool.Connect(context.Background(), url)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to connect to database: %w", err)
 	}

@@ -13,13 +13,16 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+const eVersion = 1
+
 type e struct {
+	Version    int        `json:"export_version"`
 	ExportDate time.Time  `json:"export_date"`
 	Terms      []*db.Term `json:"terms"`
 }
 
 func (c *commands) export(ctx *crouter.Ctx) (err error) {
-	export := e{ExportDate: time.Now().UTC()}
+	export := e{ExportDate: time.Now().UTC(), Version: eVersion}
 
 	fp, _ := flagparser.NewFlagParser(flagparser.Bool("gzip", "gz"), flagparser.String("out", "o", "output"))
 

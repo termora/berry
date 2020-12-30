@@ -29,7 +29,7 @@ func main() {
 
 	c := getConfig(sugar)
 
-	d, err := db.Init(c, sugar)
+	d, err := db.Init(c.Auth.DatabaseURL, sugar)
 	if err != nil {
 		sugar.Fatalf("Error connecting to database: %v", err)
 	}
