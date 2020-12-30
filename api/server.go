@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/signal"
 	"strings"
@@ -16,7 +15,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type router struct {
+type api struct {
 	db    *db.Db
 	conf  conf
 	sugar *zap.SugaredLogger
@@ -39,7 +38,7 @@ func main() {
 		panic(err)
 	}
 	err = yaml.Unmarshal(configFile, &c)
-	log.Println("Loaded configuration file.")
+	sugar.Info("Loaded configuration file.")
 
 	d, err := db.Init(c.DatabaseURL, sugar)
 	if err != nil {
@@ -47,13 +46,14 @@ func main() {
 	}
 	sugar.Info("Connected to database.")
 
-	r := router{db: d, conf: c, sugar: sugar}
+	r := api{db: d, conf: c, sugar: sugar}
 
 	e := echo.New()
 	e.Use(middleware.Logger())
 
 	e.GET("/api/v1/search/:term", r.search)
 	e.GET("/api/v1/term/:id", r.term)
+	e.GET("/api/v1/list", r.list)
 
 	// get port
 	port := c.Port

@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *router) search(c echo.Context) (err error) {
+func (r *api) search(c echo.Context) (err error) {
 	terms, err := r.db.Search(c.Param("term"), 0)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
@@ -23,7 +23,7 @@ func (r *router) search(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, terms)
 }
 
-func (r *router) term(c echo.Context) (err error) {
+func (r *api) term(c echo.Context) (err error) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
