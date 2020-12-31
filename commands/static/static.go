@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/Starshine113/crouter"
-	"github.com/Starshine113/termbot/structs"
+	"github.com/Starshine113/berry/structs"
 )
 
 type commands struct {

@@ -1,5 +1,7 @@
 config.yaml
 termbot
+api/api
+berry
 .idea
 *.code-workspace
 api/config.yaml

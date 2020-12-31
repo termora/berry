@@ -5,15 +5,16 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"go.uber.org/zap"
 
+	"github.com/Starshine113/berry/commands/admin"
+	"github.com/Starshine113/berry/commands/search"
+	"github.com/Starshine113/berry/commands/server"
+	"github.com/Starshine113/berry/commands/static"
+	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/crouter"
-	"github.com/Starshine113/termbot/commands/admin"
-	"github.com/Starshine113/termbot/commands/search"
-	"github.com/Starshine113/termbot/commands/server"
-	"github.com/Starshine113/termbot/commands/static"
-	"github.com/Starshine113/termbot/db"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -50,10 +51,21 @@ func main() {
 	// add the message create handler
 	dg.AddHandler(r.MessageCreate)
 
-	// set status on connect
-	dg.AddHandler(func(s *discordgo.Session, _ *discordgo.Ready) {
-		if err := s.UpdateStatus(0, fmt.Sprintf("%vhelp", c.Bot.Prefixes[0])); err != nil {
-			sugar.Errorf("Error setting status: %v", err)
+	// start loop to update status every minute
+	dg.AddHandlerOnce(func(s *discordgo.Session, _ *discordgo.Ready) {
+		for {
+			if err := s.UpdateStatus(0, fmt.Sprintf("%vhelp | in %v servers", c.Bot.Prefixes[0], len(s.State.Guilds))); err != nil {
+				sugar.Errorf("Error setting status: %v", err)
+			}
+			time.Sleep(time.Minute)
+			// if a URL isn't set, just loop back immediately
+			if c.Bot.Website == "" {
+				continue
+			}
+			if err := s.UpdateStatus(0, fmt.Sprintf("%vhelp | %v", c.Bot.Prefixes[0], c.Bot.Website)); err != nil {
+				sugar.Errorf("Error setting status: %v", err)
+			}
+			time.Sleep(time.Minute)
 		}
 	})
 

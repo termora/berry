@@ -11,5 +11,6 @@ type BotConfig struct {
 		BotOwners    []string `yaml:"bot_owners"`
 		AdminServer  string   `yaml:"admin_server"`
 		ServerInvite string   `yaml:"support_server"`
+		Website      string
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/Starshine113/crouter"
-	"github.com/Starshine113/termbot/db"
+	"github.com/Starshine113/berry/db"
 )
 
 func (c *commands) explanation(ctx *crouter.Ctx) (err error) {

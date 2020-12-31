@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/Starshine113/crouter"
-	"github.com/Starshine113/termbot/db"
+	"github.com/Starshine113/berry/db"
 )
 
 func (c *commands) setFlags(ctx *crouter.Ctx) (err error) {

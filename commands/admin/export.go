@@ -9,7 +9,7 @@ import (
 
 	"github.com/Starshine113/crouter"
 	"github.com/Starshine113/flagparser"
-	"github.com/Starshine113/termbot/db"
+	"github.com/Starshine113/berry/db"
 	"github.com/bwmarrin/discordgo"
 )
 

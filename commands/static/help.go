@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/Starshine113/crouter"
-	"github.com/Starshine113/termbot/db"
+	"github.com/Starshine113/berry/db"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -21,6 +21,31 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 		return
 	}
 
+	if ctx.RawArgs == "privacy" || ctx.RawArgs == "privacy-policy" {
+		_, err = ctx.Embed("Privacy", fmt.Sprintf(`We're not lawyers, we don't want to write a document that no one will (or even can) read.
+
+		This is the data %v collects:
+		
+		- Data about commands run: command, arguments, user ID, and channel ID, used exclusively for debugging purposes and automatically removed when the bot's logs are rotated
+		- A list of blacklisted channels per server
+		
+		This is the data %v stores in memory, and which is wiped on a restart:
+		
+		- Message metadata *for its own messages*
+		- Message metadata for messages that trigger commands
+		
+		This is the data %v does *not* collect:
+		
+		- Any message contents
+		- Any user information
+		- Information about messages that do not trigger commands
+		
+		Additionally, there are daily database backups, which only include a list of blacklisted channels (as well as all terms/explanations).
+		
+		%v is open source, and its source code is available [on GitHub](https://github.com/Starshine113/Berry). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.BotUser.Username, ctx.BotUser.Username, ctx.BotUser.Username, ctx.BotUser.Username), db.EmbedColour)
+		return err
+	}
+
 	e := &discordgo.MessageEmbed{
 		Color: db.EmbedColour,
 		Title: "Help",
@@ -31,7 +56,7 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:  "Bot info",
-				Value: "`help`: show a list of commands, and some info about the bot\n`about`: show more in-depth info about the bot.\n`ping`: check the bot's latency\n`hello`: say hi to the bot!\n`invite`: get an invite link for the bot",
+				Value: "`help`: show a list of commands, and some info about the bot\n`help privacy`: show the bot's privacy policy\n`about`: show more in-depth info about the bot.\n`ping`: check the bot's latency\n`hello`: say hi to the bot!\n`invite`: get an invite link for the bot",
 			},
 			{
 				Name:  "Terms",

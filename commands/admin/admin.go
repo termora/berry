@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/Starshine113/crouter"
-	"github.com/Starshine113/termbot/db"
-	"github.com/Starshine113/termbot/structs"
+	"github.com/Starshine113/berry/db"
+	"github.com/Starshine113/berry/structs"
 	"github.com/bwmarrin/discordgo"
 )
 

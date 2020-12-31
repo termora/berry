@@ -1,8 +1,8 @@
-# `termbot`
+# Berry
 
 ## License
 
-Termbot is a searchable glossary bot for Discord  
+Berry is a searchable glossary bot for Discord  
 Copyright (C) 2020, Starshine System
 
 This program is free software: you can redistribute it and/or modify

@@ -1,4 +1,4 @@
-module github.com/Starshine113/termbot
+module github.com/Starshine113/berry
 
 go 1.15
 
@@ -7,6 +7,7 @@ require (
 	github.com/Starshine113/crouter v0.6.0
 	github.com/Starshine113/flagparser v0.0.0-20201102154835-0b7a32bf8cec
 	github.com/Starshine113/pkgo v0.1.0
+	github.com/Starshine113/berry v0.0.0-20201230213736-6a4a4b02f727
 	github.com/bwmarrin/discordgo v0.22.0
 	github.com/georgysavva/scany v0.2.7
 	github.com/jackc/pgx/v4 v4.10.1

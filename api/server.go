@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/termbot/db"
+	"github.com/Starshine113/berry/db"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.uber.org/zap"

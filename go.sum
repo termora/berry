@@ -10,6 +10,8 @@ github.com/Starshine113/flagparser v0.0.0-20201102154835-0b7a32bf8cec h1:eG39FQ+
 github.com/Starshine113/flagparser v0.0.0-20201102154835-0b7a32bf8cec/go.mod h1:xu7tCzkCWcronW9zn5WQarF/FHplLGEJkAPRNjAOEik=
 github.com/Starshine113/pkgo v0.1.0 h1:1G/kqpbsjZO21L7DgR18U3aVl38rmuwqwCDwmfTA5ic=
 github.com/Starshine113/pkgo v0.1.0/go.mod h1:QCVBagv4HQgZJ0lsTnrejfA1er1iEu5DhKq8gtRyIC0=
+github.com/Starshine113/berry v0.0.0-20201230213736-6a4a4b02f727 h1:gAOhe7Y0c+s1dkb8bsmnys1/kqmLgA2fWEXcBJ2WewI=
+github.com/Starshine113/berry v0.0.0-20201230213736-6a4a4b02f727/go.mod h1:Z7YBqh1/kgZfmA+9lnmKShNDXXGf6fKIMw6D7BwraGs=
 github.com/bwmarrin/discordgo v0.22.0 h1:uBxY1HmlVCsW1IuaPjpCGT6A2DBwRn0nvOguQIxDdFM=
 github.com/bwmarrin/discordgo v0.22.0/go.mod h1:c1WtWUGN6nREDmzIpyTp/iD3VYt4Fpx+bVyfBG7JE+M=
 github.com/cockroachdb/apd v1.1.0 h1:3LFP3629v+1aKXU5Q37mxmRxX/pIu1nijXydLShEq5I=

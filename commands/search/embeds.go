@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Starshine113/termbot/db"
+	"github.com/Starshine113/berry/db"
 	"github.com/bwmarrin/discordgo"
 )
 

@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/Starshine113/crouter"
-	"github.com/Starshine113/termbot/db"
+	"github.com/Starshine113/berry/db"
 	"github.com/bwmarrin/discordgo"
 )
 
-var botVersion = "v0.1"
+var botVersion = "v0.2"
 
 func (c *commands) about(ctx *crouter.Ctx) (err error) {
 	owner, err := ctx.Session.User(c.config.Bot.BotOwners[0])
@@ -52,7 +52,7 @@ func (c *commands) about(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Source code",
-				Value:  "[GitHub](https://github.com/Starshine113/termbot) / Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
+				Value:  "[GitHub](https://github.com/Starshine113/berry) / Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
 				Inline: false,
 			},
 		},

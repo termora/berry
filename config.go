@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/Starshine113/termbot/structs"
+	"github.com/Starshine113/berry/structs"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )

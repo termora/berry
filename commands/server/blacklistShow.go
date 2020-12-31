@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Starshine113/crouter"
-	"github.com/Starshine113/termbot/db"
+	"github.com/Starshine113/berry/db"
 )
 
 func (c *commands) blacklist(ctx *crouter.Ctx) (err error) {
