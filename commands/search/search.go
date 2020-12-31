@@ -64,6 +64,16 @@ func Init(db *db.Db, s *zap.SugaredLogger, r *crouter.Router) {
 		Blacklistable: true,
 		Command:       c.list,
 	})
+
+	r.AddCommand(&crouter.Command{
+		Name:        "post",
+		Description: "Post a single term",
+		Usage:       "<term ID> [channel]",
+
+		Cooldown:      3 * time.Second,
+		Blacklistable: true,
+		Command:       c.term,
+	})
 }
 
 func (c *commands) search(ctx *crouter.Ctx) (err error) {
