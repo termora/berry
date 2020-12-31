@@ -65,7 +65,7 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:  "Terms",
-				Value: "`search`: search the database for a term (alias: `s`)\n`random`: show a random term (alias: `r`)",
+				Value: "`search`: search the database for a term (alias: `s`)\n`random`: show a random term (alias: `r`)\n`post`: post a single term by ID. You need the **Manage Messages** permission to use this.",
 			},
 			{
 				Name:  "Explanations",
