@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Starshine113/crouter"
 	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/berry/misc"
+	"github.com/Starshine113/crouter"
 )
 
 func (c *commands) list(ctx *crouter.Ctx) (err error) {
@@ -21,7 +21,7 @@ func (c *commands) list(ctx *crouter.Ctx) (err error) {
 
 	termSlices := make([][]string, 0)
 
-	for i := 0; i < len(s); i += 10 {
+	for i := 0; i < len(s); i += 5 {
 		end := i + 5
 
 		if end > len(s) {
