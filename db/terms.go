@@ -37,7 +37,7 @@ func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 	ts_headline(t.description, websearch_to_tsquery('english', $1), 'StartSel=**, StopSel=**') as headline
 	from public.terms as t, public.categories as c
 	where t.searchtext @@ websearch_to_tsquery('english', $1) and t.category = c.id and t.flags & $3 = 0
-	order by rank
+	order by rank desc
 	limit $2`, input, limit, FlagSearchHidden)
 	return terms, err
 }

@@ -24,7 +24,7 @@ func searchResultEmbed(search string, page, total int, s []*db.Term) *discordgo.
 		if len(t.Aliases) > 0 {
 			name += fmt.Sprintf(" (%v)", strings.Join(t.Aliases, ", "))
 		}
-		desc += fmt.Sprintf("%v **%v** (rank: %v)\n%v\n\n", emoji[i], name, t.Rank, h)
+		desc += fmt.Sprintf("%v **%v**\n%v\n\n", emoji[i], name, h)
 	}
 
 	return &discordgo.MessageEmbed{
