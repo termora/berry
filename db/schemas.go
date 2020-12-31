@@ -1,12 +1,20 @@
 package db
 
 // DBVersion is the current database version
-const DBVersion = 2
+const DBVersion = 3
 
 // DBVersions is a slice of schemas for every database version
 var DBVersions []string = []string{
 	`alter table public.terms add column flags integer not null default 0;
     update public.info set schema_version = 2;`,
+	`alter table public.terms drop column searchtext;
+    alter table public.terms add column searchtext tsvector generated always as (
+        setweight(to_tsvector('english', "name"), 'A') ||
+        setweight(to_tsvector('english', "description"), 'B') ||
+        setweight(to_tsvector('english', "source"), 'C') ||
+        setweight(array_to_tsvector("aliases"), 'A')
+    ) stored;
+    update public.info set schema_version = 3;`,
 }
 
 // initDBSql is the initial SQL database schema
@@ -28,10 +36,10 @@ create table if not exists terms (
 	created     timestamp   not null default (current_timestamp at time zone 'utc'),
 	source      text        not null default 'Unknown',
 	searchtext  tsvector    generated always as (
-        to_tsvector('english', "name") ||
-        to_tsvector('english', "description") ||
-        to_tsvector('english', "source") ||
-        array_to_tsvector("aliases")
+        setweight(to_tsvector('english', "name"), 'A') ||
+        setweight(to_tsvector('english', "description"), 'B') ||
+        setweight(to_tsvector('english', "source"), 'C') ||
+        setweight(array_to_tsvector("aliases"), 'A')
     ) stored
 );
 
