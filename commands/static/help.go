@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Starshine113/crouter"
 	"github.com/Starshine113/berry/db"
+	"github.com/Starshine113/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -46,6 +46,11 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
+	if ctx.RawArgs == "autopost" {
+		_, err = ctx.Embed("Autopost", "To automatically post terms at a set interval, you can use the following custom command for [YAGPDB.xyz](https://yagpdb.xyz/):\n```{{/* Recommended trigger: Minute/Hourly interval */}}\n\nt!random\n{{deleteResponse 1}}```\nOther bots may have similar functionality; if you need a bot whitelisted for commands, feel free to ask on the support server.", db.EmbedColour)
+		return
+	}
+
 	e := &discordgo.MessageEmbed{
 		Color: db.EmbedColour,
 		Title: "Help",
@@ -67,6 +72,10 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 				Value: "`explain`: get a list of all registered explanations (aliases: `e`, `ex`)\n`explain <topic>`: explain the given topic",
 			},
 			{
+				Name:  "Autoposting",
+				Value: fmt.Sprintf("%v can't automatically post terms yet, sorry! However, a couple of bots are whitelisted and can trigger commands, which can be used to emulate an autopost function. See `help autopost` for more info.", ctx.BotUser.Username),
+			},
+			{
 				Name:  "For staff",
 				Value: fmt.Sprintf("You can blacklist most commands, with the exception of `explain`, using the following commands:\n`blacklist`: show the current blacklist\n`blacklist add`: add a channel to the blacklist\n`blacklist remove`: remove a channel from the blacklist\n\nTo stop %v from responding in a channel completely, deny it the \"Read Messages\" permission in that channel.", ctx.BotUser.Username),
 			},
@@ -75,7 +84,7 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 	if c.config.Bot.ServerInvite != "" {
 		e.Fields = append(e.Fields, &discordgo.MessageEmbedField{
 			Name:  "Support server",
-			Value: fmt.Sprintf("Use this link to join the support server: %v", c.config.Bot.ServerInvite),
+			Value: fmt.Sprintf("Use this link to join the support server, for bot questions and term additions/requests: %v", c.config.Bot.ServerInvite),
 		})
 	}
 	_, err = ctx.Send(e)

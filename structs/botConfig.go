@@ -10,7 +10,8 @@ type BotConfig struct {
 		Prefixes     []string
 		BotOwners    []string `yaml:"bot_owners"`
 		AdminServer  string   `yaml:"admin_server"`
-		ServerInvite string   `yaml:"support_server"`
+		ServerInvite string   `yaml:"server_invite"`
 		Website      string
+		AllowedBots  []string `yaml:"allowed_bots"`
 	}
 }

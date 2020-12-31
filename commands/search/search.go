@@ -3,8 +3,8 @@ package search
 import (
 	"time"
 
-	"github.com/Starshine113/crouter"
 	"github.com/Starshine113/berry/db"
+	"github.com/Starshine113/crouter"
 	"github.com/bwmarrin/discordgo"
 	"go.uber.org/zap"
 )

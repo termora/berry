@@ -3,6 +3,8 @@ auth:
   database_url: postgresql://postgres:postgres@localhost/postgres
 
 bot:
-  prefixes: [t;, t!]
-  bot_owners: ["0", "0"]
-  admin_server: "0"
+  prefixes: [t;, t!] # prefixes
+  bot_owners: ["0", "0"] # owners, who can run owner commands
+  admin_server: "0" # admin server, the only server where term management commands can be run
+  server_invite: "" # invite to support server
+  allowed_bots: ["204255221017214977", "235148962103951360"] # IDs of bots allowed to run commands

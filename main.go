@@ -49,7 +49,8 @@ func main() {
 	r.PostFunc = postFunc
 
 	// add the message create handler
-	dg.AddHandler(r.MessageCreate)
+	mc := &messageCreate{r: r, c: c, sugar: sugar}
+	dg.AddHandler(mc.messageCreate)
 
 	// start loop to update status every minute
 	dg.AddHandlerOnce(func(s *discordgo.Session, _ *discordgo.Ready) {
