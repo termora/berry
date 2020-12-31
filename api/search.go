@@ -35,6 +35,5 @@ func (r *api) term(c echo.Context) (err error) {
 		}
 		return c.NoContent(http.StatusInternalServerError)
 	}
-	//return c.JSON(http.StatusOK, term)
-	return c.JSONPretty(http.StatusOK, term, "  ")
+	return c.JSON(http.StatusOK, term)
 }
