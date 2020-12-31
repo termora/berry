@@ -32,9 +32,9 @@ type Term struct {
 	Flags TermFlag `json:"flags"`
 
 	// Rank is only populated with db.Search()
-	Rank float64 `json:"-"`
+	Rank float64 `json:"rank,omitempty"`
 	// Headline is only populated with db.Search()
-	Headline string `json:"-"`
+	Headline string `json:"headline,omitempty"`
 }
 
 // SearchHidden returns true if the term is hidden from search results
