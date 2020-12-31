@@ -59,8 +59,7 @@ func Init(db *db.Db, conf *structs.BotConfig, r *crouter.Router) {
 		Name:        "SetFlags",
 		Description: "Set a term's flags",
 
-		Cooldown:    time.Minute,
-		Permissions: discordgo.PermissionManageMessages,
+		CustomPermissions: []func(*crouter.Ctx) (string, bool){c.checkOwner},
 
 		Command: c.setFlags,
 	})
@@ -70,7 +69,8 @@ func Init(db *db.Db, conf *structs.BotConfig, r *crouter.Router) {
 		Description: "Export all terms",
 		Usage:       "[-gz] [-channel <ChannelID/Mention>]",
 
-		CustomPermissions: []func(*crouter.Ctx) (string, bool){c.checkOwner},
+		Cooldown:    time.Minute,
+		Permissions: discordgo.PermissionManageMessages,
 
 		Command: c.export,
 	})
