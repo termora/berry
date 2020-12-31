@@ -16,6 +16,7 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 		- **Read Message History**: for the %vsearch command to work
 		- **Manage Messages**: to delete reactions on menus
 		- **Embed Links**: to send responses for most commands
+		- **Attach Files**: to send a glossary export
 		- **Add Reactions**: for menus to work
 		- **Use External Emojis**: to use custom emotes in a couple of commands`, ctx.BotUser.Username, ctx.Router.Prefixes[0]), db.EmbedColour)
 		return

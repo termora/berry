@@ -5,8 +5,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/Starshine113/crouter"
 	"github.com/Starshine113/berry/db"
+	"github.com/Starshine113/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -69,6 +69,7 @@ func invite(ctx *crouter.Ctx) string {
 		discordgo.PermissionSendMessages +
 		discordgo.PermissionManageMessages +
 		discordgo.PermissionEmbedLinks +
+		discordgo.PermissionAttachFiles +
 		discordgo.PermissionUseExternalEmojis +
 		discordgo.PermissionAddReactions
 
