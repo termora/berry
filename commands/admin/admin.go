@@ -3,9 +3,9 @@ package admin
 import (
 	"time"
 
-	"github.com/Starshine113/crouter"
 	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/berry/structs"
+	"github.com/Starshine113/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -73,6 +73,14 @@ func Init(db *db.Db, conf *structs.BotConfig, r *crouter.Router) {
 		CustomPermissions: []func(*crouter.Ctx) (string, bool){c.checkOwner},
 
 		Command: c.export,
+	})
+
+	r.AddCommand(&crouter.Command{
+		Name:        "Guilds",
+		Description: "List all guilds the bot is in",
+
+		OwnerOnly: true,
+		Command:   c.guilds,
 	})
 }
 
