@@ -80,7 +80,7 @@ func main() {
 	server.Init(d, r)
 
 	// add admin commands
-	admin.Init(d, c, r)
+	admin.Init(d, sugar, c, r)
 
 	// add intents
 	dg.Identify.Intents = discordgo.MakeIntent(crouter.RequiredIntents)

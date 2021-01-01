@@ -7,15 +7,17 @@ import (
 	"github.com/Starshine113/berry/structs"
 	"github.com/Starshine113/crouter"
 	"github.com/bwmarrin/discordgo"
+	"go.uber.org/zap"
 )
 
 type commands struct {
 	db     *db.Db
 	config *structs.BotConfig
+	sugar  *zap.SugaredLogger
 }
 
 // Init ...
-func Init(db *db.Db, conf *structs.BotConfig, r *crouter.Router) {
+func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *crouter.Router) {
 	c := &commands{db: db, config: conf}
 
 	r.AddCommand(&crouter.Command{
@@ -62,6 +64,15 @@ func Init(db *db.Db, conf *structs.BotConfig, r *crouter.Router) {
 		CustomPermissions: []func(*crouter.Ctx) (string, bool){c.checkOwner},
 
 		Command: c.setFlags,
+	})
+
+	r.AddCommand(&crouter.Command{
+		Name:        "SetCW",
+		Description: "Set a term's CW",
+
+		CustomPermissions: []func(*crouter.Ctx) (string, bool){c.checkOwner},
+
+		Command: c.setCW,
 	})
 
 	r.AddCommand(&crouter.Command{

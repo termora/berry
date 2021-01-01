@@ -19,7 +19,7 @@ var (
 // GetTerms gets all terms not blocked by the given mask
 func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags, t.content_warnings
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0
 	order by t.id`, mask)
@@ -32,7 +32,7 @@ func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 		limit = 50
 	}
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags,
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags, t.content_warnings,
 	ts_rank_cd(t.searchtext, websearch_to_tsquery('english', $1), 32) as rank,
 	ts_headline(t.description, websearch_to_tsquery('english', $1), 'StartSel=**, StopSel=**') as headline
 	from public.terms as t, public.categories as c
@@ -64,14 +64,14 @@ func (db *Db) RemoveTerm(id int) (err error) {
 func (db *Db) GetTerm(id int) (t *Term, err error) {
 	t = &Term{}
 	err = pgxscan.Get(context.Background(), db.Pool, t, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags from public.terms as t, public.categories as c where t.id = $1`, id)
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.content_warnings, t.flags from public.terms as t, public.categories as c where t.id = $1`, id)
 	return t, err
 }
 
 // RandomTerm gets a random term from the database
 func (db *Db) RandomTerm() (t *Term, err error) {
 	var terms []*Term
-	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags
+	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.content_warnings, t.flags
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0
 	order by t.id`, FlagRandomHidden)
@@ -90,6 +90,19 @@ func (db *Db) RandomTerm() (t *Term, err error) {
 // SetFlags sets the flags for a term
 func (db *Db) SetFlags(id int, flags TermFlag) (err error) {
 	commandTag, err := db.Pool.Exec(context.Background(), "update public.terms set flags = $1 where id = $2", flags, id)
+	if err != nil {
+		return
+	}
+	if commandTag.RowsAffected() != 1 {
+		return ErrorNoRowsAffected
+	}
+
+	return
+}
+
+// SetCW sets the content warning for a term
+func (db *Db) SetCW(id int, text string) (err error) {
+	commandTag, err := db.Pool.Exec(context.Background(), "update public.terms set content_warnings = $1 where id = $2", text, id)
 	if err != nil {
 		return
 	}

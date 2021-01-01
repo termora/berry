@@ -20,14 +20,15 @@ const (
 
 // Term holds info on a single term
 type Term struct {
-	ID           int       `json:"id"`
-	Category     int       `json:"-"`
-	CategoryName string    `json:"category"`
-	Name         string    `json:"name"`
-	Aliases      []string  `json:"aliases"`
-	Description  string    `json:"description"`
-	Source       string    `json:"source"`
-	Created      time.Time `json:"created"`
+	ID              int       `json:"id"`
+	Category        int       `json:"-"`
+	CategoryName    string    `json:"category"`
+	Name            string    `json:"name"`
+	Aliases         []string  `json:"aliases"`
+	Description     string    `json:"description"`
+	Source          string    `json:"source"`
+	Created         time.Time `json:"created"`
+	ContentWarnings string    `json:"content_warnings,omitempty"`
 
 	Flags TermFlag `json:"flags"`
 
@@ -66,6 +67,15 @@ func (t *Term) TermEmbed() *discordgo.MessageEmbed {
 		})
 	}
 
+	desc := t.Description
+	if t.ContentWarnings != "" {
+		desc = "||" + t.Description + "||"
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:  "Content warning",
+			Value: t.ContentWarnings,
+		})
+	}
+
 	if t.Warning() {
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:  "Warning",
@@ -80,7 +90,7 @@ func (t *Term) TermEmbed() *discordgo.MessageEmbed {
 
 	e := &discordgo.MessageEmbed{
 		Title:       t.Name,
-		Description: t.Description,
+		Description: desc,
 		Color:       EmbedColour,
 		Timestamp:   t.Created.Format(time.RFC3339),
 		Fields:      fields,
