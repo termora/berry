@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Starshine113/berry/db"
@@ -14,6 +15,8 @@ type commands struct {
 	db     *db.Db
 	config *structs.BotConfig
 	sugar  *zap.SugaredLogger
+
+	admins []string
 }
 
 // Init ...
@@ -93,6 +96,15 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *crout
 		OwnerOnly: true,
 		Command:   c.guilds,
 	})
+
+	r.AddCommand(&crouter.Command{
+		Name:        "AddAdmin",
+		Description: "Add an admin",
+		Usage:       "<user ID/mention>",
+
+		OwnerOnly: true,
+		Command:   c.addAdmin,
+	})
 }
 
 func (c *commands) checkOwner(ctx *crouter.Ctx) (string, bool) {
@@ -106,5 +118,22 @@ func (c *commands) checkOwner(ctx *crouter.Ctx) (string, bool) {
 			return "", true
 		}
 	}
+
+	if len(c.admins) == 0 {
+		admins, err := c.db.GetAdmins()
+		fmt.Println(admins, err)
+		if err != nil {
+			c.sugar.Error("Error getting admins:", err)
+			return "Bot Admin", false
+		}
+		c.admins = admins
+	}
+
+	for _, id := range c.admins {
+		if id == ctx.Author.ID {
+			return "", true
+		}
+	}
+
 	return "Bot Admin", false
 }
