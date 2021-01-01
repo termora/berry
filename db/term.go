@@ -21,7 +21,7 @@ const (
 // Term holds info on a single term
 type Term struct {
 	ID              int       `json:"id"`
-	Category        int       `json:"-"`
+	Category        int       `json:"category_id"`
 	CategoryName    string    `json:"category"`
 	Name            string    `json:"name"`
 	Aliases         []string  `json:"aliases"`
