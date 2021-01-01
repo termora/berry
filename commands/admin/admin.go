@@ -79,6 +79,15 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *crout
 	})
 
 	r.AddCommand(&crouter.Command{
+		Name:        "EditTerm",
+		Description: "Edit a term",
+
+		CustomPermissions: []func(*crouter.Ctx) (string, bool){c.checkOwner},
+
+		Command: c.editTerm,
+	})
+
+	r.AddCommand(&crouter.Command{
 		Name:        "Export",
 		Description: "Export all terms",
 		Usage:       "[-gz] [-channel <ChannelID/Mention>]",

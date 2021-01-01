@@ -6,6 +6,7 @@ import (
 	"math/rand"
 
 	"github.com/georgysavva/scany/pgxscan"
+	"github.com/jackc/pgconn"
 )
 
 // EmbedColour is the embed colour used throughout the bot
@@ -116,6 +117,47 @@ func (db *Db) SetCW(id int, text string) (err error) {
 // UpdateDesc updates the description for a term
 func (db *Db) UpdateDesc(id int, desc string) (err error) {
 	commandTag, err := db.Pool.Exec(context.Background(), "update public.terms set description = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", desc, id)
+	if err != nil {
+		return
+	}
+	if commandTag.RowsAffected() != 1 {
+		return ErrorNoRowsAffected
+	}
+	return
+}
+
+// UpdateSource updates the source for a term
+func (db *Db) UpdateSource(id int, source string) (err error) {
+	commandTag, err := db.Pool.Exec(context.Background(), "update public.terms set source = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", source, id)
+	if err != nil {
+		return
+	}
+	if commandTag.RowsAffected() != 1 {
+		return ErrorNoRowsAffected
+	}
+	return
+}
+
+// UpdateTitle updates the title for a term
+func (db *Db) UpdateTitle(id int, title string) (err error) {
+	commandTag, err := db.Pool.Exec(context.Background(), "update public.terms set name = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", title, id)
+	if err != nil {
+		return
+	}
+	if commandTag.RowsAffected() != 1 {
+		return ErrorNoRowsAffected
+	}
+	return
+}
+
+// UpdateAliases updates the aliases for a term
+func (db *Db) UpdateAliases(id int, aliases []string) (err error) {
+	var commandTag pgconn.CommandTag
+	if len(aliases) > 0 {
+		commandTag, err = db.Pool.Exec(context.Background(), "update public.terms set aliases = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", aliases, id)
+	} else {
+		commandTag, err = db.Pool.Exec(context.Background(), "update public.terms set aliases = array[]::text[], last_modified = (current_timestamp at time zone 'utc') where id = $1", id)
+	}
 	if err != nil {
 		return
 	}

@@ -9,6 +9,7 @@ require (
 	github.com/Starshine113/pkgo v0.1.0
 	github.com/bwmarrin/discordgo v0.22.0
 	github.com/georgysavva/scany v0.2.7
+	github.com/jackc/pgconn v1.8.0
 	github.com/jackc/pgx/v4 v4.10.1
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/pkg/errors v0.9.1
