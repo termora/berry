@@ -1,7 +1,7 @@
 package db
 
 // DBVersion is the current database version
-const DBVersion = 5
+const DBVersion = 6
 
 // DBVersions is a slice of schemas for every database version
 var DBVersions []string = []string{
@@ -19,6 +19,11 @@ var DBVersions []string = []string{
     update public.info set schema_version = 4;`,
 	`create index term_names_alphabetical on public.terms (name, id);
     update public.info set schema_version = 5;`,
+	`alter table public.terms add column last_modified timestamp;
+    update public.terms set last_modified = created where last_modified is null;
+    alter table public.terms alter column last_modified set default (current_timestamp at time zone 'utc');
+    alter table public.terms alter column last_modified set not null;
+    update public.info set schema_version = 6;`,
 }
 
 // initDBSql is the initial SQL database schema
