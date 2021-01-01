@@ -3,8 +3,8 @@ package admin
 import (
 	"strings"
 
-	"github.com/Starshine113/crouter"
 	"github.com/Starshine113/berry/db"
+	"github.com/Starshine113/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -82,7 +82,7 @@ func (c *commands) addTerm(ctx *crouter.Ctx) (err error) {
 
 					msg, err := ctx.Send(&discordgo.MessageSend{
 						Content: "Term finished. React with ✅ to finish adding it, or with ❌ to cancel. Preview:",
-						Embed:   t.TermEmbed(),
+						Embed:   t.TermEmbed(""),
 					})
 					if err != nil {
 						return

@@ -24,7 +24,7 @@ func (c *commands) delTerm(ctx *crouter.Ctx) (err error) {
 
 	m, err := ctx.Send(&discordgo.MessageSend{
 		Content: "Are you sure you want to delete this term? React with ✅ to delete it, or with ❌ to cancel.",
-		Embed:   t.TermEmbed(),
+		Embed:   t.TermEmbed(""),
 	})
 
 	ctx.AddYesNoHandler(m.ID, func(ctx *crouter.Ctx) {

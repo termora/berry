@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Starshine113/berry/db"
+	"github.com/Starshine113/berry/structs"
 	"github.com/Starshine113/crouter"
 	"github.com/bwmarrin/discordgo"
 	"go.uber.org/zap"
@@ -12,11 +13,12 @@ import (
 type commands struct {
 	Db    *db.Db
 	Sugar *zap.SugaredLogger
+	conf  *structs.BotConfig
 }
 
 // Init ...
-func Init(db *db.Db, s *zap.SugaredLogger, r *crouter.Router) {
-	c := commands{Db: db, Sugar: s}
+func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *crouter.Router) {
+	c := commands{Db: db, conf: conf, Sugar: s}
 
 	r.AddCommand(&crouter.Command{
 		Name:    "search",
@@ -92,7 +94,7 @@ func (c *commands) search(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 	if len(terms) == 1 {
-		_, err = ctx.Send(terms[0].TermEmbed())
+		_, err = ctx.Send(terms[0].TermEmbed(c.conf.Bot.TermBaseURL))
 		return err
 	}
 
@@ -149,7 +151,7 @@ func (c *commands) search(ctx *crouter.Ctx) (err error) {
 			}
 
 			ctx.Session.ChannelMessageDelete(ctx.Channel.ID, msg.ID)
-			ctx.Send(termSlice[index].TermEmbed())
+			ctx.Send(termSlice[index].TermEmbed(c.conf.Bot.TermBaseURL))
 		})
 	}
 

@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -54,7 +55,7 @@ func (t *Term) Warning() bool {
 }
 
 // TermEmbed creates a Discord embed from a term object
-func (t *Term) TermEmbed() *discordgo.MessageEmbed {
+func (t *Term) TermEmbed(baseURL string) *discordgo.MessageEmbed {
 	if t == nil {
 		return nil
 	}
@@ -88,8 +89,14 @@ func (t *Term) TermEmbed() *discordgo.MessageEmbed {
 		Value: t.Source,
 	})
 
+	var u string
+	if baseURL != "" {
+		u = baseURL + url.PathEscape(strings.ToLower(t.Name))
+	}
+
 	e := &discordgo.MessageEmbed{
 		Title:       t.Name,
+		URL:         u,
 		Description: desc,
 		Color:       EmbedColour,
 		Timestamp:   t.Created.Format(time.RFC3339),

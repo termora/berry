@@ -7,6 +7,6 @@ func (c *commands) random(ctx *crouter.Ctx) (err error) {
 	if err != nil {
 		return ctx.CommandError(err)
 	}
-	_, err = ctx.Send(t.TermEmbed())
+	_, err = ctx.Send(t.TermEmbed(c.conf.Bot.TermBaseURL))
 	return
 }

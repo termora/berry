@@ -12,6 +12,7 @@ type BotConfig struct {
 		AdminServer  string   `yaml:"admin_server"`
 		ServerInvite string   `yaml:"server_invite"`
 		Website      string
+		TermBaseURL  string   `yaml:"term_base_url"`
 		AllowedBots  []string `yaml:"allowed_bots"`
 	}
 }

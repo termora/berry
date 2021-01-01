@@ -74,7 +74,7 @@ func main() {
 	static.Init(c, r)
 
 	// add term commands
-	search.Init(d, sugar, r)
+	search.Init(d, c, sugar, r)
 
 	// add server commands
 	server.Init(d, r)

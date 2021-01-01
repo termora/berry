@@ -57,7 +57,7 @@ func (c *commands) term(ctx *crouter.Ctx) (err error) {
 		return
 	}
 
-	_, err = ctx.Session.ChannelMessageSendEmbed(channel.ID, term.TermEmbed())
+	_, err = ctx.Session.ChannelMessageSendEmbed(channel.ID, term.TermEmbed(c.conf.Bot.TermBaseURL))
 	if err != nil {
 		return
 	}
