@@ -8,3 +8,7 @@ bot:
   admin_server: "0" # admin server, the only server where term management commands can be run
   server_invite: "" # invite to support server
   allowed_bots: ["204255221017214977", "235148962103951360"] # IDs of bots allowed to run commands
+  help_field:
+    name: "name"
+    value: |
+      value

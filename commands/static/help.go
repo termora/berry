@@ -88,6 +88,15 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 			Value: fmt.Sprintf("Use this link to join the support server, for bot questions and term additions/requests: %v", c.config.Bot.ServerInvite),
 		})
 	}
+
+	// if a custom field is defined in the config file, add that too
+	if c.config.Bot.HelpField.Name != "" && c.config.Bot.HelpField.Value != "" {
+		e.Fields = append(e.Fields, &discordgo.MessageEmbedField{
+			Name:  c.config.Bot.HelpField.Name,
+			Value: c.config.Bot.HelpField.Value,
+		})
+	}
+
 	_, err = ctx.Send(e)
 	return err
 }

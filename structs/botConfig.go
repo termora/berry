@@ -14,5 +14,10 @@ type BotConfig struct {
 		Website      string
 		TermBaseURL  string   `yaml:"term_base_url"`
 		AllowedBots  []string `yaml:"allowed_bots"`
+
+		HelpField struct {
+			Name  string
+			Value string
+		} `yaml:"help_field"`
 	}
 }
