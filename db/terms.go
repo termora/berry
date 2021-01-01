@@ -22,7 +22,7 @@ func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.flags, t.content_warnings
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0
-	order by t.id`, mask)
+	order by t.name, t.id`, mask)
 	return terms, err
 }
 
