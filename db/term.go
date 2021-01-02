@@ -57,6 +57,7 @@ func (t *Term) Warning() bool {
 
 // TermEmbed creates a Discord embed from a term object
 func (t *Term) TermEmbed(baseURL string) *discordgo.MessageEmbed {
+	defer AddCount()
 	if t == nil {
 		return nil
 	}

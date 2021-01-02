@@ -1,19 +1,29 @@
 package static
 
 import (
+	"sync"
 	"time"
 
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/berry/structs"
+	"github.com/Starshine113/crouter"
+	"go.uber.org/zap"
 )
 
-type commands struct {
+// Commands ...
+type Commands struct {
 	config *structs.BotConfig
+	start  time.Time
+	sugar  *zap.SugaredLogger
+	db     *db.Db
+
+	cmdCount int
+	cmdMutex sync.RWMutex
 }
 
 // Init ...
-func Init(conf *structs.BotConfig, r *crouter.Router) {
-	c := &commands{config: conf}
+func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *crouter.Router) *Commands {
+	c := &Commands{config: conf, start: time.Now(), sugar: s, db: d}
 	r.AddCommand(&crouter.Command{
 		Name: "ping",
 
@@ -64,4 +74,14 @@ func Init(conf *structs.BotConfig, r *crouter.Router) {
 		Blacklistable: true,
 		Command:       c.cmdInvite,
 	})
+
+	return c
+}
+
+// PostFunc logs when a command is used
+func (c *Commands) PostFunc(ctx *crouter.Ctx) {
+	c.sugar.Debugf("Command executed: `%v` (arguments %v) by %v (channel %v, guild %v)", ctx.Cmd.Name, ctx.Args, ctx.Author.ID, ctx.Channel.ID, ctx.Message.GuildID)
+	c.cmdMutex.Lock()
+	c.cmdCount++
+	c.cmdMutex.Unlock()
 }

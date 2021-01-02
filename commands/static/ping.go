@@ -6,7 +6,7 @@ import (
 	"github.com/Starshine113/crouter"
 )
 
-func (c *commands) ping(ctx *crouter.Ctx) (err error) {
+func (c *Commands) ping(ctx *crouter.Ctx) (err error) {
 	t := time.Now()
 	ping := ctx.Session.HeartbeatLatency().Round(time.Millisecond)
 	m, err := ctx.Sendf("🏓 **Pong!**\nHeartbeat: %s", ping)

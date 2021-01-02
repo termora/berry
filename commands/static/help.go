@@ -9,7 +9,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func (c *commands) help(ctx *crouter.Ctx) (err error) {
+func (c *Commands) help(ctx *crouter.Ctx) (err error) {
 	if ctx.RawArgs == "permissions" || ctx.RawArgs == "perms" {
 		_, err = ctx.Embed("Required permissions", fmt.Sprintf(`%v requires the following permissions to function correctly:
 		- **Read Messages** & **Send Messages**: to respond to commands
@@ -101,7 +101,7 @@ func (c *commands) help(ctx *crouter.Ctx) (err error) {
 	return err
 }
 
-func (c *commands) cmdInvite(ctx *crouter.Ctx) (err error) {
+func (c *Commands) cmdInvite(ctx *crouter.Ctx) (err error) {
 	_, err = ctx.Sendf("Use this link to invite me to your server: <%v>\n\nYou can use the `%vhelp permissions` command to get a detailed explanation of all permissions required.", invite(ctx), ctx.Router.Prefixes[0])
 	return
 }

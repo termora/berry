@@ -17,6 +17,12 @@ var (
 	ErrorNoRowsAffected = errors.New("no rows affected")
 )
 
+// TermCount ...
+func (db *Db) TermCount() (count int) {
+	db.Pool.QueryRow(context.Background(), "select count(id) from public.terms").Scan(&count)
+	return count
+}
+
 // GetTerms gets all terms not blocked by the given mask
 func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select

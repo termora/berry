@@ -12,7 +12,7 @@ var pk = pkgo.NewSession(nil)
 
 var greetings = []string{"Hello", "Heyo", "Heya", "Hiya"}
 
-func (c *commands) hello(ctx *crouter.Ctx) (err error) {
+func (c *Commands) hello(ctx *crouter.Ctx) (err error) {
 	// sleep for a second to give PK time to process the message
 	time.Sleep(1 * time.Second)
 

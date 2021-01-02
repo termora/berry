@@ -3,12 +3,33 @@ package db
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
 )
+
+var termCounter struct {
+	count uint64
+	mu    sync.RWMutex
+}
+
+// AddCount adds one to the term fetch count
+func AddCount() uint64 {
+	termCounter.mu.Lock()
+	defer termCounter.mu.Unlock()
+	termCounter.count++
+	return termCounter.count
+}
+
+// GetCount ...
+func GetCount() uint64 {
+	termCounter.mu.RLock()
+	defer termCounter.mu.RUnlock()
+	return termCounter.count
+}
 
 // Db ...
 type Db struct {

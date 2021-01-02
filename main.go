@@ -45,8 +45,6 @@ func main() {
 	r := crouter.NewRouter(dg, c.Bot.BotOwners, c.Bot.Prefixes)
 	// set blacklist function
 	r.Blacklist(d.CtxInBlacklist)
-	// set post-command log function
-	r.PostFunc = postFunc
 
 	// add the message create handler
 	mc := &messageCreate{r: r, c: c, sugar: sugar}
@@ -71,7 +69,10 @@ func main() {
 	})
 
 	// add static commands
-	static.Init(c, r)
+	cmds := static.Init(c, d, sugar, r)
+
+	// set post-command log function
+	r.PostFunc = cmds.PostFunc
 
 	// add term commands
 	search.Init(d, c, sugar, r)

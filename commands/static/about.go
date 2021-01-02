@@ -2,6 +2,7 @@ package static
 
 import (
 	"fmt"
+	"math"
 	"runtime"
 	"time"
 
@@ -12,12 +13,14 @@ import (
 
 var botVersion = "v0.2"
 
-func (c *commands) about(ctx *crouter.Ctx) (err error) {
+func (c *Commands) about(ctx *crouter.Ctx) (err error) {
 	owner, err := ctx.Session.User(c.config.Bot.BotOwners[0])
 	if err != nil {
 		return ctx.CommandError(err)
 	}
 
+	c.cmdMutex.RLock()
+	defer c.cmdMutex.RUnlock()
 	embed := &discordgo.MessageEmbed{
 		Title: "About",
 		Color: db.EmbedColour,
@@ -46,13 +49,31 @@ func (c *commands) about(ctx *crouter.Ctx) (err error) {
 				Inline: true,
 			},
 			{
+				Name: "Uptime",
+				Value: fmt.Sprintf(`%v
+				(Since %v)
+				
+				**Commands run since last restart:** %v (%.1f/min)
+
+				**Terms:** %v
+				**Searches since last restart:** %v`,
+					prettyDurationString(time.Since(c.start)),
+					c.start.Format("Jan _2 2006, 15:04:05 MST"),
+					c.cmdCount,
+					float64(c.cmdCount)/time.Since(c.start).Minutes(),
+					c.db.TermCount(),
+					db.GetCount(),
+				),
+				Inline: false,
+			},
+			{
 				Name:   "Author",
 				Value:  owner.Mention() + " / " + owner.String(),
 				Inline: false,
 			},
 			{
 				Name:   "Source code",
-				Value:  "[GitHub](https://github.com/Starshine113/berry) / Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
+				Value:  "[GitHub](https://github.com/Starshine113/berry)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
 				Inline: false,
 			},
 		},
@@ -74,4 +95,27 @@ func invite(ctx *crouter.Ctx) string {
 		discordgo.PermissionAddReactions
 
 	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&scope=bot", ctx.Session.State.User.ID, perms)
+}
+
+func prettyDurationString(duration time.Duration) (out string) {
+	var days, hours, hoursFrac, minutes float64
+
+	hours = duration.Hours()
+	hours, hoursFrac = math.Modf(hours)
+	minutes = hoursFrac * 60
+
+	hoursFrac = math.Mod(hours, 24)
+	days = (hours - hoursFrac) / 24
+	hours = hours - (days * 24)
+	minutes = minutes - math.Mod(minutes, 1)
+
+	if days != 0 {
+		out += fmt.Sprintf("%v days, ", days)
+	}
+	if hours != 0 {
+		out += fmt.Sprintf("%v hours, ", hours)
+	}
+	out += fmt.Sprintf("%v minutes", minutes)
+
+	return
 }
