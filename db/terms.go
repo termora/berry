@@ -33,6 +33,16 @@ func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 	return terms, err
 }
 
+// GetCategoryTerms gets terms by category
+func (db *Db) GetCategoryTerms(id int, mask TermFlag) (terms []*Term, err error) {
+	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.last_modified, t.flags, t.content_warnings
+	from public.terms as t, public.categories as c
+	where t.flags & $1 = 0 and t.category = $2
+	order by t.name, t.id`, mask, id)
+	return terms, err
+}
+
 // Search searches the database for terms
 func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 	if limit == 0 {

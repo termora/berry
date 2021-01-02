@@ -17,6 +17,7 @@ const (
 	FlagSearchHidden TermFlag = 1 << iota
 	FlagRandomHidden
 	FlagShowWarning
+	FlagListHidden
 )
 
 // Term holds info on a single term

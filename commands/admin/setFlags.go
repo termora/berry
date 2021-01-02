@@ -3,8 +3,8 @@ package admin
 import (
 	"strconv"
 
-	"github.com/Starshine113/crouter"
 	"github.com/Starshine113/berry/db"
+	"github.com/Starshine113/crouter"
 )
 
 func (c *commands) setFlags(ctx *crouter.Ctx) (err error) {
@@ -13,6 +13,7 @@ func (c *commands) setFlags(ctx *crouter.Ctx) (err error) {
 		- 1: hidden from search
 		- 2: hidden from random
 		- 4: show a warning
+		- 8: hide from lists (including the website)
 		These can be combined by adding the numbers together.`, db.EmbedColour)
 		return err
 	}

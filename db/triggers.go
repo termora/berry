@@ -9,11 +9,11 @@ import (
 
 // Explanation is a single explanation
 type Explanation struct {
-	ID          int
-	Name        string
-	Aliases     []string
-	Description string
-	Created     time.Time
+	ID          int       `json:"id"`
+	Name        string    `json:"name"`
+	Aliases     []string  `json:"aliases"`
+	Description string    `json:"description"`
+	Created     time.Time `json:"created"`
 }
 
 // AddExplanation adds an explanation to the database

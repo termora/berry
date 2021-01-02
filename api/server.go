@@ -54,6 +54,9 @@ func main() {
 	e.GET("/api/v1/search/:term", r.search)
 	e.GET("/api/v1/term/:id", r.term)
 	e.GET("/api/v1/list", r.list)
+	e.GET("/api/v1/list/:id", r.listCategory)
+	e.GET("/api/v1/categories", r.categories)
+	e.GET("/api/v1/explanations", r.explanations)
 
 	// get port
 	port := c.Port
