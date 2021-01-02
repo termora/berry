@@ -49,9 +49,10 @@ func (c *commands) export(ctx *crouter.Ctx) (err error) {
 	}
 	fn := fmt.Sprintf("export-%v.json", time.Now().Format("2006-01-02-15-04-05"))
 
-	var buf bytes.Buffer
+	var buf *bytes.Buffer
 	if gz {
-		zw := gzip.NewWriter(&buf)
+		buf = new(bytes.Buffer)
+		zw := gzip.NewWriter(buf)
 		zw.Name = fn
 		_, err = zw.Write(b)
 		if err != nil {
@@ -63,12 +64,12 @@ func (c *commands) export(ctx *crouter.Ctx) (err error) {
 		}
 		fn = fn + ".gz"
 	} else {
-		buf.Read(b)
+		buf = bytes.NewBuffer(b)
 	}
 
 	file := discordgo.File{
 		Name:   fn,
-		Reader: &buf,
+		Reader: buf,
 	}
 
 	_, err = ctx.Session.ChannelMessageSendComplex(u.ID, &discordgo.MessageSend{
