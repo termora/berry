@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/crouter"
 	"github.com/bwmarrin/discordgo"
 )
@@ -17,8 +16,15 @@ func (c *commands) guilds(ctx *crouter.Ctx) (err error) {
 		b.WriteString(fmt.Sprintf("%v (%v)\n", g.ID, g.Name))
 	}
 
+	u, err := ctx.Session.UserChannelCreate(ctx.Author.ID)
+	if err != nil {
+		c.sugar.Error("Error creating DM channel:", err)
+		_, err = ctx.Send("Error creating DM channel.")
+		return
+	}
+
 	if len(b.String()) < 2000 {
-		_, err = ctx.Embed("Guilds", "```"+b.String()+"```", db.EmbedColour)
+		_, err = ctx.Session.ChannelMessageSend(u.ID, fmt.Sprintf("```Guilds (%v)\n=============\n%v```", len(ctx.Session.State.Guilds), b.String()))
 		return
 	}
 
@@ -27,8 +33,8 @@ func (c *commands) guilds(ctx *crouter.Ctx) (err error) {
 		Reader: &b,
 	}
 
-	_, err = ctx.Send(&discordgo.MessageSend{
-		Content: "Done! List of guilds:",
+	_, err = ctx.Session.ChannelMessageSendComplex(u.ID, &discordgo.MessageSend{
+		Content: fmt.Sprintf("Done! List of %v guilds:", len(ctx.Session.State.Guilds)),
 		Files:   []*discordgo.File{&file},
 	})
 	return err
