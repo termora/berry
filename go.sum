@@ -6,6 +6,8 @@ github.com/ReneKroon/ttlcache/v2 v2.1.0 h1:5GQZXf7Pl68S4O/Mps4kAXQ+ObEqwHskC8WKT
 github.com/ReneKroon/ttlcache/v2 v2.1.0/go.mod h1:0E5EIhFJrGmcn/niHrqnnvQHvihj+DdPzJlOEzBS3o4=
 github.com/Starshine113/crouter v0.6.1 h1:UefbAx5iFj2Rwgyiqj009Ob8edTi3/wtHa/O21HeHV8=
 github.com/Starshine113/crouter v0.6.1/go.mod h1:2fRQTX78V3lVOd6h+Q3Kv6BhM+v+n+OQkYP/mMRfuPs=
+github.com/Starshine113/crouter v0.7.0 h1:SxJfZw8eC8m9QMuuELlDO2+E3o5zzlqsK6GcNnYUENo=
+github.com/Starshine113/crouter v0.7.0/go.mod h1:2fRQTX78V3lVOd6h+Q3Kv6BhM+v+n+OQkYP/mMRfuPs=
 github.com/Starshine113/flagparser v0.0.0-20201102154835-0b7a32bf8cec h1:eG39FQ+HeSYw3Swvrri2Uf8/9FdBlTX/TcQGsk2UgPA=
 github.com/Starshine113/flagparser v0.0.0-20201102154835-0b7a32bf8cec/go.mod h1:xu7tCzkCWcronW9zn5WQarF/FHplLGEJkAPRNjAOEik=
 github.com/Starshine113/pkgo v0.1.0 h1:1G/kqpbsjZO21L7DgR18U3aVl38rmuwqwCDwmfTA5ic=

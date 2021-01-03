@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
-	github.com/Starshine113/crouter v0.6.1
+	github.com/Starshine113/crouter v0.7.0
 	github.com/Starshine113/flagparser v0.0.0-20201102154835-0b7a32bf8cec
 	github.com/Starshine113/pkgo v0.1.0
 	github.com/bwmarrin/discordgo v0.22.0
