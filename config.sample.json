@@ -1,0 +1,29 @@
+{
+    "auth": {
+        "token": "longDiscordString",
+        "database_url": "postgresql://postgres:postgres@localhost/postgres"
+    },
+    "bot": {
+        "prefixes": [
+            "t!",
+            "t;"
+        ],
+        "bot_owners": [
+            "0"
+        ],
+        "admin_server": "0",
+        "server_invite": "",
+        "website": "https://berry.starshines.xyz/",
+        "term_base_url": "https://berry.starshines.xyz/term/",
+        "allowed_bots": [
+            "204255221017214977",
+            "235148962103951360"
+        ],
+        "help_fields": [
+            {
+                "name": "name",
+                "value": "value"
+            }
+        ]
+    }
+}

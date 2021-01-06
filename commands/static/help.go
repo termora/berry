@@ -89,12 +89,14 @@ func (c *Commands) help(ctx *crouter.Ctx) (err error) {
 		})
 	}
 
-	// if a custom field is defined in the config file, add that too
-	if c.config.Bot.HelpField.Name != "" && c.config.Bot.HelpField.Value != "" {
-		e.Fields = append(e.Fields, &discordgo.MessageEmbedField{
-			Name:  c.config.Bot.HelpField.Name,
-			Value: c.config.Bot.HelpField.Value,
-		})
+	// if custom help fields are defined, add those
+	if len(c.config.Bot.HelpFields) != 0 {
+		for _, f := range c.config.Bot.HelpFields {
+			e.Fields = append(e.Fields, &discordgo.MessageEmbedField{
+				Name:  f.Name,
+				Value: f.Value,
+			})
+		}
 	}
 
 	_, err = ctx.Send(e)
