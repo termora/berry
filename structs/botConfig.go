@@ -15,12 +15,14 @@ type BotConfig struct {
 		TermBaseURL  string   `json:"term_base_url"`
 		AllowedBots  []string `json:"allowed_bots"`
 
-		HelpFields []HelpField `json:"help_fields"`
+		HelpFields []EmbedField `json:"help_fields"`
+
+		CreditFields []EmbedField `json:"credit_fields"`
 	}
 }
 
-// HelpField ...
-type HelpField struct {
+// EmbedField ...
+type EmbedField struct {
 	Name  string
 	Value string
 }

@@ -14,11 +14,6 @@ import (
 var botVersion = "v0.2"
 
 func (c *Commands) about(ctx *crouter.Ctx) (err error) {
-	owner, err := ctx.Session.User(c.config.Bot.BotOwners[0])
-	if err != nil {
-		return ctx.CommandError(err)
-	}
-
 	c.cmdMutex.RLock()
 	defer c.cmdMutex.RUnlock()
 	embed := &discordgo.MessageEmbed{
@@ -67,8 +62,8 @@ func (c *Commands) about(ctx *crouter.Ctx) (err error) {
 				Inline: false,
 			},
 			{
-				Name:   "Author",
-				Value:  owner.Mention() + " / " + owner.String(),
+				Name:   "Credits",
+				Value:  fmt.Sprintf("Check `%vcredits`!", ctx.Router.Prefixes[0]),
 				Inline: false,
 			},
 			{

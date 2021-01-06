@@ -62,7 +62,7 @@ func (c *Commands) help(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:  "Bot info",
-				Value: "`help`: show a list of commands, and some info about the bot\n`help privacy`: show the bot's privacy policy\n`about`: show more in-depth info about the bot.\n`ping`: check the bot's latency\n`hello`: say hi to the bot!\n`invite`: get an invite link for the bot",
+				Value: "`help`: show a list of commands, and some info about the bot\n`help privacy`: show the bot's privacy policy\n`about`: show more in-depth info about the bot.\n`credits`: a list of people who helped create the bot\n`ping`: check the bot's latency\n`hello`: say hi to the bot!\n`invite`: get an invite link for the bot",
 			},
 			{
 				Name:  "Terms",

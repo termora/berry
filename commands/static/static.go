@@ -45,6 +45,16 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *crouter.Ro
 	})
 
 	r.AddCommand(&crouter.Command{
+		Name: "credits",
+
+		Summary:  "A list of people who helped create the bot",
+		Cooldown: 5 * time.Second,
+
+		Blacklistable: true,
+		Command:       c.credits,
+	})
+
+	r.AddCommand(&crouter.Command{
 		Name:    "hello",
 		Aliases: []string{"Hi"},
 
