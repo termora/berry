@@ -28,7 +28,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 		Name: "ping",
 
 		Summary:  "Check the bot's message latency",
-		Cooldown: 3 * time.Second,
+		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
 		Command:       c.ping,
@@ -38,7 +38,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 		Name: "about",
 
 		Summary:  "Some info about the bot",
-		Cooldown: 5 * time.Second,
+		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
 		Command:       c.about,
@@ -48,7 +48,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 		Name: "credits",
 
 		Summary:  "A list of people who helped create the bot",
-		Cooldown: 5 * time.Second,
+		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
 		Command:       c.credits,
@@ -59,7 +59,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 		Aliases: []string{"Hi"},
 
 		Summary:  "Say hi!",
-		Cooldown: 3 * time.Second,
+		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
 		Command:       c.hello,
@@ -69,7 +69,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 		Name: "help",
 
 		Summary:  "Show info about how to use the bot",
-		Cooldown: 5 * time.Second,
+		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
 		Command:       c.help,
@@ -79,7 +79,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 		Name: "invite",
 
 		Summary:  "Get an invite link",
-		Cooldown: 5 * time.Second,
+		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
 		Command:       c.cmdInvite,
