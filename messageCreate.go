@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/structs"
 	"github.com/diamondburned/arikawa/v2/gateway"
@@ -22,6 +24,7 @@ func (mc *messageCreate) messageCreate(m *gateway.MessageCreateEvent) {
 			mc.sugar.Error("Error setting bot user:", err)
 			return
 		}
+		mc.r.Prefixes = append(mc.r.Prefixes, fmt.Sprintf("<@%v>", mc.r.Bot.ID), fmt.Sprintf("<@!%v>", mc.r.Bot.ID))
 	}
 
 	// if message was sent by a bot return, unless it's in the list of allowed bots
