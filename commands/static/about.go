@@ -46,15 +46,11 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 				Name: "Uptime",
 				Value: fmt.Sprintf(`%v
 				(Since %v)
-				
-				**Commands run since last restart:** %v (%.1f/min)
 
 				**Terms:** %v
 				**Searches since last restart:** %v`,
 					prettyDurationString(time.Since(c.start)),
 					c.start.Format("Jan _2 2006, 15:04:05 MST"),
-					c.cmdCount,
-					float64(c.cmdCount)/time.Since(c.start).Minutes(),
 					c.db.TermCount(),
 					db.GetCount(),
 				),

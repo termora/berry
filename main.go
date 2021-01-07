@@ -5,9 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
-	"time"
 
 	"go.uber.org/zap"
 
@@ -55,36 +53,22 @@ func main() {
 	mc := &messageCreate{r: r, c: c, sugar: sugar}
 	s.AddHandler(mc.messageCreate)
 
-	// start loop to update status every minute
-	// :uhhh: arikawa doesn't have a way to add a handler that only runs once
-	var o sync.Once
+	// set status
 	s.AddHandler(func(d *gateway.ReadyEvent) {
-		o.Do(func() {
-			for {
-				if err := s.Gateway.UpdateStatus(gateway.UpdateStatusData{
-					Status: gateway.IdleStatus,
-					Activities: &[]discord.Activity{{
-						Name: fmt.Sprintf("%vhelp", c.Bot.Prefixes[0]),
-					}},
-				}); err != nil {
-					sugar.Error("Error setting status:", err)
-				}
-				time.Sleep(time.Minute)
-				// if a URL isn't set, just loop back immediately
-				if c.Bot.Website == "" {
-					continue
-				}
-				if err := s.Gateway.UpdateStatus(gateway.UpdateStatusData{
-					Status: gateway.IdleStatus,
-					Activities: &[]discord.Activity{{
-						Name: fmt.Sprintf("%vhelp | %v", c.Bot.Prefixes[0], c.Bot.Website),
-					}},
-				}); err != nil {
-					sugar.Error("Error setting status:", err)
-				}
-				time.Sleep(time.Minute)
-			}
-		})
+		st := fmt.Sprintf("%vhelp", c.Bot.Prefixes[0])
+
+		if c.Bot.Website != "" {
+			st += " | " + c.Bot.Website
+		}
+
+		if err := s.Gateway.UpdateStatus(gateway.UpdateStatusData{
+			Status: gateway.OnlineStatus,
+			Activities: &[]discord.Activity{{
+				Name: st,
+			}},
+		}); err != nil {
+			sugar.Error("Error setting status:", err)
+		}
 	})
 
 	// add static commands
