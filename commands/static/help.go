@@ -64,6 +64,11 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 		return
 	}
 
+	// help for commands
+	if len(ctx.Args) > 0 {
+		return ctx.Help(ctx.Args)
+	}
+
 	e := &discord.Embed{
 		Color: db.EmbedColour,
 		Title: "Help",
