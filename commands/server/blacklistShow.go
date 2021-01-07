@@ -3,14 +3,17 @@ package server
 import (
 	"fmt"
 
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/bcr"
+	"github.com/diamondburned/arikawa/v2/discord"
+
 	"github.com/Starshine113/berry/db"
 )
 
-func (c *commands) blacklist(ctx *crouter.Ctx) (err error) {
-	b, err := c.db.GetBlacklist(ctx.Message.GuildID)
+func (c *commands) blacklist(ctx *bcr.Context) (err error) {
+	b, err := c.db.GetBlacklist(ctx.Message.GuildID.String())
 	if err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Sendf(":x: Internal error occurred: %v", err)
+		return err
 	}
 	var x string
 	for _, c := range b {
@@ -19,6 +22,10 @@ func (c *commands) blacklist(ctx *crouter.Ctx) (err error) {
 	if len(b) == 0 {
 		x = "No channels are blacklisted."
 	}
-	_, err = ctx.Embed("Channel blacklist", x, db.EmbedColour)
+	_, err = ctx.Send("", &discord.Embed{
+		Title:       "Channel blacklist",
+		Description: x,
+		Color:       db.EmbedColour,
+	})
 	return err
 }

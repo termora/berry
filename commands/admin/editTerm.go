@@ -4,15 +4,16 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/berry/misc"
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 )
 
-func (c *commands) editTerm(ctx *crouter.Ctx) (err error) {
+func (c *commands) editTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(3); err != nil {
-		_, err = ctx.Send("Not enough arguments. Valid subcommands are: `title`, `desc`, `source`, `aliases`.")
+		_, err = ctx.Send("Not enough arguments. Valid subcommands are: `title`, `desc`, `source`, `aliases`.", nil)
 		return
 	}
 
@@ -24,10 +25,12 @@ func (c *commands) editTerm(ctx *crouter.Ctx) (err error) {
 	t, err := c.db.GetTerm(id)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
-			_, err = ctx.Send("No term with that ID found.")
+			_, err = ctx.Send("No term with that ID found.", nil)
 			return
 		}
-		return ctx.CommandError(err)
+
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 
 	switch ctx.Args[0] {
@@ -41,11 +44,11 @@ func (c *commands) editTerm(ctx *crouter.Ctx) (err error) {
 		return c.editTermAliases(ctx, t)
 	}
 
-	_, err = ctx.Send("Invalid subcommand supplied.\nValid subcommands are: `title`, `desc`, `source`, `aliases`.")
+	_, err = ctx.Send("Invalid subcommand supplied.\nValid subcommands are: `title`, `desc`, `source`, `aliases`.", nil)
 	return
 }
 
-func (c *commands) editTermTitle(ctx *crouter.Ctx, t *db.Term) (err error) {
+func (c *commands) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
 	title := strings.Join(ctx.Args[2:], " ")
 	if len(title) > 200 {
 		_, err = ctx.Sendf("Title too long (%v > 200).", len(title))
@@ -58,11 +61,11 @@ func (c *commands) editTermTitle(ctx *crouter.Ctx, t *db.Term) (err error) {
 		return
 	}
 
-	_, err = ctx.Send("Title updated!")
+	_, err = ctx.Send("Title updated!", nil)
 	return
 }
 
-func (c *commands) editTermDesc(ctx *crouter.Ctx, t *db.Term) (err error) {
+func (c *commands) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
 	desc := strings.Join(ctx.Args[2:], " ")
 	if len(desc) > 1800 {
 		_, err = ctx.Sendf("Description too long (%v > 1800).", len(desc))
@@ -75,11 +78,11 @@ func (c *commands) editTermDesc(ctx *crouter.Ctx, t *db.Term) (err error) {
 		return
 	}
 
-	_, err = ctx.Send("Description updated!")
+	_, err = ctx.Send("Description updated!", nil)
 	return
 }
 
-func (c *commands) editTermSource(ctx *crouter.Ctx, t *db.Term) (err error) {
+func (c *commands) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 	source := strings.Join(ctx.Args[2:], " ")
 	if len(source) > 200 {
 		_, err = ctx.Sendf("Source too long (%v > 200).", len(source))
@@ -92,11 +95,11 @@ func (c *commands) editTermSource(ctx *crouter.Ctx, t *db.Term) (err error) {
 		return
 	}
 
-	_, err = ctx.Send("Source updated!")
+	_, err = ctx.Send("Source updated!", nil)
 	return
 }
 
-func (c *commands) editTermAliases(ctx *crouter.Ctx, t *db.Term) (err error) {
+func (c *commands) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 	var aliases []string
 	if ctx.Args[2] != "clear" {
 		aliases = strings.Split(strings.Join(ctx.Args[2:], " "), "\n")
@@ -113,6 +116,6 @@ func (c *commands) editTermAliases(ctx *crouter.Ctx, t *db.Term) (err error) {
 		return
 	}
 
-	_, err = ctx.Send("Aliases updated!")
+	_, err = ctx.Send("Aliases updated!", nil)
 	return
 }

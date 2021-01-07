@@ -4,22 +4,26 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/bcr"
+	"github.com/Starshine113/berry/misc"
 )
 
-func (c *commands) setCW(ctx *crouter.Ctx) (err error) {
+func (c *commands) setCW(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send("Not enough arguments provided: need ID and bitmask", nil)
+		return err
 	}
 
 	id, err := strconv.Atoi(ctx.Args[0])
 	if err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 
 	t, err := c.db.GetTerm(id)
 	if err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 
 	cw := strings.Join(ctx.Args[1:], " ")
@@ -32,7 +36,8 @@ func (c *commands) setCW(ctx *crouter.Ctx) (err error) {
 	err = c.db.SetCW(t.ID, cw)
 	if err != nil {
 		c.sugar.Errorf("Error setting CW for %v: %v", id, err)
-		return ctx.CommandError(err)
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 
 	_, err = ctx.Sendf("Updated CW for %v.", id)

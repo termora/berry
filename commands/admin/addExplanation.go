@@ -3,13 +3,15 @@ package admin
 import (
 	"strings"
 
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
+	"github.com/Starshine113/berry/misc"
 )
 
-func (c *commands) addExplanation(ctx *crouter.Ctx) (err error) {
+func (c *commands) addExplanation(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send("Not enough arguments provided.", nil)
+		return err
 	}
 	e := &db.Explanation{}
 
@@ -26,7 +28,8 @@ func (c *commands) addExplanation(ctx *crouter.Ctx) (err error) {
 	e.Description = strings.Join(content[1:], "\n")
 	e, err = c.db.AddExplanation(e)
 	if err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 	_, err = ctx.Sendf("Added explanation with ID %v.\nName: `%v`\nAliases: `%v`", e.ID, e.Name, strings.Join(e.Aliases, ", "))
 	return err

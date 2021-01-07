@@ -3,40 +3,44 @@ package admin
 import (
 	"strconv"
 
-	"github.com/Starshine113/crouter"
-	"github.com/bwmarrin/discordgo"
+	"github.com/Starshine113/bcr"
+	"github.com/Starshine113/berry/misc"
 )
 
-func (c *commands) delTerm(ctx *crouter.Ctx) (err error) {
+func (c *commands) delTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckRequiredArgs(1); err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send("No term ID provided.", nil)
+		return err
 	}
 
 	id, err := strconv.Atoi(ctx.Args[0])
 	if err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 
 	t, err := c.db.GetTerm(id)
 	if err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 
-	m, err := ctx.Send(&discordgo.MessageSend{
-		Content: "Are you sure you want to delete this term? React with ✅ to delete it, or with ❌ to cancel.",
-		Embed:   t.TermEmbed(""),
-	})
+	m, err := ctx.Send("Are you sure you want to delete this term? React with ✅ to delete it, or with ❌ to cancel.", t.TermEmbed(""))
+	if err != nil {
+		return err
+	}
 
-	ctx.AddYesNoHandler(m.ID, func(ctx *crouter.Ctx) {
+	ctx.AddYesNoHandler(m.ID, ctx.Author.ID, func(ctx *bcr.Context) {
 		err = c.db.RemoveTerm(id)
 		if err != nil {
-			ctx.CommandError(err)
+			c.sugar.Error("Error removing term:", err)
+			ctx.Send(misc.InternalError, nil)
 			return
 		}
-
-		ctx.Sendf("Removed term `%v`.", id)
-	}, func(ctx *crouter.Ctx) {
-		ctx.Sendf("Cancelled.")
+	}, func(ctx *bcr.Context) {
+		ctx.Send("Cancelled.", nil)
+		return
 	})
-	return
+
+	return nil
 }

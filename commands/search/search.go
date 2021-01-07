@@ -3,10 +3,11 @@ package search
 import (
 	"time"
 
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
+	"github.com/Starshine113/berry/misc"
 	"github.com/Starshine113/berry/structs"
-	"github.com/Starshine113/crouter"
-	"github.com/bwmarrin/discordgo"
+	"github.com/diamondburned/arikawa/v2/discord"
 	"go.uber.org/zap"
 )
 
@@ -17,10 +18,10 @@ type commands struct {
 }
 
 // Init ...
-func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *crouter.Router) {
+func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Router) {
 	c := commands{Db: db, conf: conf, Sugar: s}
 
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name:    "search",
 		Aliases: []string{"s"},
 
@@ -33,7 +34,7 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *crouter.R
 		Command: c.search,
 	})
 
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name:    "random",
 		Aliases: []string{"r"},
 
@@ -45,7 +46,7 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *crouter.R
 		Command: c.random,
 	})
 
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name:    "explain",
 		Aliases: []string{"e", "ex"},
 
@@ -58,7 +59,7 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *crouter.R
 		Command: c.explanation,
 	})
 
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name:        "list",
 		Description: "List all terms",
 
@@ -67,7 +68,7 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *crouter.R
 		Command:       c.list,
 	})
 
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name:        "post",
 		Description: "Post a single term",
 		Usage:       "<term ID> [channel]",
@@ -78,23 +79,24 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *crouter.R
 	})
 }
 
-func (c *commands) search(ctx *crouter.Ctx) (err error) {
+func (c *commands) search(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("No search term provided.")
+		_, err = ctx.Send("No search term provided.", nil)
 		return err
 	}
 
 	terms, err := c.Db.Search(ctx.RawArgs, 0)
 	if err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 
 	if len(terms) == 0 {
-		_, err = ctx.Send("No results found.")
+		_, err = ctx.Send("No results found.", nil)
 		return err
 	}
 	if len(terms) == 1 {
-		_, err = ctx.Send(terms[0].TermEmbed(c.conf.Bot.TermBaseURL))
+		_, err = ctx.Send("", terms[0].TermEmbed(c.conf.Bot.TermBaseURL))
 		return err
 	}
 
@@ -110,7 +112,7 @@ func (c *commands) search(ctx *crouter.Ctx) (err error) {
 		termSlices = append(termSlices, terms[i:end])
 	}
 
-	embeds := make([]*discordgo.MessageEmbed, 0)
+	embeds := make([]discord.Embed, 0)
 
 	for i, t := range termSlices {
 		embeds = append(embeds, searchResultEmbed(ctx.RawArgs, i+1, len(termSlices), t))
@@ -125,12 +127,12 @@ func (c *commands) search(ctx *crouter.Ctx) (err error) {
 
 	for i, e := range emoji {
 		emoji := e
-		if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, emoji); err != nil {
+		if err = ctx.Session.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(emoji)); err != nil {
 			return
 		}
 
 		index := i
-		ctx.AddReactionHandler(msg.ID, e, func(ctx *crouter.Ctx) {
+		ctx.AddReactionHandler(msg.ID, ctx.Author.ID, e, false, false, func(ctx *bcr.Context) {
 			page, ok := ctx.AdditionalParams["page"].(int)
 			if ok == false {
 				return
@@ -140,18 +142,18 @@ func (c *commands) search(ctx *crouter.Ctx) (err error) {
 				return
 			}
 			if len(termSlices) < page {
-				ctx.Session.MessageReactionRemove(ctx.Channel.ID, msg.ID, emoji, ctx.Author.ID)
+				ctx.Session.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
 				return
 			}
 
 			termSlice := termSlices[page]
 			if index >= len(termSlice) {
-				ctx.Session.MessageReactionRemove(ctx.Channel.ID, msg.ID, emoji, ctx.Author.ID)
+				ctx.Session.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
 				return
 			}
 
-			ctx.Session.ChannelMessageDelete(ctx.Channel.ID, msg.ID)
-			ctx.Send(termSlice[index].TermEmbed(c.conf.Bot.TermBaseURL))
+			ctx.Session.DeleteMessage(ctx.Channel.ID, msg.ID)
+			ctx.Send("", termSlice[index].TermEmbed(c.conf.Bot.TermBaseURL))
 		})
 	}
 

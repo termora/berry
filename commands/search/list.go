@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/berry/misc"
-	"github.com/Starshine113/crouter"
 )
 
-func (c *commands) list(ctx *crouter.Ctx) (err error) {
+func (c *commands) list(ctx *bcr.Context) (err error) {
 	terms, err := c.Db.GetTerms(db.FlagSearchHidden)
 	if err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 	s := make([]string, 0)
 	for _, t := range terms {

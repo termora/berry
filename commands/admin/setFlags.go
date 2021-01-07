@@ -3,18 +3,24 @@ package admin
 import (
 	"strconv"
 
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/berry/misc"
+	"github.com/diamondburned/arikawa/v2/discord"
 )
 
-func (c *commands) setFlags(ctx *crouter.Ctx) (err error) {
+func (c *commands) setFlags(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckRequiredArgs(2); err != nil {
-		_, err = ctx.Embed("Flags", `The possible flags are:
+		_, err = ctx.Send("", &discord.Embed{
+			Title: "Flags",
+			Description: `The possible flags are:
 		- 1: hidden from search
 		- 2: hidden from random
 		- 4: show a warning
 		- 8: hide from lists (including the website)
-		These can be combined by adding the numbers together.`, db.EmbedColour)
+		These can be combined by adding the numbers together.`,
+			Color: db.EmbedColour,
+		})
 		return err
 	}
 
@@ -32,7 +38,8 @@ func (c *commands) setFlags(ctx *crouter.Ctx) (err error) {
 
 	err = c.db.SetFlags(id, db.TermFlag(flags))
 	if err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 
 	_, err = ctx.Sendf("Updated the flags for %v to %v.", id, flags)

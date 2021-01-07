@@ -5,12 +5,12 @@ import (
 	"strings"
 
 	"github.com/Starshine113/berry/db"
-	"github.com/bwmarrin/discordgo"
+	"github.com/diamondburned/arikawa/v2/discord"
 )
 
 var emoji = []string{"1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"}
 
-func searchResultEmbed(search string, page, total int, s []*db.Term) *discordgo.MessageEmbed {
+func searchResultEmbed(search string, page, total int, s []*db.Term) discord.Embed {
 	var desc string
 	for i, t := range s {
 		h := t.Headline
@@ -27,16 +27,16 @@ func searchResultEmbed(search string, page, total int, s []*db.Term) *discordgo.
 		desc += fmt.Sprintf("%v **%v**\n%v\n\n", emoji[i], name, h)
 	}
 
-	return &discordgo.MessageEmbed{
+	return discord.Embed{
 		Title:       fmt.Sprintf("Search results for \"%v\"", search),
 		Description: desc,
 		Color:       db.EmbedColour,
-		Fields: []*discordgo.MessageEmbedField{{
+		Fields: []discord.EmbedField{{
 			Name:   "Usage",
 			Value:  "Use ⬅️ ➡️ to navigate between pages, the numbers to choose a term, and ❌ to delete this message.",
 			Inline: false,
 		}},
-		Footer: &discordgo.MessageEmbedFooter{
+		Footer: &discord.EmbedFooter{
 			Text: fmt.Sprintf("Page %v/%v", page, total),
 		},
 	}

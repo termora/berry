@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/bwmarrin/discordgo"
+	"github.com/diamondburned/arikawa/v2/discord"
 )
 
 type commands struct {
@@ -11,36 +11,32 @@ type commands struct {
 }
 
 // Init ...
-func Init(db *db.Db, r *crouter.Router) {
+func Init(db *db.Db, r *bcr.Router) {
 	c := &commands{db: db}
 
-	g := r.AddGroup(&crouter.Group{
-		Name:        "blacklist",
-		Description: "Manage this server's blacklist",
-		Command: &crouter.Command{
-			Name:    "Show",
-			Summary: "Show the current blacklist",
+	g := r.AddCommand(&bcr.Command{
+		Name:    "blacklist",
+		Summary: "Manage this server's blacklist",
 
-			Permissions: discordgo.PermissionManageServer,
-			Command:     c.blacklist,
-		},
+		Permissions: discord.PermissionManageGuild,
+		Command:     c.blacklist,
 	})
 
-	g.AddCommand(&crouter.Command{
+	g.AddSubcommand(&bcr.Command{
 		Name:        "add",
 		Description: "Add a channel to the blacklist",
 		Usage:       "<channel>",
 
-		Permissions: discordgo.PermissionManageServer,
+		Permissions: discord.PermissionManageGuild,
 		Command:     c.blacklistAdd,
 	})
 
-	g.AddCommand(&crouter.Command{
+	g.AddSubcommand(&bcr.Command{
 		Name:        "remove",
 		Description: "Remove a channel from the blacklist",
 		Usage:       "<channel>",
 
-		Permissions: discordgo.PermissionManageServer,
+		Permissions: discord.PermissionManageGuild,
 		Command:     c.blacklistRemove,
 	})
 }

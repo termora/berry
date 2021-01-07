@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/pkgo"
 )
 
@@ -12,14 +12,14 @@ var pk = pkgo.NewSession(nil)
 
 var greetings = []string{"Hello", "Heyo", "Heya", "Hiya"}
 
-func (c *Commands) hello(ctx *crouter.Ctx) (err error) {
+func (c *Commands) hello(ctx *bcr.Context) (err error) {
 	// sleep for a second to give PK time to process the message
 	time.Sleep(1 * time.Second)
 
 	var name string
-	m, err := pk.GetMessage(ctx.Message.ID)
+	m, err := pk.GetMessage(ctx.Message.ID.String())
 	if err != nil {
-		member, err := ctx.ParseMember(ctx.Author.ID)
+		member, err := ctx.ParseMember(ctx.Author.ID.String())
 		if err != nil {
 			name = ctx.Author.Username
 		} else {

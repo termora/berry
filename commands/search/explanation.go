@@ -4,24 +4,27 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
+	"github.com/Starshine113/berry/misc"
+	"github.com/diamondburned/arikawa/v2/discord"
 )
 
-func (c *commands) explanation(ctx *crouter.Ctx) (err error) {
+func (c *commands) explanation(ctx *bcr.Context) (err error) {
 	ex, err := c.Db.GetAllExplanations()
 	if err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send(misc.InternalError, nil)
+		return err
 	}
 	if ctx.RawArgs != "" {
 		for _, e := range ex {
 			if strings.ToLower(ctx.RawArgs) == e.Name {
-				_, err = ctx.Send(e.Description)
+				_, err = ctx.Send(e.Description, nil)
 				return err
 			}
 			for _, alias := range e.Aliases {
 				if strings.ToLower(ctx.RawArgs) == alias {
-					_, err = ctx.Send(e.Description)
+					_, err = ctx.Send(e.Description, nil)
 					return err
 				}
 			}
@@ -35,6 +38,10 @@ func (c *commands) explanation(ctx *crouter.Ctx) (err error) {
 	if x == "" {
 		x = "No explanations."
 	}
-	_, err = ctx.Embed("All explanations", x, db.EmbedColour)
+	_, err = ctx.Send("", &discord.Embed{
+		Title:       "All explanations",
+		Description: x,
+		Color:       db.EmbedColour,
+	})
 	return err
 }

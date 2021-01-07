@@ -3,32 +3,34 @@ package admin
 import (
 	"strings"
 
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/crouter"
-	"github.com/bwmarrin/discordgo"
+	"github.com/Starshine113/berry/misc"
+	"github.com/diamondburned/arikawa/v2/discord"
 )
 
-func (c *commands) addTerm(ctx *crouter.Ctx) (err error) {
+func (c *commands) addTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
-		return ctx.CommandError(err)
+		_, err = ctx.Send("Please provide a term name.", nil)
+		return err
 	}
 
 	term := &db.Term{Name: ctx.RawArgs}
 	ctx.AdditionalParams["term"] = term
 
-	m, err := ctx.Sendf("Creating a term with the name `%v`. To cancel at any time, send `cancel`.\nPlease type the name of the category this term belongs to:", ctx.RawArgs)
+	_, err = ctx.Sendf("Creating a term with the name `%v`. To cancel at any time, send `cancel`.\nPlease type the name of the category this term belongs to:", ctx.RawArgs)
 	if err != nil {
 		return err
 	}
 
-	ctx.AddMessageHandler(m.ID, func(ctx *crouter.Ctx, m *discordgo.MessageCreate) {
+	ctx.AddMessageHandler(ctx.Channel.ID, ctx.Author.ID, func(ctx *bcr.Context, m discord.Message) {
 		if m.Content == "cancel" {
-			ctx.Send("Term creation cancelled.")
+			ctx.Send("Term creation cancelled.", nil)
 			return
 		}
 		cat, err := c.db.CategoryID(m.Content)
 		if err != nil {
-			ctx.CommandError(err)
+			_, err = ctx.Send("Could not find that category, cancelled.", nil)
 			return
 		}
 		if cat == 0 {
@@ -38,40 +40,40 @@ func (c *commands) addTerm(ctx *crouter.Ctx) (err error) {
 		t := ctx.AdditionalParams["term"].(*db.Term)
 		t.Category = cat
 		ctx.AdditionalParams["term"] = t
-		msg, err := ctx.Sendf("Category set to `%v` (ID %v). Please type the description:", m.Content, cat)
+		_, err = ctx.Sendf("Category set to `%v` (ID %v). Please type the description:", m.Content, cat)
 		if err != nil {
 			return
 		}
 
-		ctx.AddMessageHandler(msg.ID, func(ctx *crouter.Ctx, m *discordgo.MessageCreate) {
+		ctx.AddMessageHandler(ctx.Channel.ID, ctx.Author.ID, func(ctx *bcr.Context, m discord.Message) {
 			if m.Content == "cancel" {
-				ctx.Send("Term creation cancelled.")
+				ctx.Send("Term creation cancelled.", nil)
 				return
 			}
 			t := ctx.AdditionalParams["term"].(*db.Term)
 			t.Description = m.Content
 			ctx.AdditionalParams["term"] = t
-			msg, err := ctx.Send("Description set. Please type the source:")
+			_, err := ctx.Send("Description set. Please type the source:", nil)
 			if err != nil {
 				return
 			}
 
-			ctx.AddMessageHandler(msg.ID, func(ctx *crouter.Ctx, m *discordgo.MessageCreate) {
+			ctx.AddMessageHandler(ctx.Channel.ID, ctx.Author.ID, func(ctx *bcr.Context, m discord.Message) {
 				if m.Content == "cancel" {
-					ctx.Send("Term creation cancelled.")
+					ctx.Send("Term creation cancelled.", nil)
 					return
 				}
 				t := ctx.AdditionalParams["term"].(*db.Term)
 				t.Source = m.Content
 				ctx.AdditionalParams["term"] = t
-				msg, err := ctx.Send("Source set. Please type a *newline separated* list of aliases/synonyms, or \"none\" to set no aliases:")
+				_, err := ctx.Send("Source set. Please type a *newline separated* list of aliases/synonyms, or \"none\" to set no aliases:", nil)
 				if err != nil {
 					return
 				}
 
-				ctx.AddMessageHandler(msg.ID, func(ctx *crouter.Ctx, m *discordgo.MessageCreate) {
+				ctx.AddMessageHandler(ctx.Channel.ID, ctx.Author.ID, func(ctx *bcr.Context, m discord.Message) {
 					if m.Content == "cancel" {
-						ctx.Send("Term creation cancelled.")
+						ctx.Send("Term creation cancelled.", nil)
 						return
 					}
 					t := ctx.AdditionalParams["term"].(*db.Term)
@@ -80,23 +82,20 @@ func (c *commands) addTerm(ctx *crouter.Ctx) (err error) {
 						t.Aliases = []string{}
 					}
 
-					msg, err := ctx.Send(&discordgo.MessageSend{
-						Content: "Term finished. React with ✅ to finish adding it, or with ❌ to cancel. Preview:",
-						Embed:   t.TermEmbed(""),
-					})
+					msg, err := ctx.Send("Term finished. React with ✅ to finish adding it, or with ❌ to cancel. Preview:", t.TermEmbed(""))
 					if err != nil {
 						return
 					}
 
-					ctx.AddYesNoHandler(msg.ID, func(ctx *crouter.Ctx) {
+					ctx.AddYesNoHandler(msg.ID, ctx.Author.ID, func(ctx *bcr.Context) {
 						t, err := c.db.AddTerm(t)
 						if err != nil {
-							ctx.CommandError(err)
+							_, err = ctx.Send(misc.InternalError, nil)
 							return
 						}
 						ctx.Sendf("Added term with ID %v.", t.ID)
-					}, func(ctx *crouter.Ctx) {
-						ctx.Send("Cancelled.")
+					}, func(ctx *bcr.Context) {
+						ctx.Send("Cancelled.", nil)
 					})
 				})
 			})

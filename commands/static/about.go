@@ -6,36 +6,35 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/crouter"
-	"github.com/bwmarrin/discordgo"
+	"github.com/diamondburned/arikawa/v2/discord"
 )
 
 var botVersion = "v0.2"
 
-func (c *Commands) about(ctx *crouter.Ctx) (err error) {
+func (c *Commands) about(ctx *bcr.Context) (err error) {
 	c.cmdMutex.RLock()
 	defer c.cmdMutex.RUnlock()
-	embed := &discordgo.MessageEmbed{
+	embed := &discord.Embed{
 		Title: "About",
 		Color: db.EmbedColour,
-		Footer: &discordgo.MessageEmbedFooter{
-			Text:    fmt.Sprintf("Made with discordgo %v", discordgo.VERSION),
-			IconURL: "https://raw.githubusercontent.com/bwmarrin/discordgo/master/docs/img/discordgo.png",
+		Footer: &discord.EmbedFooter{
+			Text: "Made with Arikawa",
 		},
-		Thumbnail: &discordgo.MessageEmbedThumbnail{
-			URL: ctx.BotUser.AvatarURL("256"),
+		Thumbnail: &discord.EmbedThumbnail{
+			URL: ctx.Bot.AvatarURL(),
 		},
-		Timestamp: time.Now().Format(time.RFC3339),
-		Fields: []*discordgo.MessageEmbedField{
+		Timestamp: discord.NewTimestamp(time.Now()),
+		Fields: []discord.EmbedField{
 			{
 				Name:   "Bot version",
-				Value:  fmt.Sprintf("%v (crouter v%v)", botVersion, crouter.Version()),
+				Value:  fmt.Sprintf("%v (bcr v%v)", botVersion, bcr.Version()),
 				Inline: true,
 			},
 			{
-				Name:   "discordgo version",
-				Value:  fmt.Sprintf("%v (%v)", discordgo.VERSION, runtime.Version()),
+				Name:   "Go version",
+				Value:  runtime.Version(),
 				Inline: true,
 			},
 			{
@@ -64,32 +63,32 @@ func (c *Commands) about(ctx *crouter.Ctx) (err error) {
 			{
 				Name:   "Credits",
 				Value:  fmt.Sprintf("Check `%vcredits`!", ctx.Router.Prefixes[0]),
-				Inline: false,
+				Inline: true,
 			},
 			{
 				Name:   "Source code",
 				Value:  "[GitHub](https://github.com/Starshine113/berry)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
-				Inline: false,
+				Inline: true,
 			},
 		},
 	}
 
-	_, err = ctx.Send(embed)
+	_, err = ctx.Send("", embed)
 	return
 }
 
-func invite(ctx *crouter.Ctx) string {
+func invite(ctx *bcr.Context) string {
 	// perms is the list of permissions the bot will be granted by default
-	var perms = discordgo.PermissionReadMessages +
-		discordgo.PermissionReadMessageHistory +
-		discordgo.PermissionSendMessages +
-		discordgo.PermissionManageMessages +
-		discordgo.PermissionEmbedLinks +
-		discordgo.PermissionAttachFiles +
-		discordgo.PermissionUseExternalEmojis +
-		discordgo.PermissionAddReactions
+	var perms = discord.PermissionViewChannel +
+		discord.PermissionReadMessageHistory +
+		discord.PermissionSendMessages +
+		discord.PermissionManageMessages +
+		discord.PermissionEmbedLinks +
+		discord.PermissionAttachFiles +
+		discord.PermissionUseExternalEmojis +
+		discord.PermissionAddReactions
 
-	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&scope=bot", ctx.Session.State.User.ID, perms)
+	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&scope=bot", ctx.Bot.ID, perms)
 }
 
 func prettyDurationString(duration time.Duration) (out string) {

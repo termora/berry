@@ -3,31 +3,32 @@ package admin
 import (
 	"strings"
 
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/crouter"
 )
 
-func (c *commands) addAdmin(ctx *crouter.Ctx) (err error) {
+func (c *commands) addAdmin(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("You need to pass a user ID or mention to this command.")
+		_, err = ctx.Send("You need to pass a user ID or mention to this command.", nil)
 		return
 	}
 
-	u, err := ctx.ParseUser(strings.Join(ctx.Args, " "))
+	u, err := ctx.ParseMember(strings.Join(ctx.Args, " "))
 	if err != nil {
 		if err == crouter.ErrNoID {
-			_, err = ctx.Send("Invalid ID passed.")
+			_, err = ctx.Send("Invalid ID passed.", nil)
 		} else {
-			_, err = ctx.Send("User not found")
+			_, err = ctx.Send("User not found", nil)
 		}
 		return
 	}
 
-	msg, err := ctx.Sendf("Are you sure you want to add %v as a bot admin?", u.Mention())
-	ctx.AddYesNoHandler(msg.ID, func(ctx *crouter.Ctx) {
-		err := c.db.AddAdmin(u.ID)
+	msg, err := ctx.Sendf("Are you sure you want to add %v as a bot admin?", u.User.Mention())
+	ctx.AddYesNoHandler(msg.ID, ctx.Author.ID, func(ctx *bcr.Context) {
+		err := c.db.AddAdmin(u.User.ID.String())
 		if err != nil {
-			c.sugar.Errorf("Error adding admin %v: %v", u.ID, err)
-			_, err = ctx.Send("Error adding admin.")
+			c.sugar.Errorf("Error adding admin %v: %v", u.User.ID.String(), err)
+			_, err = ctx.Send("Error adding admin.", nil)
 			if err != nil {
 				c.sugar.Errorf("Error sending message: %v", err)
 			}
@@ -43,8 +44,8 @@ func (c *commands) addAdmin(ctx *crouter.Ctx) (err error) {
 			c.sugar.Error("Error refreshing list of admins:", err)
 		}
 		return
-	}, func(ctx *crouter.Ctx) {
-		_, err = ctx.Send("Cancelled.")
+	}, func(ctx *bcr.Context) {
+		_, err = ctx.Send("Cancelled.", nil)
 		if err != nil {
 			c.sugar.Errorf("Error sending message: %v", err)
 		}

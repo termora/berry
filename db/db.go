@@ -44,7 +44,7 @@ func Init(url string, sugar *zap.SugaredLogger) (db *Db, err error) {
 	guildCache.SetCacheSizeLimit(100)
 	guildCache.SetTTL(10 * time.Minute)
 
-	pool, err := initDB(url)
+	pool, err := initDB(sugar, url)
 	if err != nil {
 		return nil, err
 	}
@@ -58,22 +58,22 @@ func Init(url string, sugar *zap.SugaredLogger) (db *Db, err error) {
 	return
 }
 
-func initDB(url string) (*pgxpool.Pool, error) {
+func initDB(s *zap.SugaredLogger, url string) (*pgxpool.Pool, error) {
 	db, err := pgxpool.Connect(context.Background(), url)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to connect to database: %w", err)
 	}
-	if err := initDBIfNotInitialised(db); err != nil {
+	if err := initDBIfNotInitialised(s, db); err != nil {
 		return nil, err
 	}
-	err = updateDB(db)
+	err = updateDB(s, db)
 	if err != nil {
 		return nil, err
 	}
 	return db, nil
 }
 
-func initDBIfNotInitialised(db *pgxpool.Pool) error {
+func initDBIfNotInitialised(s *zap.SugaredLogger, db *pgxpool.Pool) error {
 	var exists bool
 	err := db.QueryRow(context.Background(), "select exists (select from information_schema.tables where table_schema = 'public' and table_name = 'info')").Scan(&exists)
 	if err != nil {
@@ -88,11 +88,11 @@ func initDBIfNotInitialised(db *pgxpool.Pool) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Successfully initialised the database.\n")
+	s.Infof("Successfully initialised the database.")
 	return nil
 }
 
-func updateDB(db *pgxpool.Pool) (err error) {
+func updateDB(s *zap.SugaredLogger, db *pgxpool.Pool) (err error) {
 	var dbVersion int
 	err = db.QueryRow(context.Background(), "select schema_version from public.info").Scan(&dbVersion)
 	if err != nil {
@@ -105,10 +105,10 @@ func updateDB(db *pgxpool.Pool) (err error) {
 			return err
 		}
 		dbVersion++
-		fmt.Printf("Updated database to version %v\n", dbVersion)
+		s.Infof("Updated database to version %v", dbVersion)
 	}
 	if initialDBVersion < DBVersion {
-		fmt.Printf("Successfully updated database to target version %v\n", DBVersion)
+		s.Infof("Successfully updated database to target version %v", DBVersion)
 	}
 	return nil
 }

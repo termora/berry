@@ -3,30 +3,30 @@ package static
 import (
 	"fmt"
 
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/crouter"
-	"github.com/bwmarrin/discordgo"
+	"github.com/diamondburned/arikawa/v2/discord"
 )
 
-func (c *Commands) credits(ctx *crouter.Ctx) (err error) {
+func (c *Commands) credits(ctx *bcr.Context) (err error) {
 	// return if there's no credit fields
 	if len(c.config.Bot.CreditFields) == 0 {
 		return nil
 	}
 
-	fs := make([]*discordgo.MessageEmbedField, 0)
+	fs := make([]discord.EmbedField, 0)
 
 	for _, f := range c.config.Bot.CreditFields {
-		fs = append(fs, &discordgo.MessageEmbedField{
+		fs = append(fs, discord.EmbedField{
 			Name:  f.Name,
 			Value: f.Value,
 		})
 	}
 
-	_, err = ctx.Send(&discordgo.MessageEmbed{
+	_, err = ctx.Send("", &discord.Embed{
 		Color:       db.EmbedColour,
 		Title:       "Credits",
-		Description: fmt.Sprintf("These are the people who helped create %v!", ctx.BotUser.Username),
+		Description: fmt.Sprintf("These are the people who helped create %v!", ctx.Bot.Username),
 		Fields:      fs,
 	})
 	return err

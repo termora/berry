@@ -1,19 +1,23 @@
 package static
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/bcr"
 )
 
-func (c *Commands) ping(ctx *crouter.Ctx) (err error) {
+func (c *Commands) ping(ctx *bcr.Context) (err error) {
 	t := time.Now()
-	ping := ctx.Session.HeartbeatLatency().Round(time.Millisecond)
-	m, err := ctx.Sendf("🏓 **Pong!**\nHeartbeat: %s", ping)
+	heartbeat := ctx.Session.Gateway.PacerLoop.EchoBeat.Time().Sub(ctx.Session.Gateway.PacerLoop.SentBeat.Time()).Round(time.Millisecond)
+
+	m, err := ctx.Send(fmt.Sprintf("🏓 **Pong!**\nHeartbeat: %v", heartbeat), nil)
 	if err != nil {
 		return err
 	}
+
 	latency := time.Since(t).Round(time.Millisecond)
-	_, err = ctx.Editf(m, m.Content+"\nMessage: %s", latency)
+
+	_, err = ctx.Edit(m, fmt.Sprintf("%v\nMessage: %v", m.Content, latency), nil)
 	return err
 }

@@ -4,9 +4,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/berry/structs"
-	"github.com/Starshine113/crouter"
 	"go.uber.org/zap"
 )
 
@@ -22,9 +22,9 @@ type Commands struct {
 }
 
 // Init ...
-func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *crouter.Router) *Commands {
+func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router) *Commands {
 	c := &Commands{config: conf, start: time.Now(), sugar: s, db: d}
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name: "ping",
 
 		Summary:  "Check the bot's message latency",
@@ -34,7 +34,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *crouter.Ro
 		Command:       c.ping,
 	})
 
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name: "about",
 
 		Summary:  "Some info about the bot",
@@ -44,7 +44,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *crouter.Ro
 		Command:       c.about,
 	})
 
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name: "credits",
 
 		Summary:  "A list of people who helped create the bot",
@@ -54,7 +54,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *crouter.Ro
 		Command:       c.credits,
 	})
 
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name:    "hello",
 		Aliases: []string{"Hi"},
 
@@ -65,7 +65,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *crouter.Ro
 		Command:       c.hello,
 	})
 
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name: "help",
 
 		Summary:  "Show info about how to use the bot",
@@ -75,7 +75,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *crouter.Ro
 		Command:       c.help,
 	})
 
-	r.AddCommand(&crouter.Command{
+	r.AddCommand(&bcr.Command{
 		Name: "invite",
 
 		Summary:  "Get an invite link",
@@ -89,7 +89,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *crouter.Ro
 }
 
 // PostFunc logs when a command is used
-func (c *Commands) PostFunc(ctx *crouter.Ctx) {
+func (c *Commands) PostFunc(ctx *bcr.Context) {
 	c.sugar.Debugf("Command executed: `%v` (arguments %v) by %v (channel %v, guild %v)", ctx.Cmd.Name, ctx.Args, ctx.Author.ID, ctx.Channel.ID, ctx.Message.GuildID)
 	c.cmdMutex.Lock()
 	c.cmdCount++

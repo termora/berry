@@ -4,14 +4,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/bcr"
 )
 
-func (c *commands) term(ctx *crouter.Ctx) (err error) {
+func (c *commands) term(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
 		_, err = ctx.Sendf("❌ No term ID provided.")
 		return
@@ -45,34 +45,25 @@ func (c *commands) term(ctx *crouter.Ctx) (err error) {
 		return
 	}
 
-	perms, err := getPerms(ctx, ctx.Author.ID, channel.ID)
+	perms, err := ctx.Session.Permissions(channel.ID, ctx.Author.ID)
 	if err != nil {
 		c.Sugar.Errorf("Error getting perms for %v in %v: %v", ctx.Author.ID, channel.ID, err)
 		_, err = ctx.Sendf("❌ An error occurred while trying to get permissions.\nIf this issue persists, please contact the bot developer.")
 		return
 	}
 
-	if perms&discordgo.PermissionManageMessages != discordgo.PermissionManageMessages {
+	if perms&discord.PermissionManageMessages != discord.PermissionManageMessages {
 		_, err = ctx.Sendf("❌ Error: this command requires the `Manage Messages` permission in the channel you're posting to.")
 		return
 	}
 
-	_, err = ctx.Session.ChannelMessageSendEmbed(channel.ID, term.TermEmbed(c.conf.Bot.TermBaseURL))
+	_, err = ctx.Session.SendEmbed(channel.ID, *term.TermEmbed(c.conf.Bot.TermBaseURL))
 	if err != nil {
 		return
 	}
 
 	if channel.ID != ctx.Channel.ID {
 		_, err = ctx.Sendf("✅ Message sent to %v!", channel.Mention())
-	}
-	return
-}
-
-func getPerms(ctx *crouter.Ctx, userID, channelID string) (perms int, err error) {
-	perms, err = ctx.Session.State.UserChannelPermissions(userID, channelID)
-	if err == discordgo.ErrStateNotFound {
-		perms, err = ctx.Session.UserChannelPermissions(userID, channelID)
-		return
 	}
 	return
 }

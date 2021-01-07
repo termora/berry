@@ -2,20 +2,24 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
 	"go.uber.org/zap"
 
+	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/commands/admin"
 	"github.com/Starshine113/berry/commands/search"
 	"github.com/Starshine113/berry/commands/server"
 	"github.com/Starshine113/berry/commands/static"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/crouter"
-	"github.com/bwmarrin/discordgo"
+	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v2/gateway"
+	"github.com/diamondburned/arikawa/v2/state"
 )
 
 var sugar *zap.SugaredLogger
@@ -36,43 +40,55 @@ func main() {
 	}
 	sugar.Info("Connected to database.")
 
-	dg, err := discordgo.New("Bot " + c.Auth.Token)
+	s, err := state.NewWithIntents("Bot "+c.Auth.Token, bcr.RequiredIntents)
 	if err != nil {
-		sugar.Fatalf("Error creating Discord session: %v", err)
+		log.Fatalln("Error creating state:", err)
 	}
 
-	// create the router
-	r := crouter.NewRouter(dg, c.Bot.BotOwners, c.Bot.Prefixes)
+	r := bcr.NewRouter(s, c.Bot.BotOwners, c.Bot.Prefixes)
+	r.EmbedColor = 0xe00d7a
+
 	// set blacklist function
-	r.Blacklist(d.CtxInBlacklist)
+	r.BlacklistFunc = d.CtxInBlacklist
 
 	// add the message create handler
 	mc := &messageCreate{r: r, c: c, sugar: sugar}
-	dg.AddHandler(mc.messageCreate)
+	s.AddHandler(mc.messageCreate)
 
 	// start loop to update status every minute
-	dg.AddHandlerOnce(func(s *discordgo.Session, _ *discordgo.Ready) {
-		for {
-			if err := s.UpdateStatus(0, fmt.Sprintf("%vhelp | in %v servers", c.Bot.Prefixes[0], len(s.State.Guilds))); err != nil {
-				sugar.Errorf("Error setting status: %v", err)
+	// :uhhh: arikawa doesn't have a way to add a handler that only runs once
+	var o sync.Once
+	s.AddHandler(func(d *gateway.ReadyEvent) {
+		o.Do(func() {
+			for {
+				if err := s.Gateway.UpdateStatus(gateway.UpdateStatusData{
+					Status: gateway.IdleStatus,
+					Activities: &[]discord.Activity{{
+						Name: fmt.Sprintf("%vhelp", c.Bot.Prefixes[0]),
+					}},
+				}); err != nil {
+					sugar.Error("Error setting status:", err)
+				}
+				time.Sleep(time.Minute)
+				// if a URL isn't set, just loop back immediately
+				if c.Bot.Website == "" {
+					continue
+				}
+				if err := s.Gateway.UpdateStatus(gateway.UpdateStatusData{
+					Status: gateway.IdleStatus,
+					Activities: &[]discord.Activity{{
+						Name: fmt.Sprintf("%vhelp | %v", c.Bot.Prefixes[0], c.Bot.Website),
+					}},
+				}); err != nil {
+					sugar.Error("Error setting status:", err)
+				}
+				time.Sleep(time.Minute)
 			}
-			time.Sleep(time.Minute)
-			// if a URL isn't set, just loop back immediately
-			if c.Bot.Website == "" {
-				continue
-			}
-			if err := s.UpdateStatus(0, fmt.Sprintf("%vhelp | %v", c.Bot.Prefixes[0], c.Bot.Website)); err != nil {
-				sugar.Errorf("Error setting status: %v", err)
-			}
-			time.Sleep(time.Minute)
-		}
+		})
 	})
 
 	// add static commands
-	cmds := static.Init(c, d, sugar, r)
-
-	// set post-command log function
-	r.PostFunc = cmds.PostFunc
+	static.Init(c, d, sugar, r)
 
 	// add term commands
 	search.Init(d, c, sugar, r)
@@ -83,18 +99,14 @@ func main() {
 	// add admin commands
 	admin.Init(d, sugar, c, r)
 
-	// add intents
-	dg.Identify.Intents = discordgo.MakeIntent(crouter.RequiredIntents)
-
 	// open a connection to Discord
-	err = dg.Open()
-	if err != nil {
-		panic(err)
+	if err = s.Open(); err != nil {
+		sugar.Fatal("Failed to connect:", err)
 	}
 
 	// Defer this to make sure that things are always cleanly shutdown even in the event of a crash
 	defer func() {
-		dg.Close()
+		s.Close()
 		sugar.Infof("Disconnected from Discord.")
 		d.Pool.Close()
 		sugar.Infof("Closed database connection.")

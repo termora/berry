@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Starshine113/crouter"
+	"github.com/Starshine113/bcr"
 )
 
 // Errors for setting the blacklist
@@ -70,7 +70,7 @@ func (db *Db) GetBlacklist(guildID string) (b []string, err error) {
 	return b, err
 }
 
-// CtxInBlacklist is a wrapper around IsBlacklisted for crouter
-func (db *Db) CtxInBlacklist(ctx *crouter.Ctx) bool {
-	return db.IsBlacklisted(ctx.Message.GuildID, ctx.Channel.ID)
+// CtxInBlacklist is a wrapper around IsBlacklisted for bcr
+func (db *Db) CtxInBlacklist(ctx *bcr.Context) bool {
+	return db.IsBlacklisted(ctx.Message.GuildID.String(), ctx.Channel.ID.String())
 }
