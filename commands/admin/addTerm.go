@@ -87,7 +87,7 @@ func (c *commands) addTerm(ctx *bcr.Context) (err error) {
 						return
 					}
 
-					ctx.AddYesNoHandler(msg.ID, ctx.Author.ID, func(ctx *bcr.Context) {
+					ctx.AddYesNoHandler(*msg, ctx.Author.ID, func(ctx *bcr.Context) {
 						t, err := c.db.AddTerm(t)
 						if err != nil {
 							_, err = ctx.Send(misc.InternalError, nil)

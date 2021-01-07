@@ -11,7 +11,7 @@ import (
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 
-var botVersion = "v0.2"
+var botVersion = "v0.3"
 
 func (c *Commands) about(ctx *bcr.Context) (err error) {
 	c.cmdMutex.RLock()

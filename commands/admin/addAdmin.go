@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/crouter"
 )
 
 func (c *commands) addAdmin(ctx *bcr.Context) (err error) {
@@ -15,16 +14,12 @@ func (c *commands) addAdmin(ctx *bcr.Context) (err error) {
 
 	u, err := ctx.ParseMember(strings.Join(ctx.Args, " "))
 	if err != nil {
-		if err == crouter.ErrNoID {
-			_, err = ctx.Send("Invalid ID passed.", nil)
-		} else {
-			_, err = ctx.Send("User not found", nil)
-		}
+		_, err = ctx.Send("User not found", nil)
 		return
 	}
 
 	msg, err := ctx.Sendf("Are you sure you want to add %v as a bot admin?", u.User.Mention())
-	ctx.AddYesNoHandler(msg.ID, ctx.Author.ID, func(ctx *bcr.Context) {
+	ctx.AddYesNoHandler(*msg, ctx.Author.ID, func(ctx *bcr.Context) {
 		err := c.db.AddAdmin(u.User.ID.String())
 		if err != nil {
 			c.sugar.Errorf("Error adding admin %v: %v", u.User.ID.String(), err)

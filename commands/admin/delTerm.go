@@ -30,7 +30,7 @@ func (c *commands) delTerm(ctx *bcr.Context) (err error) {
 		return err
 	}
 
-	ctx.AddYesNoHandler(m.ID, ctx.Author.ID, func(ctx *bcr.Context) {
+	ctx.AddYesNoHandler(*m, ctx.Author.ID, func(ctx *bcr.Context) {
 		err = c.db.RemoveTerm(id)
 		if err != nil {
 			c.sugar.Error("Error removing term:", err)
