@@ -23,18 +23,18 @@ func Init(db *db.Db, r *bcr.Router) {
 	})
 
 	g.AddSubcommand(&bcr.Command{
-		Name:        "add",
-		Description: "Add a channel to the blacklist",
-		Usage:       "<channel>",
+		Name:    "add",
+		Summary: "Add a channel to the blacklist",
+		Usage:   "<channel>",
 
 		Permissions: discord.PermissionManageGuild,
 		Command:     c.blacklistAdd,
 	})
 
 	g.AddSubcommand(&bcr.Command{
-		Name:        "remove",
-		Description: "Remove a channel from the blacklist",
-		Usage:       "<channel>",
+		Name:    "remove",
+		Summary: "Remove a channel from the blacklist",
+		Usage:   "<channel>",
 
 		Permissions: discord.PermissionManageGuild,
 		Command:     c.blacklistRemove,

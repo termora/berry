@@ -25,8 +25,8 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 		Name:    "search",
 		Aliases: []string{"s"},
 
-		Description: "Search for a term",
-		Usage:       "<search term>",
+		Summary: "Search for a term",
+		Usage:   "<search term>",
 
 		Cooldown:      3 * time.Second,
 		Blacklistable: true,
@@ -38,7 +38,7 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 		Name:    "random",
 		Aliases: []string{"r"},
 
-		Description: "Show a random term",
+		Summary: "Show a random term",
 
 		Cooldown:      3 * time.Second,
 		Blacklistable: true,
@@ -50,8 +50,8 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 		Name:    "explain",
 		Aliases: []string{"e", "ex"},
 
-		Description: "",
-		Usage:       "[explanation]",
+		Summary: "Show a single explanation, or a list of all explanations",
+		Usage:   "[explanation]",
 
 		Cooldown:      1 * time.Second,
 		Blacklistable: false,
@@ -60,8 +60,8 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 	})
 
 	r.AddCommand(&bcr.Command{
-		Name:        "list",
-		Description: "List all terms",
+		Name:    "list",
+		Summary: "List all terms",
 
 		Cooldown:      3 * time.Second,
 		Blacklistable: true,
@@ -69,9 +69,9 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 	})
 
 	r.AddCommand(&bcr.Command{
-		Name:        "post",
-		Description: "Post a single term",
-		Usage:       "<term ID> [channel]",
+		Name:    "post",
+		Summary: "Post a single term",
+		Usage:   "<term ID> [channel]",
 
 		Cooldown:      3 * time.Second,
 		Blacklistable: true,

@@ -9,61 +9,61 @@ import (
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 
+func (c *Commands) perms(ctx *bcr.Context) (err error) {
+	_, err = ctx.Send("", &discord.Embed{
+		Title: "Required permissions",
+		Description: fmt.Sprintf(`%v requires the following permissions to function correctly:
+	- **Read Messages** & **Send Messages**: to respond to commands
+	- **Read Message History**: for the %vsearch command to work
+	- **Manage Messages**: to delete reactions on menus
+	- **Embed Links**: to send responses for most commands
+	- **Attach Files**: to send a glossary export
+	- **Add Reactions**: for menus to work
+	- **Use External Emojis**: to use custom emotes in a couple of commands`, ctx.Bot.Username, ctx.Router.Prefixes[0]),
+		Color: db.EmbedColour,
+	})
+	return
+}
+
+func (c *Commands) privacy(ctx *bcr.Context) (err error) {
+	_, err = ctx.Send("", &discord.Embed{
+		Title: "Privacy",
+		Description: fmt.Sprintf(`We're not lawyers, we don't want to write a document that no one will (or even can) read.
+
+	This is the data %v collects:
+	
+	- Data about commands run: command, arguments, user ID, and channel ID, used exclusively for debugging purposes and automatically removed when the bot's logs are rotated
+	- A list of blacklisted channels per server
+	
+	This is the data %v stores in memory, and which is wiped on a restart:
+	
+	- Message metadata *for its own messages*
+	- Message metadata for messages that trigger commands
+	
+	This is the data %v does *not* collect:
+	
+	- Any message contents
+	- Any user information
+	- Information about messages that do not trigger commands
+	
+	Additionally, there are daily database backups, which only include a list of blacklisted channels (as well as all terms/explanations).
+	
+	%v is open source, and its source code is available [on GitHub](https://github.com/Starshine113/Berry). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username),
+		Color: db.EmbedColour,
+	})
+	return err
+}
+
+func (c *Commands) autopost(ctx *bcr.Context) (err error) {
+	_, err = ctx.Send("", &discord.Embed{
+		Title:       "Autopost",
+		Description: "To automatically post terms at a set interval, you can use the following custom command for [YAGPDB.xyz](https://yagpdb.xyz/):\n```{{/* Recommended trigger: Minute/Hourly interval */}}\n\nt!random\n{{deleteResponse 1}}```\nOther bots may have similar functionality; if you need a bot whitelisted for commands, feel free to ask on the support server.",
+		Color:       db.EmbedColour,
+	})
+	return
+}
+
 func (c *Commands) help(ctx *bcr.Context) (err error) {
-	if ctx.RawArgs == "permissions" || ctx.RawArgs == "perms" {
-		_, err = ctx.Send("", &discord.Embed{
-			Title: "Required permissions",
-			Description: fmt.Sprintf(`%v requires the following permissions to function correctly:
-		- **Read Messages** & **Send Messages**: to respond to commands
-		- **Read Message History**: for the %vsearch command to work
-		- **Manage Messages**: to delete reactions on menus
-		- **Embed Links**: to send responses for most commands
-		- **Attach Files**: to send a glossary export
-		- **Add Reactions**: for menus to work
-		- **Use External Emojis**: to use custom emotes in a couple of commands`, ctx.Bot.Username, ctx.Router.Prefixes[0]),
-			Color: db.EmbedColour,
-		})
-		return
-	}
-
-	if ctx.RawArgs == "privacy" || ctx.RawArgs == "privacy-policy" {
-		_, err = ctx.Send("", &discord.Embed{
-			Title: "Privacy",
-			Description: fmt.Sprintf(`We're not lawyers, we don't want to write a document that no one will (or even can) read.
-
-		This is the data %v collects:
-		
-		- Data about commands run: command, arguments, user ID, and channel ID, used exclusively for debugging purposes and automatically removed when the bot's logs are rotated
-		- A list of blacklisted channels per server
-		
-		This is the data %v stores in memory, and which is wiped on a restart:
-		
-		- Message metadata *for its own messages*
-		- Message metadata for messages that trigger commands
-		
-		This is the data %v does *not* collect:
-		
-		- Any message contents
-		- Any user information
-		- Information about messages that do not trigger commands
-		
-		Additionally, there are daily database backups, which only include a list of blacklisted channels (as well as all terms/explanations).
-		
-		%v is open source, and its source code is available [on GitHub](https://github.com/Starshine113/Berry). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username),
-			Color: db.EmbedColour,
-		})
-		return err
-	}
-
-	if ctx.RawArgs == "autopost" {
-		_, err = ctx.Send("", &discord.Embed{
-			Title:       "Autopost",
-			Description: "To automatically post terms at a set interval, you can use the following custom command for [YAGPDB.xyz](https://yagpdb.xyz/):\n```{{/* Recommended trigger: Minute/Hourly interval */}}\n\nt!random\n{{deleteResponse 1}}```\nOther bots may have similar functionality; if you need a bot whitelisted for commands, feel free to ask on the support server.",
-			Color:       db.EmbedColour,
-		})
-		return
-	}
-
 	// help for commands
 	if len(ctx.Args) > 0 {
 		return ctx.Help(ctx.Args)

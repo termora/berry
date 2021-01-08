@@ -65,14 +65,48 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 		Command:       c.hello,
 	})
 
-	r.AddCommand(&bcr.Command{
+	help := r.AddCommand(&bcr.Command{
 		Name: "help",
 
-		Summary:  "Show info about how to use the bot",
-		Cooldown: 1 * time.Second,
+		Summary:     "Show info about how to use the bot",
+		Description: "Show info about how to use the bot. If a command name is given as an argument, show the help for that command.",
+		Usage:       "[command]",
+		Cooldown:    1 * time.Second,
 
 		Blacklistable: true,
 		Command:       c.help,
+	})
+
+	help.AddSubcommand(&bcr.Command{
+		Name:    "permissions",
+		Aliases: []string{"perms"},
+
+		Summary:  "Show an explanation of the permissions the bot needs",
+		Cooldown: 1 * time.Second,
+
+		Blacklistable: true,
+		Command:       c.perms,
+	})
+
+	help.AddSubcommand(&bcr.Command{
+		Name:    "privacy",
+		Aliases: []string{"privacy-policy"},
+
+		Summary:  "Show an explanation of the data the bot collects (and what it doesn't)",
+		Cooldown: 1 * time.Second,
+
+		Blacklistable: true,
+		Command:       c.privacy,
+	})
+
+	help.AddSubcommand(&bcr.Command{
+		Name: "autopost",
+
+		Summary:  "Show how to set up automatically posting terms in a channel",
+		Cooldown: 1 * time.Second,
+
+		Blacklistable: true,
+		Command:       c.autopost,
 	})
 
 	r.AddCommand(&bcr.Command{
