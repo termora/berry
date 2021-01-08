@@ -20,7 +20,7 @@ type commands struct {
 
 // Init ...
 func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.Router) {
-	c := &commands{db: db, config: conf}
+	c := &commands{db: db, config: conf, sugar: sugar}
 
 	r.AddCommand(&bcr.Command{
 		Name:    "AddTerm",

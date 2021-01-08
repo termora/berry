@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -58,7 +59,15 @@ func main() {
 		st := fmt.Sprintf("%vhelp", c.Bot.Prefixes[0])
 
 		if c.Bot.Website != "" {
-			st += " | " + c.Bot.Website
+			var w string
+			u, err := url.Parse(c.Bot.Website)
+			if err != nil {
+				w = c.Bot.Website
+			} else {
+				w = u.Host
+			}
+
+			st += " | " + w
 		}
 
 		if err := s.Gateway.UpdateStatus(gateway.UpdateStatusData{
