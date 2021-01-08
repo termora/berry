@@ -119,7 +119,7 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Summary: "Restart the bot",
 
 		OwnerOnly: true,
-		Command:   c.update,
+		Command:   c.kill,
 	})
 }
 
