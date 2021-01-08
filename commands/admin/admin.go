@@ -105,6 +105,22 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		OwnerOnly: true,
 		Command:   c.addAdmin,
 	})
+
+	r.AddCommand(&bcr.Command{
+		Name:    "update",
+		Summary: "Update the bot",
+
+		OwnerOnly: true,
+		Command:   c.update,
+	})
+
+	r.AddCommand(&bcr.Command{
+		Name:    "restart",
+		Summary: "Restart the bot",
+
+		OwnerOnly: true,
+		Command:   c.update,
+	})
 }
 
 func (c *commands) checkOwner(ctx *bcr.Context) (string, bool) {
