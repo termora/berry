@@ -59,6 +59,18 @@ func (t *Term) Warning() bool {
 
 // TermEmbed creates a Discord embed from a term object
 func (t *Term) TermEmbed(baseURL string) *discord.Embed {
+	var (
+		desc = t.Description
+		cw   = t.ContentWarnings
+		note = t.Note
+	)
+
+	if baseURL != "" {
+		desc = strings.ReplaceAll(desc, "(##", "("+baseURL)
+		note = strings.ReplaceAll(note, "(##", "("+baseURL)
+		cw = strings.ReplaceAll(cw, "(##", "("+baseURL)
+	}
+
 	defer AddCount()
 
 	fields := make([]discord.EmbedField, 0)
@@ -69,19 +81,18 @@ func (t *Term) TermEmbed(baseURL string) *discord.Embed {
 		})
 	}
 
-	desc := t.Description
-	if t.ContentWarnings != "" {
+	if cw != "" {
 		desc = "||" + t.Description + "||"
 		fields = append(fields, discord.EmbedField{
 			Name:  "Content warning",
-			Value: t.ContentWarnings,
+			Value: cw,
 		})
 	}
 
-	if t.Note != "" {
+	if note != "" {
 		fields = append(fields, discord.EmbedField{
 			Name:  "Note",
-			Value: t.Note,
+			Value: note,
 		})
 	}
 
