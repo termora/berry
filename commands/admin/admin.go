@@ -23,7 +23,8 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 	c := &commands{db: db, config: conf, sugar: sugar}
 
 	r.AddCommand(&bcr.Command{
-		Name:    "AddTerm",
+		Name:    "addterm",
+		Aliases: []string{"add-term"},
 		Summary: "Add a term",
 
 		CustomPermissions: c.checkOwner,
@@ -32,7 +33,8 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 	})
 
 	r.AddCommand(&bcr.Command{
-		Name:    "DelTerm",
+		Name:    "delterm",
+		Aliases: []string{"del-term"},
 		Summary: "Delete a term",
 
 		CustomPermissions: c.checkOwner,
@@ -41,7 +43,8 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 	})
 
 	r.AddCommand(&bcr.Command{
-		Name:    "AddCategory",
+		Name:    "addcategory",
+		Aliases: []string{"add-category"},
 		Summary: "Add a category",
 		Usage:   "<name>",
 
@@ -51,7 +54,8 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 	})
 
 	r.AddCommand(&bcr.Command{
-		Name:    "AddExplanation",
+		Name:    "addexplanation",
+		Aliases: []string{"add-explanation"},
 		Summary: "Add an explanation",
 
 		CustomPermissions: c.checkOwner,
@@ -60,7 +64,7 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 	})
 
 	r.AddCommand(&bcr.Command{
-		Name:    "SetFlags",
+		Name:    "setflags",
 		Summary: "Set a term's flags",
 
 		CustomPermissions: c.checkOwner,
@@ -69,7 +73,7 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 	})
 
 	r.AddCommand(&bcr.Command{
-		Name:    "SetCW",
+		Name:    "setcw",
 		Summary: "Set a term's CW",
 
 		CustomPermissions: c.checkOwner,
@@ -78,7 +82,17 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 	})
 
 	r.AddCommand(&bcr.Command{
-		Name:    "EditTerm",
+		Name:    "setnote",
+		Summary: "Set a term's note",
+
+		CustomPermissions: c.checkOwner,
+
+		Command: c.setNote,
+	})
+
+	r.AddCommand(&bcr.Command{
+		Name:    "editterm",
+		Aliases: []string{"edit-term"},
 		Summary: "Edit a term",
 
 		CustomPermissions: c.checkOwner,
@@ -87,7 +101,7 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 	})
 
 	r.AddCommand(&bcr.Command{
-		Name:    "Export",
+		Name:    "export",
 		Summary: "Export all terms",
 		Usage:   "[-gz] [-channel <ChannelID/Mention>]",
 
@@ -98,7 +112,8 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 	})
 
 	r.AddCommand(&bcr.Command{
-		Name:    "AddAdmin",
+		Name:    "addadmin",
+		Aliases: []string{"add-admin"},
 		Summary: "Add an admin",
 		Usage:   "<user ID/mention>",
 

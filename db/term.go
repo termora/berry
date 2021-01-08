@@ -28,6 +28,7 @@ type Term struct {
 	Name            string    `json:"name"`
 	Aliases         []string  `json:"aliases"`
 	Description     string    `json:"description"`
+	Note            string    `json:"string"`
 	Source          string    `json:"source"`
 	Created         time.Time `json:"created"`
 	LastModified    time.Time `json:"last_modified"`
@@ -74,6 +75,13 @@ func (t *Term) TermEmbed(baseURL string) *discord.Embed {
 		fields = append(fields, discord.EmbedField{
 			Name:  "Content warning",
 			Value: t.ContentWarnings,
+		})
+	}
+
+	if t.Note != "" {
+		fields = append(fields, discord.EmbedField{
+			Name:  "Note",
+			Value: t.Note,
 		})
 	}
 

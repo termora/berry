@@ -26,7 +26,7 @@ func (db *Db) TermCount() (count int) {
 // GetTerms gets all terms not blocked by the given mask
 func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.last_modified, t.flags, t.content_warnings
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.content_warnings
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0
 	order by t.name, t.id`, mask)
@@ -36,7 +36,7 @@ func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 // GetCategoryTerms gets terms by category
 func (db *Db) GetCategoryTerms(id int, mask TermFlag) (terms []*Term, err error) {
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.last_modified, t.flags, t.content_warnings
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.content_warnings
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0 and t.category = $2
 	order by t.name, t.id`, mask, id)
@@ -49,7 +49,7 @@ func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 		limit = 50
 	}
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.last_modified, t.flags, t.content_warnings,
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.content_warnings,
 	ts_rank_cd(t.searchtext, websearch_to_tsquery('english', $1), 32) as rank,
 	ts_headline(t.description, websearch_to_tsquery('english', $1), 'StartSel=**, StopSel=**') as headline
 	from public.terms as t, public.categories as c
@@ -81,14 +81,14 @@ func (db *Db) RemoveTerm(id int) (err error) {
 func (db *Db) GetTerm(id int) (t *Term, err error) {
 	t = &Term{}
 	err = pgxscan.Get(context.Background(), db.Pool, t, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.last_modified, t.content_warnings, t.flags from public.terms as t, public.categories as c where t.id = $1`, id)
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags from public.terms as t, public.categories as c where t.id = $1`, id)
 	return t, err
 }
 
 // RandomTerm gets a random term from the database
 func (db *Db) RandomTerm() (t *Term, err error) {
 	var terms []*Term
-	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.source, t.created, t.last_modified, t.content_warnings, t.flags
+	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0
 	order by t.id`, FlagRandomHidden)
@@ -173,6 +173,23 @@ func (db *Db) UpdateAliases(id int, aliases []string) (err error) {
 		commandTag, err = db.Pool.Exec(context.Background(), "update public.terms set aliases = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", aliases, id)
 	} else {
 		commandTag, err = db.Pool.Exec(context.Background(), "update public.terms set aliases = array[]::text[], last_modified = (current_timestamp at time zone 'utc') where id = $1", id)
+	}
+	if err != nil {
+		return
+	}
+	if commandTag.RowsAffected() != 1 {
+		return ErrorNoRowsAffected
+	}
+	return
+}
+
+// SetNote updates the note for a term
+func (db *Db) SetNote(id int, note string) (err error) {
+	var commandTag pgconn.CommandTag
+	if len(note) > 0 {
+		commandTag, err = db.Pool.Exec(context.Background(), "update public.terms set note = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", note, id)
+	} else {
+		commandTag, err = db.Pool.Exec(context.Background(), "update public.terms set note = '', last_modified = (current_timestamp at time zone 'utc') where id = $1", id)
 	}
 	if err != nil {
 		return
