@@ -52,6 +52,10 @@ func (c *commands) addTerm(ctx *bcr.Context) (err error) {
 			}
 			t := ctx.AdditionalParams["term"].(*db.Term)
 			t.Description = m.Content
+			if len(t.Description) > 1800 {
+				_, err = ctx.Send("Description too long (maximum 1800 characters).", nil)
+				return
+			}
 			ctx.AdditionalParams["term"] = t
 			_, err := ctx.Send("Description set. Please type the source:", nil)
 			if err != nil {
