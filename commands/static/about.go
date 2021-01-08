@@ -3,6 +3,7 @@ package static
 import (
 	"fmt"
 	"math"
+	"os/exec"
 	"runtime"
 	"time"
 
@@ -12,6 +13,16 @@ import (
 )
 
 var botVersion = "v0.3"
+var gitVer string
+
+func init() {
+	git := exec.Command("git", "rev-parse", "--short", "HEAD")
+	b, _ := git.Output()
+	gitVer = string(b)
+	if gitVer == "" {
+		gitVer = "unknown"
+	}
+}
 
 func (c *Commands) about(ctx *bcr.Context) (err error) {
 	c.cmdMutex.RLock()
@@ -29,7 +40,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 		Fields: []discord.EmbedField{
 			{
 				Name:   "Bot version",
-				Value:  fmt.Sprintf("%v (bcr v%v)", botVersion, bcr.Version()),
+				Value:  fmt.Sprintf("%v-%v (bcr v%v)", botVersion, gitVer, bcr.Version()),
 				Inline: true,
 			},
 			{
@@ -44,11 +55,8 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name: "Uptime",
-				Value: fmt.Sprintf(`%v
-				(Since %v)
-
-				**Terms:** %v
-				**Searches since last restart:** %v`,
+				Value: fmt.Sprintf(
+					"%v\n(Since %v)\n\n**Terms:** %v\n**Searches since last restart:** %v",
 					prettyDurationString(time.Since(c.start)),
 					c.start.Format("Jan _2 2006, 15:04:05 MST"),
 					c.db.TermCount(),
