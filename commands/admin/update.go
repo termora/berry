@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/Starshine113/bcr"
+	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v2/gateway"
 )
 
 func (c *commands) update(ctx *bcr.Context) (err error) {
@@ -39,6 +41,13 @@ func (c *commands) update(ctx *bcr.Context) (err error) {
 }
 
 func (c *commands) restart(ctx *bcr.Context) (err error) {
+	ctx.Session.Gateway.UpdateStatus(gateway.UpdateStatusData{
+		Status: gateway.IdleStatus,
+		Activities: &[]discord.Activity{{
+			Name: "Restarting, please wait...",
+		}},
+	})
+
 	_, err = ctx.Send("Restarting the bot, please wait...", nil)
 	if err != nil {
 		return err
