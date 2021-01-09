@@ -52,8 +52,8 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	if perms&discord.PermissionManageMessages != discord.PermissionManageMessages {
-		_, err = ctx.Sendf("❌ Error: this command requires the `Manage Messages` permission in the channel you're posting to.")
+	if perms&discord.PermissionSendMessages != discord.PermissionSendMessages || perms&discord.PermissionViewChannel != discord.PermissionViewChannel {
+		_, err = ctx.Sendf("❌ Error: this command requires the `%v` permissions in the channel you're posting to.", strings.Join(bcr.PermStrings(discord.PermissionSendMessages|discord.PermissionViewChannel), ", "))
 		return
 	}
 
