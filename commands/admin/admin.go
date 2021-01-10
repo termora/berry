@@ -29,6 +29,15 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		CustomPermissions: c.checkOwner,
 
 		Command: c.addTerm,
+	}).AddSubcommand(&bcr.Command{
+		Name:    "all-in-one",
+		Aliases: []string{"aio", "allinone"},
+
+		Summary: "Add a term by passing all parameters to the command invocation",
+		Usage:   "<name> <category> <description> <aliases, comma separated> <source>",
+
+		CustomPermissions: c.checkOwner,
+		Command:           c.aio,
 	})
 
 	r.AddCommand(&bcr.Command{
