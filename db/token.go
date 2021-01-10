@@ -30,7 +30,7 @@ func GenerateToken() string {
 // GetOrCreateToken gets or creates a token for the given user
 func (db *Db) GetOrCreateToken(userID string) (token string, err error) {
 	var expires time.Time
-	err = db.Pool.QueryRow(context.Background(), "select token, expires from public.admin_tokens where user_id = $1").Scan(&token, &expires)
+	err = db.Pool.QueryRow(context.Background(), "select token, expires from public.admin_tokens where user_id = $1", userID).Scan(&token, &expires)
 	if err == pgx.ErrNoRows {
 		token = GenerateToken()
 		commandTag, err := db.Pool.Exec(context.Background(), "insert into public.admin_tokens (user_id, token) values ($1, $2)", userID, token)
@@ -42,6 +42,9 @@ func (db *Db) GetOrCreateToken(userID string) (token string, err error) {
 		}
 		return token, err
 	}
+	if err != nil {
+		return token, err
+	}
 
 	if expires.Before(time.Now().UTC()) {
 		return token, ErrTokenExpired
@@ -50,20 +53,14 @@ func (db *Db) GetOrCreateToken(userID string) (token string, err error) {
 	return token, nil
 }
 
+// ResetToken ...
+func (db *Db) ResetToken(userID string) (token string, err error) {
+	err = db.Pool.QueryRow(context.Background(), "insert into public.admin_tokens (user_id, token) values ($1, $2) on conflict (user_id) do update set token = $2, expires = (now() + interval '30 days')::timestamp returning token", userID, GenerateToken()).Scan(&token)
+	return token, err
+}
+
 // ValidateToken checks if a token is valid and not expired
-func (db *Db) ValidateToken(token string) (userID string, err error) {
-	var expires time.Time
-	err = db.Pool.QueryRow(context.Background(), "select user_id, expires from public.admin_tokens where token = $1").Scan(&userID, &expires)
-	if err == pgx.ErrNoRows {
-		return "", ErrInvalidToken
-	}
-	if err != nil {
-		return "", err
-	}
-
-	if expires.Before(time.Now().UTC()) {
-		return userID, ErrTokenExpired
-	}
-
-	return userID, nil
+func (db *Db) ValidateToken(token string) (t bool) {
+	db.Pool.QueryRow(context.Background(), "select exists (select user_id from admin_tokens where token = $1 and expires > (current_timestamp at time zone 'utc') and user_id = any(select user_id from admins))", token).Scan(&t)
+	return t
 }

@@ -61,6 +61,10 @@ func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 
 // AddTerm adds a term to the database
 func (db *Db) AddTerm(t *Term) (*Term, error) {
+	if t.Aliases == nil {
+		t.Aliases = []string{}
+	}
+
 	err := db.Pool.QueryRow(context.Background(), "insert into public.terms (name, category, aliases, description, source) values ($1, $2, $3, $4, $5) returning id, created", t.Name, t.Category, t.Aliases, t.Description, t.Source).Scan(&t.ID, &t.Created)
 	return t, err
 }

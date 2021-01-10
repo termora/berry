@@ -6,7 +6,6 @@ import (
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/berry/structs"
-	"github.com/diamondburned/arikawa/v2/discord"
 	"go.uber.org/zap"
 )
 
@@ -105,8 +104,7 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Summary: "Export all terms",
 		Usage:   "[-gz] [-channel <ChannelID/Mention>]",
 
-		Cooldown:    time.Minute,
-		Permissions: discord.PermissionManageMessages,
+		Cooldown: time.Minute,
 
 		Command: c.export,
 	})
@@ -135,6 +133,22 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 
 		OwnerOnly: true,
 		Command:   c.restart,
+	})
+
+	token := r.AddCommand(&bcr.Command{
+		Name:    "token",
+		Summary: "Get an API token",
+
+		CustomPermissions: c.checkOwner,
+		Command:           c.token,
+	})
+
+	token.AddSubcommand(&bcr.Command{
+		Name:    "refresh",
+		Summary: "Refresh your API token",
+
+		CustomPermissions: c.checkOwner,
+		Command:           c.refreshToken,
 	})
 }
 
