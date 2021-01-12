@@ -22,8 +22,8 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 
 	termSlices := make([][]string, 0)
 
-	for i := 0; i < len(s); i += 5 {
-		end := i + 5
+	for i := 0; i < len(s); i += 15 {
+		end := i + 15
 
 		if end > len(s) {
 			end = len(s)
@@ -32,7 +32,7 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 		termSlices = append(termSlices, s[i:end])
 	}
 
-	b := misc.NewEmbedBuilder("List of terms", "", "", db.EmbedColour)
+	b := misc.NewEmbedBuilder(fmt.Sprintf("List of terms (%v)", len(terms)), "", "", db.EmbedColour)
 	for _, s := range termSlices {
 		b.Add("", strings.Join(s, "\n"), nil)
 	}
