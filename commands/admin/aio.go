@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/Starshine113/bcr"
@@ -42,21 +43,11 @@ func (c *commands) aio(ctx *bcr.Context) (err error) {
 		Source:      source,
 	}
 
-	msg, err := ctx.Send("Term finished. React with ✅ to finish adding it, or with ❌ to cancel. Preview:", t.TermEmbed(""))
+	t, err = c.db.AddTerm(t)
 	if err != nil {
-		return err
+		_, err = ctx.Send(misc.InternalError, nil)
+		return
 	}
-
-	ctx.AddYesNoHandler(*msg, ctx.Author.ID, func(ctx *bcr.Context) {
-		t, err := c.db.AddTerm(t)
-		if err != nil {
-			_, err = ctx.Send(misc.InternalError, nil)
-			return
-		}
-		ctx.Sendf("Added term with ID %v.", t.ID)
-	}, func(ctx *bcr.Context) {
-		ctx.Send("Cancelled.", nil)
-	})
-
-	return nil
+	_, err = ctx.Send(fmt.Sprintf("Added term with ID %v.", t.ID), t.TermEmbed(c.config.Bot.TermBaseURL))
+	return err
 }
