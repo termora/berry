@@ -1,6 +1,7 @@
 package search
 
 import (
+	"strings"
 	"time"
 
 	"github.com/Starshine113/bcr"
@@ -25,10 +26,10 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 		Name:    "search",
 		Aliases: []string{"s"},
 
-		Summary: "Search for a term",
-		Usage:   "<search term>",
+		Summary:     "Search for a term",
+		Description: "Search for a term. Prefix your search with `!` to show the first result.",
+		Usage:       "<search term>",
 
-		Cooldown:      3 * time.Second,
 		Blacklistable: true,
 
 		Command: c.search,
@@ -85,7 +86,12 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		return err
 	}
 
-	terms, err := c.Db.Search(ctx.RawArgs, 0)
+	limit := 0
+	if strings.HasPrefix(ctx.RawArgs, "!") {
+		limit = 1
+		ctx.RawArgs = strings.TrimPrefix(ctx.RawArgs, "!")
+	}
+	terms, err := c.Db.Search(ctx.RawArgs, limit)
 	if err != nil {
 		_, err = ctx.Send(misc.InternalError, nil)
 		return err

@@ -28,7 +28,7 @@ type Term struct {
 	Name            string    `json:"name"`
 	Aliases         []string  `json:"aliases"`
 	Description     string    `json:"description"`
-	Note            string    `json:"note"`
+	Note            string    `json:"note,omitempty"`
 	Source          string    `json:"source"`
 	Created         time.Time `json:"created"`
 	LastModified    time.Time `json:"last_modified"`
