@@ -6,6 +6,7 @@ import (
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/berry/misc"
+	"github.com/diamondburned/arikawa/v2/bot/extras/shellwords"
 )
 
 func (c *commands) addExplanation(ctx *bcr.Context) (err error) {
@@ -20,7 +21,10 @@ func (c *commands) addExplanation(ctx *bcr.Context) (err error) {
 		_, err = ctx.Sendf("Not enough arguments provided.")
 		return err
 	}
-	names := strings.Split(content[0], " ")
+	names, err := shellwords.Parse(content[0])
+	if err != nil {
+		names = strings.Split(content[0], " ")
+	}
 	e.Name = names[0]
 	if len(names) > 1 {
 		e.Aliases = names[1:]
