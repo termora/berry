@@ -7,6 +7,7 @@ import (
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/berry/misc"
+	"github.com/diamondburned/arikawa/v2/discord"
 )
 
 func (c *commands) list(ctx *bcr.Context) (err error) {
@@ -32,11 +33,20 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 		termSlices = append(termSlices, s[i:end])
 	}
 
-	b := misc.NewEmbedBuilder(fmt.Sprintf("List of terms (%v)", len(terms)), "", "", db.EmbedColour)
-	for _, s := range termSlices {
-		b.Add("", strings.Join(s, "\n"), nil)
+	embeds := make([]discord.Embed, 0)
+
+	for i, s := range termSlices {
+		embeds = append(embeds, discord.Embed{
+			Title:       fmt.Sprintf("List of terms (%v)", len(terms)),
+			Description: strings.Join(s, "\n"),
+			Color:       db.EmbedColour,
+
+			Footer: &discord.EmbedFooter{
+				Text: fmt.Sprintf("Page %v/%v", i+1, len(termSlices)),
+			},
+		})
 	}
 
-	_, err = ctx.PagedEmbed(b.Build())
+	_, err = ctx.PagedEmbed(embeds)
 	return err
 }
