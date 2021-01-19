@@ -109,6 +109,16 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 		Command:       c.autopost,
 	})
 
+	help.AddSubcommand(&bcr.Command{
+		Name: "commands",
+
+		Summary:  "Show a list of all commands",
+		Cooldown: 1 * time.Second,
+
+		Blacklistable: true,
+		Command:       r.CommandList,
+	})
+
 	r.AddCommand(&bcr.Command{
 		Name: "invite",
 
