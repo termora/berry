@@ -1,6 +1,8 @@
 package admin
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/Starshine113/bcr"
@@ -35,6 +37,34 @@ func (c *commands) addExplanation(ctx *bcr.Context) (err error) {
 		_, err = ctx.Send(misc.InternalError, nil)
 		return err
 	}
-	_, err = ctx.Sendf("Added explanation with ID %v.\nName: `%v`\nAliases: `%v`", e.ID, e.Name, strings.Join(e.Aliases, ", "))
+	_, err = ctx.Sendf("Added explanation with ID %v.\nName: `%v`\nAliases: `%v`\n**:warning: Warning:** to have me respond to this explanation as a base command, please restart the bot.", e.ID, e.Name, strings.Join(e.Aliases, ", "))
+	return err
+}
+
+func (c *commands) toggleExplanationCmd(ctx *bcr.Context) (err error) {
+	if err = ctx.CheckMinArgs(2); err != nil {
+		_, err = ctx.Send("Not enough arguments provided.", nil)
+		return err
+	}
+
+	id, err := strconv.Atoi(ctx.Args[0])
+	if err != nil {
+		_, err = ctx.Send("Couldn't parse a numeric ID.", nil)
+		return err
+	}
+
+	b, err := strconv.ParseBool(ctx.Args[1])
+	if err != nil {
+		_, err = ctx.Send("Couldn't parse a boolean.", nil)
+		return err
+	}
+
+	err = c.db.SetAsCommand(id, b)
+	if err != nil {
+		_, err = ctx.Send(fmt.Sprintf("Internal error occurred: %v", bcr.AsCode(bcr.EscapeBackticks(err.Error()))), nil)
+		return err
+	}
+
+	_, err = ctx.Send(fmt.Sprintf("Set command status for `%v` to `%v`.\n**:warning: Note:** the bot has to be restarted to see the changes.", id, b), nil)
 	return err
 }

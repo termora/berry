@@ -65,10 +65,22 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Name:    "addexplanation",
 		Aliases: []string{"add-explanation"},
 		Summary: "Add an explanation",
+		Usage:   "<names...>(newline)<explanation>",
 
 		CustomPermissions: c.checkOwner,
 
 		Command: c.addExplanation,
+	})
+
+	r.AddCommand(&bcr.Command{
+		Name:    "toggleExplanationCmd",
+		Aliases: []string{"toggle-explanation-cmd"},
+		Summary: "Set whether or not this explanation can be triggered as a command",
+		Usage:   "<id> <bool>",
+
+		CustomPermissions: c.checkOwner,
+
+		Command: c.toggleExplanationCmd,
 	})
 
 	r.AddCommand(&bcr.Command{

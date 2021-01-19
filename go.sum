@@ -4,6 +4,8 @@ github.com/ReneKroon/ttlcache/v2 v2.1.0 h1:5GQZXf7Pl68S4O/Mps4kAXQ+ObEqwHskC8WKT
 github.com/ReneKroon/ttlcache/v2 v2.1.0/go.mod h1:0E5EIhFJrGmcn/niHrqnnvQHvihj+DdPzJlOEzBS3o4=
 github.com/Starshine113/bcr v0.4.1 h1:pTibTa1UofnIECUkFGY3IJlPxuz1lvP9fAYvWMRqPhA=
 github.com/Starshine113/bcr v0.4.1/go.mod h1:VtujbTyV1vI+/0APsvW30NZ3k8qMFX+y+Yca3YeYl3U=
+github.com/Starshine113/bcr v0.4.2 h1:NOM91mA/c5FV5/LKixIxi2BOTUwSbFyiYFiduWrJHlQ=
+github.com/Starshine113/bcr v0.4.2/go.mod h1:VtujbTyV1vI+/0APsvW30NZ3k8qMFX+y+Yca3YeYl3U=
 github.com/Starshine113/pkgo v0.1.0 h1:1G/kqpbsjZO21L7DgR18U3aVl38rmuwqwCDwmfTA5ic=
 github.com/Starshine113/pkgo v0.1.0/go.mod h1:QCVBagv4HQgZJ0lsTnrejfA1er1iEu5DhKq8gtRyIC0=
 github.com/Starshine113/snowflake v0.2.0 h1:1RFxWvmivFU0rXpAlWXT+CnGpe1ob3Xvu9dzocV/vWs=

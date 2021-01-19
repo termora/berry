@@ -78,6 +78,8 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 		Blacklistable: true,
 		Command:       c.term,
 	})
+
+	c.initExplanations(r)
 }
 
 func (c *commands) search(ctx *bcr.Context) (err error) {
@@ -133,8 +135,9 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	for i, e := range emoji {
 		emoji := e
-		if err = ctx.Session.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(emoji)); err != nil {
-			return
+		if err := ctx.Session.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(emoji)); err != nil {
+			c.Sugar.Error("Error adding reaction:", err)
+			return err
 		}
 
 		index := i
@@ -158,8 +161,14 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 				return
 			}
 
-			ctx.Session.DeleteMessage(ctx.Channel.ID, msg.ID)
-			ctx.Send("", termSlice[index].TermEmbed(c.conf.Bot.TermBaseURL))
+			err := ctx.Session.DeleteMessage(ctx.Channel.ID, msg.ID)
+			if err != nil {
+				c.Sugar.Error("Error deleting message:", err)
+			}
+			_, err = ctx.Send("", termSlice[index].TermEmbed(c.conf.Bot.TermBaseURL))
+			if err != nil {
+				c.Sugar.Error("Error sending message:", err)
+			}
 		})
 	}
 
