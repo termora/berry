@@ -12,7 +12,7 @@ import (
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 
-var botVersion = "v0.3"
+var botVersion = "v0.4"
 var gitVer string
 
 func init() {
