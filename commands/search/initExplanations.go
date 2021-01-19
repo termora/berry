@@ -14,6 +14,7 @@ func (c *commands) initExplanations(r *bcr.Router) {
 	}
 
 	for _, e := range explanations {
+		e := e
 		r.AddCommand(&bcr.Command{
 			Name:    e.Name,
 			Aliases: e.Aliases,
