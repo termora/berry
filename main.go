@@ -45,7 +45,7 @@ func main() {
 	}
 
 	r := bcr.NewRouter(s, c.Bot.BotOwners, c.Bot.Prefixes)
-	r.EmbedColor = 0xe00d7a
+	r.EmbedColor = db.EmbedColour
 
 	// set blacklist function
 	r.BlacklistFunc = d.CtxInBlacklist

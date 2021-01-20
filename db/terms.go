@@ -11,7 +11,7 @@ import (
 )
 
 // EmbedColour is the embed colour used throughout the bot
-const EmbedColour = 0xe00d7a
+const EmbedColour = 0xd14171
 
 // Errors related to database operations
 var (
