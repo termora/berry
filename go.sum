@@ -18,6 +18,8 @@ github.com/Starshine113/bcr v0.7.2 h1:7+PHhBgVAfdvTkoBRLj8w8pwZ546w6BQEOWTrY5nkB
 github.com/Starshine113/bcr v0.7.2/go.mod h1:yfkK8Mp/kYXjJDXkPFNTRJaBhzuArFUn6FpvCKlvvdA=
 github.com/Starshine113/bcr v0.7.3-0.20210120115110-c7690c8692c2 h1:px72jwZ9QgRF7S89j/fqi71uUa0i6Y3KQwMRa7IPXU8=
 github.com/Starshine113/bcr v0.7.3-0.20210120115110-c7690c8692c2/go.mod h1:yfkK8Mp/kYXjJDXkPFNTRJaBhzuArFUn6FpvCKlvvdA=
+github.com/Starshine113/bcr v0.7.3-0.20210120142138-c529e2c9e4f7 h1:GayOkUWjOCDsdPA3HSSnVPSmFmBZcSiU5TSz10lVV74=
+github.com/Starshine113/bcr v0.7.3-0.20210120142138-c529e2c9e4f7/go.mod h1:yfkK8Mp/kYXjJDXkPFNTRJaBhzuArFUn6FpvCKlvvdA=
 github.com/Starshine113/pkgo v0.1.0 h1:1G/kqpbsjZO21L7DgR18U3aVl38rmuwqwCDwmfTA5ic=
 github.com/Starshine113/pkgo v0.1.0/go.mod h1:QCVBagv4HQgZJ0lsTnrejfA1er1iEu5DhKq8gtRyIC0=
 github.com/Starshine113/snowflake v0.2.0 h1:1RFxWvmivFU0rXpAlWXT+CnGpe1ob3Xvu9dzocV/vWs=

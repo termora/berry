@@ -126,7 +126,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		embeds = append(embeds, searchResultEmbed(ctx.RawArgs, i+1, len(termSlices), t))
 	}
 
-	msg, err := ctx.PagedEmbed(embeds)
+	msg, err := ctx.PagedEmbed(embeds, false)
 	if err != nil {
 		return err
 	}
@@ -134,6 +134,10 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	ctx.AdditionalParams["termSlices"] = termSlices
 
 	for i, e := range emoji {
+		if i > len(termSlices)+1 {
+			return
+		}
+
 		emoji := e
 		if err := ctx.Session.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(emoji)); err != nil {
 			c.Sugar.Error("Error adding reaction:", err)

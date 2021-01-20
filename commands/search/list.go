@@ -47,6 +47,6 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 		})
 	}
 
-	_, err = ctx.PagedEmbed(embeds)
+	_, err = ctx.PagedEmbed(embeds, false)
 	return err
 }
