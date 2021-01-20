@@ -6,15 +6,13 @@ import (
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/misc"
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 
 func (c *commands) list(ctx *bcr.Context) (err error) {
 	terms, err := c.Db.GetTerms(db.FlagSearchHidden)
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.Db.InternalError(ctx, err)
 	}
 	s := make([]string, 0)
 	for _, t := range terms {

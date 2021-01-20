@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/berry/misc"
 )
 
 func (c *commands) delTerm(ctx *bcr.Context) (err error) {
@@ -15,14 +14,12 @@ func (c *commands) delTerm(ctx *bcr.Context) (err error) {
 
 	id, err := strconv.Atoi(ctx.Args[0])
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 
 	t, err := c.db.GetTerm(id)
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 
 	m, err := ctx.Send("Are you sure you want to delete this term? React with ✅ to delete it, or with ❌ to cancel.", t.TermEmbed(""))
@@ -34,7 +31,7 @@ func (c *commands) delTerm(ctx *bcr.Context) (err error) {
 		err = c.db.RemoveTerm(id)
 		if err != nil {
 			c.sugar.Error("Error removing term:", err)
-			ctx.Send(misc.InternalError, nil)
+			c.db.InternalError(ctx, err)
 			return
 		}
 	}, func(ctx *bcr.Context) {

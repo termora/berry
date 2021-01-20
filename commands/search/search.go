@@ -6,7 +6,6 @@ import (
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/misc"
 	"github.com/Starshine113/berry/structs"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"go.uber.org/zap"
@@ -95,8 +94,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 	terms, err := c.Db.Search(ctx.RawArgs, limit)
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.Db.InternalError(ctx, err)
 	}
 
 	if len(terms) == 0 {

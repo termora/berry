@@ -5,7 +5,6 @@ import (
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/misc"
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 
@@ -38,8 +37,7 @@ func (c *commands) setFlags(ctx *bcr.Context) (err error) {
 
 	err = c.db.SetFlags(id, db.TermFlag(flags))
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Updated the flags for %v to %v.", id, flags)

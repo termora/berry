@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/berry/misc"
 )
 
 func (c *commands) addCategory(ctx *bcr.Context) (err error) {
@@ -16,7 +15,7 @@ func (c *commands) addCategory(ctx *bcr.Context) (err error) {
 	var e bool
 	err = c.db.Pool.QueryRow(context.Background(), "select exists (select from categories where lower(name) = lower($1))", ctx.RawArgs).Scan(&e)
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
+		return c.db.InternalError(ctx, err)
 		return err
 	}
 	if e {
@@ -27,7 +26,7 @@ func (c *commands) addCategory(ctx *bcr.Context) (err error) {
 	var id int
 	err = c.db.Pool.QueryRow(context.Background(), "insert into public.categories (name) values ($1) returning id", ctx.RawArgs).Scan(&id)
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
+		return c.db.InternalError(ctx, err)
 		return err
 	}
 	_, err = ctx.Sendf("Added category `%v` with ID %v.", ctx.RawArgs, id)

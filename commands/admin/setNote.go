@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/berry/misc"
 )
 
 func (c *commands) setNote(ctx *bcr.Context) (err error) {
@@ -16,14 +15,12 @@ func (c *commands) setNote(ctx *bcr.Context) (err error) {
 
 	id, err := strconv.Atoi(ctx.Args[0])
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 
 	t, err := c.db.GetTerm(id)
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 
 	note := strings.TrimSpace(strings.TrimPrefix(ctx.RawArgs, ctx.Args[0]))
@@ -38,9 +35,7 @@ func (c *commands) setNote(ctx *bcr.Context) (err error) {
 
 	err = c.db.SetNote(t.ID, note)
 	if err != nil {
-		c.sugar.Errorf("Error setting note for %v: %v", id, err)
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Updated note for %v.", id)

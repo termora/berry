@@ -7,7 +7,6 @@ import (
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/misc"
 	"github.com/diamondburned/arikawa/v2/bot/extras/shellwords"
 )
 
@@ -34,8 +33,7 @@ func (c *commands) addExplanation(ctx *bcr.Context) (err error) {
 	e.Description = strings.Join(content[1:], "\n")
 	e, err = c.db.AddExplanation(e)
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 	_, err = ctx.Sendf("Added explanation with ID %v.\nName: `%v`\nAliases: `%v`\n**:warning: Warning:** to have me respond to this explanation as a base command, please restart the bot.", e.ID, e.Name, strings.Join(e.Aliases, ", "))
 	return err

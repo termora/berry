@@ -18,6 +18,14 @@ type messageCreate struct {
 func (mc *messageCreate) messageCreate(m *gateway.MessageCreateEvent) {
 	var err error
 
+	// defer panic handling
+	defer func() {
+		r := recover()
+		if r != nil {
+			mc.sugar.Errorf("Caught panic in channel ID %v (user %v, guild %v): %v", m.ChannelID, m.Author.ID, m.GuildID, err)
+		}
+	}()
+
 	if mc.r.Bot == nil {
 		err = mc.r.SetBotUser()
 		if err != nil {

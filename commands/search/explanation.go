@@ -6,15 +6,13 @@ import (
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/misc"
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 
 func (c *commands) explanation(ctx *bcr.Context) (err error) {
 	ex, err := c.Db.GetAllExplanations()
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.Db.InternalError(ctx, err)
 	}
 	if ctx.RawArgs != "" {
 		for _, e := range ex {

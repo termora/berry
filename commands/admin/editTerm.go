@@ -6,7 +6,6 @@ import (
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/misc"
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 )
@@ -29,8 +28,7 @@ func (c *commands) editTerm(ctx *bcr.Context) (err error) {
 			return
 		}
 
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 
 	switch ctx.Args[0] {

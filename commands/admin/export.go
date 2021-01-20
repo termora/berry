@@ -10,7 +10,6 @@ import (
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/misc"
 	"github.com/diamondburned/arikawa/v2/api"
 	"github.com/diamondburned/arikawa/v2/utils/sendpart"
 )
@@ -40,16 +39,14 @@ func (c *commands) export(ctx *bcr.Context) (err error) {
 
 	terms, err := c.db.GetTerms(0)
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 
 	export.Terms = terms
 
 	b, err := json.MarshalIndent(export, "", "  ")
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 	fn := fmt.Sprintf("export-%v.json", time.Now().Format("2006-01-02-15-04-05"))
 
@@ -60,13 +57,11 @@ func (c *commands) export(ctx *bcr.Context) (err error) {
 		zw.Name = fn
 		_, err = zw.Write(b)
 		if err != nil {
-			_, err = ctx.Send(misc.InternalError, nil)
-			return err
+			return c.db.InternalError(ctx, err)
 		}
 		err = zw.Close()
 		if err != nil {
-			_, err = ctx.Send(misc.InternalError, nil)
-			return err
+			return c.db.InternalError(ctx, err)
 		}
 		fn = fn + ".gz"
 	} else {

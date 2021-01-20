@@ -5,7 +5,6 @@ import (
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/misc"
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 
@@ -94,7 +93,7 @@ func (c *commands) addTerm(ctx *bcr.Context) (err error) {
 					ctx.AddYesNoHandler(*msg, ctx.Author.ID, func(ctx *bcr.Context) {
 						t, err := c.db.AddTerm(t)
 						if err != nil {
-							_, err = ctx.Send(misc.InternalError, nil)
+							c.db.InternalError(ctx, err)
 							return
 						}
 						ctx.Sendf("Added term with ID %v.", t.ID)

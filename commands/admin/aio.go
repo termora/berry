@@ -6,7 +6,6 @@ import (
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/misc"
 )
 
 func (c *commands) aio(ctx *bcr.Context) (err error) {
@@ -45,8 +44,7 @@ func (c *commands) aio(ctx *bcr.Context) (err error) {
 
 	t, err = c.db.AddTerm(t)
 	if err != nil {
-		_, err = ctx.Send(misc.InternalError, nil)
-		return
+		return c.db.InternalError(ctx, err)
 	}
 	_, err = ctx.Send(fmt.Sprintf("Added term with ID %v.", t.ID), t.TermEmbed(c.config.Bot.TermBaseURL))
 	return err

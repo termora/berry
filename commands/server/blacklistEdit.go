@@ -6,7 +6,6 @@ import (
 	"github.com/Starshine113/bcr"
 
 	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/misc"
 )
 
 func (c *commands) blacklistAdd(ctx *bcr.Context) (err error) {
@@ -37,8 +36,7 @@ func (c *commands) blacklistAdd(ctx *bcr.Context) (err error) {
 			return err
 		}
 
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Added %v to the blacklist.", strings.Join(mapString(ch, func(s string) string { return "<#" + s + ">" }), ", "))
@@ -58,8 +56,7 @@ func (c *commands) blacklistRemove(ctx *bcr.Context) (err error) {
 			return err
 		}
 
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 	if ch.GuildID != ctx.Message.GuildID {
 		_, err = ctx.Sendf("The given channel (%v) isn't in this server.", ch.Mention())
@@ -73,8 +70,7 @@ func (c *commands) blacklistRemove(ctx *bcr.Context) (err error) {
 			return err
 		}
 
-		_, err = ctx.Send(misc.InternalError, nil)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Removed %v from the blacklist.", ch.Mention())
