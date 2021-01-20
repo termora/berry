@@ -123,7 +123,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	embeds := make([]discord.Embed, 0)
 
 	for i, t := range termSlices {
-		embeds = append(embeds, searchResultEmbed(ctx.RawArgs, i+1, len(termSlices), t))
+		embeds = append(embeds, searchResultEmbed(ctx.RawArgs, i+1, len(termSlices), len(terms), t))
 	}
 
 	msg, err := ctx.PagedEmbed(embeds, false)
@@ -134,7 +134,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	ctx.AdditionalParams["termSlices"] = termSlices
 
 	for i, e := range emoji {
-		if i > len(termSlices)+1 {
+		if i >= len(terms) {
 			return
 		}
 

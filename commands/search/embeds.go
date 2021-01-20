@@ -10,7 +10,7 @@ import (
 
 var emoji = []string{"1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"}
 
-func searchResultEmbed(search string, page, total int, s []*db.Term) discord.Embed {
+func searchResultEmbed(search string, page, total, totalTerms int, s []*db.Term) discord.Embed {
 	var desc string
 	for i, t := range s {
 		h := t.Headline
@@ -27,17 +27,20 @@ func searchResultEmbed(search string, page, total int, s []*db.Term) discord.Emb
 		desc += fmt.Sprintf("%v **%v**\n%v\n\n", emoji[i], name, h)
 	}
 
+	v := []discord.EmbedField{{
+		Name:  "Usage",
+		Value: "Use ⬅️ ➡️ to navigate between pages and the numbers to choose a term.",
+	}}
+	if totalTerms <= 5 {
+		v = nil
+	}
 	return discord.Embed{
 		Title:       fmt.Sprintf("Search results for \"%v\"", search),
 		Description: desc,
 		Color:       db.EmbedColour,
-		Fields: []discord.EmbedField{{
-			Name:   "Usage",
-			Value:  "Use ⬅️ ➡️ to navigate between pages, the numbers to choose a term, and ❌ to delete this message.",
-			Inline: false,
-		}},
+		Fields:      v,
 		Footer: &discord.EmbedFooter{
-			Text: fmt.Sprintf("Page %v/%v", page, total),
+			Text: fmt.Sprintf("Results: %v | Page %v/%v", totalTerms, page, total),
 		},
 	}
 }
