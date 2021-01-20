@@ -3,11 +3,23 @@ package db
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Starshine113/bcr"
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/georgysavva/scany/pgxscan"
 	"github.com/google/uuid"
 )
+
+// Error ...
+type Error struct {
+	ID      uuid.UUID
+	Command string
+	UserID  discord.UserID
+	Channel discord.ChannelID
+	Error   string
+	Time    time.Time
+}
 
 // InternalError sends an error message and logs the error to the database
 func (db *Db) InternalError(ctx *bcr.Context, e error) error {
@@ -25,7 +37,7 @@ func (db *Db) InternalError(ctx *bcr.Context, e error) error {
 		&discord.Embed{
 			Title:       "Internal error occurred",
 			Description: "An internal error has occurred. If this issue persists, please contact the bot developer with the error code above.",
-			Color:       0xe01a00,
+			Color:       0xE74C3C,
 
 			Footer: &discord.EmbedFooter{
 				Text: id.String(),
@@ -34,4 +46,14 @@ func (db *Db) InternalError(ctx *bcr.Context, e error) error {
 		},
 	)
 	return err
+}
+
+// Error ...
+func (db *Db) Error(id string) (e *Error, err error) {
+	e = &Error{}
+
+	err = pgxscan.Get(context.Background(), db.Pool, e, `select
+	id, command, user_id, channel, error, time
+	from public.errors where id = $1`, id)
+	return e, err
 }

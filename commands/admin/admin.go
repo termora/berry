@@ -202,6 +202,14 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Command:   c.restart,
 	})
 
+	a.AddSubcommand(&bcr.Command{
+		Name:    "error",
+		Summary: "Get an error by ID",
+
+		CustomPermissions: c,
+		Command:           c.error,
+	})
+
 	token := a.AddSubcommand(&bcr.Command{
 		Name:    "token",
 		Summary: "Get an API token",
