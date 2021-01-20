@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
-	github.com/Starshine113/bcr v0.7.2
+	github.com/Starshine113/bcr v0.7.3-0.20210120115110-c7690c8692c2
 	github.com/Starshine113/pkgo v0.1.0
 	github.com/diamondburned/arikawa/v2 v2.0.0-20210106051538-d9a159d948af
 	github.com/georgysavva/scany v0.2.7
