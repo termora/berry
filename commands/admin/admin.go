@@ -17,16 +17,62 @@ type commands struct {
 	admins []string
 }
 
+func (commands) String() string {
+	return "Bot Admin"
+}
+
+func (c *commands) Check(ctx *bcr.Context) (bool, error) {
+	if c.config.Bot.AdminServer != "" {
+		if ctx.Message.GuildID.String() != c.config.Bot.AdminServer {
+			return false, nil
+		}
+	}
+	for _, id := range c.config.Bot.BotOwners {
+		if id == ctx.Author.ID.String() {
+			return true, nil
+		}
+	}
+
+	if len(c.admins) == 0 {
+		admins, err := c.db.GetAdmins()
+		if err != nil {
+			c.sugar.Error("Error getting admins:", err)
+			return false, err
+		}
+		c.admins = admins
+	}
+
+	for _, id := range c.admins {
+		if id == ctx.Author.ID.String() {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 // Init ...
 func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.Router) {
 	c := &commands{db: db, config: conf, sugar: sugar}
 
-	r.AddCommand(&bcr.Command{
+	a := r.AddCommand(&bcr.Command{
+		Name:    "admin",
+		Summary: "Admin commands",
+
+		CustomPermissions: c,
+
+		Command: func(ctx *bcr.Context) (err error) {
+			_, err = ctx.Send("Nothing to see here, move along...", nil)
+			return err
+		},
+	})
+
+	a.AddSubcommand(&bcr.Command{
 		Name:    "addterm",
 		Aliases: []string{"add-term"},
 		Summary: "Add a term",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 
 		Command: c.addTerm,
 	}).AddSubcommand(&bcr.Command{
@@ -36,86 +82,86 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Summary: "Add a term by passing all parameters to the command invocation",
 		Usage:   "<name> <category> <description> <aliases, comma separated> <source>",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 		Command:           c.aio,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "delterm",
 		Aliases: []string{"del-term"},
 		Summary: "Delete a term",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 
 		Command: c.delTerm,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "addcategory",
 		Aliases: []string{"add-category"},
 		Summary: "Add a category",
 		Usage:   "<name>",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 
 		Command: c.addCategory,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "addexplanation",
 		Aliases: []string{"add-explanation"},
 		Summary: "Add an explanation",
 		Usage:   "<names...>(newline)<explanation>",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 
 		Command: c.addExplanation,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "toggleExplanationCmd",
 		Aliases: []string{"toggle-explanation-cmd"},
 		Summary: "Set whether or not this explanation can be triggered as a command",
 		Usage:   "<id> <bool>",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 
 		Command: c.toggleExplanationCmd,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "setflags",
 		Summary: "Set a term's flags",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 
 		Command: c.setFlags,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "setcw",
 		Summary: "Set a term's CW",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 
 		Command: c.setCW,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "setnote",
 		Summary: "Set a term's note",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 
 		Command: c.setNote,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "editterm",
 		Aliases: []string{"edit-term"},
 		Summary: "Edit a term",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 
 		Command: c.editTerm,
 	})
@@ -130,7 +176,7 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Command: c.export,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "addadmin",
 		Aliases: []string{"add-admin"},
 		Summary: "Add an admin",
@@ -140,7 +186,7 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Command:   c.addAdmin,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "update",
 		Summary: "Update the bot",
 
@@ -148,7 +194,7 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Command:   c.update,
 	})
 
-	r.AddCommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "restart",
 		Summary: "Restart the bot",
 
@@ -156,11 +202,11 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Command:   c.restart,
 	})
 
-	token := r.AddCommand(&bcr.Command{
+	token := a.AddSubcommand(&bcr.Command{
 		Name:    "token",
 		Summary: "Get an API token",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 		Command:           c.token,
 	})
 
@@ -168,37 +214,7 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Name:    "refresh",
 		Summary: "Refresh your API token",
 
-		CustomPermissions: c.checkOwner,
+		CustomPermissions: c,
 		Command:           c.refreshToken,
 	})
-}
-
-func (c *commands) checkOwner(ctx *bcr.Context) (string, bool) {
-	if c.config.Bot.AdminServer != "" {
-		if ctx.Message.GuildID.String() != c.config.Bot.AdminServer {
-			return "Bot Admin", false
-		}
-	}
-	for _, id := range c.config.Bot.BotOwners {
-		if id == ctx.Author.ID.String() {
-			return "", true
-		}
-	}
-
-	if len(c.admins) == 0 {
-		admins, err := c.db.GetAdmins()
-		if err != nil {
-			c.sugar.Error("Error getting admins:", err)
-			return "Bot Admin", false
-		}
-		c.admins = admins
-	}
-
-	for _, id := range c.admins {
-		if id == ctx.Author.ID.String() {
-			return "", true
-		}
-	}
-
-	return "Bot Admin", false
 }

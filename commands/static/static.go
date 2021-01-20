@@ -116,7 +116,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       r.CommandList,
+		Command:       c.commandList,
 	})
 
 	r.AddCommand(&bcr.Command{

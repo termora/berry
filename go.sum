@@ -8,6 +8,14 @@ github.com/Starshine113/bcr v0.4.2 h1:NOM91mA/c5FV5/LKixIxi2BOTUwSbFyiYFiduWrJHl
 github.com/Starshine113/bcr v0.4.2/go.mod h1:VtujbTyV1vI+/0APsvW30NZ3k8qMFX+y+Yca3YeYl3U=
 github.com/Starshine113/bcr v0.5.0 h1:9d1y8EGOGlHtvb2zxdH2oefPNUaBnmWnVINo/YQOHSw=
 github.com/Starshine113/bcr v0.5.0/go.mod h1:yfkK8Mp/kYXjJDXkPFNTRJaBhzuArFUn6FpvCKlvvdA=
+github.com/Starshine113/bcr v0.6.0 h1:1IaTv9aDCdJ0lcdAoYERI1tpJ8ALD+KHL3XwdhwASjs=
+github.com/Starshine113/bcr v0.6.0/go.mod h1:yfkK8Mp/kYXjJDXkPFNTRJaBhzuArFUn6FpvCKlvvdA=
+github.com/Starshine113/bcr v0.7.0 h1:UGswG41mSoOd29nJzj/sRt1PwD6mWoom07FjEb6/bjI=
+github.com/Starshine113/bcr v0.7.0/go.mod h1:yfkK8Mp/kYXjJDXkPFNTRJaBhzuArFUn6FpvCKlvvdA=
+github.com/Starshine113/bcr v0.7.1 h1:8adPdx1vEZ/0JM0PDKH488mE7ssJGCPGlcpr5q/FboE=
+github.com/Starshine113/bcr v0.7.1/go.mod h1:yfkK8Mp/kYXjJDXkPFNTRJaBhzuArFUn6FpvCKlvvdA=
+github.com/Starshine113/bcr v0.7.2 h1:7+PHhBgVAfdvTkoBRLj8w8pwZ546w6BQEOWTrY5nkBU=
+github.com/Starshine113/bcr v0.7.2/go.mod h1:yfkK8Mp/kYXjJDXkPFNTRJaBhzuArFUn6FpvCKlvvdA=
 github.com/Starshine113/pkgo v0.1.0 h1:1G/kqpbsjZO21L7DgR18U3aVl38rmuwqwCDwmfTA5ic=
 github.com/Starshine113/pkgo v0.1.0/go.mod h1:QCVBagv4HQgZJ0lsTnrejfA1er1iEu5DhKq8gtRyIC0=
 github.com/Starshine113/snowflake v0.2.0 h1:1RFxWvmivFU0rXpAlWXT+CnGpe1ob3Xvu9dzocV/vWs=
