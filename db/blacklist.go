@@ -20,16 +20,18 @@ func (db *Db) IsBlacklisted(guildID, channelID string) (b bool) {
 }
 
 // AddToBlacklist adds the given channelID to the blacklist for guildID
-func (db *Db) AddToBlacklist(guildID, channelID string) (err error) {
+func (db *Db) AddToBlacklist(guildID string, channelIDs []string) (err error) {
 	err = db.CreateServerIfNotExists(guildID)
 	if err != nil {
 		return err
 	}
 
-	if db.IsBlacklisted(guildID, channelID) {
-		return ErrorAlreadyBlacklisted
+	for _, channelID := range channelIDs {
+		if db.IsBlacklisted(guildID, channelID) {
+			return ErrorAlreadyBlacklisted
+		}
 	}
-	commandTag, err := db.Pool.Exec(context.Background(), "update public.servers set blacklist = array_append(blacklist, $1) where id = $2", channelID, guildID)
+	commandTag, err := db.Pool.Exec(context.Background(), "update public.servers set blacklist = array_cat(blacklist, $1) where id = $2", channelIDs, guildID)
 	if err != nil {
 		return err
 	}

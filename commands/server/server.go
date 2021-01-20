@@ -16,6 +16,7 @@ func Init(db *db.Db, r *bcr.Router) {
 
 	g := r.AddCommand(&bcr.Command{
 		Name:    "blacklist",
+		Aliases: []string{"bl", "blocklist", "blocking"},
 		Summary: "Manage this server's blacklist",
 
 		Permissions: discord.PermissionManageGuild,
@@ -24,8 +25,9 @@ func Init(db *db.Db, r *bcr.Router) {
 
 	g.AddSubcommand(&bcr.Command{
 		Name:    "add",
-		Summary: "Add a channel to the blacklist",
-		Usage:   "<channel>",
+		Aliases: []string{"block"},
+		Summary: "Add channels to the blacklist",
+		Usage:   "<channels...>",
 
 		Permissions: discord.PermissionManageGuild,
 		Command:     c.blacklistAdd,
@@ -33,6 +35,7 @@ func Init(db *db.Db, r *bcr.Router) {
 
 	g.AddSubcommand(&bcr.Command{
 		Name:    "remove",
+		Aliases: []string{"rm", "unblock"},
 		Summary: "Remove a channel from the blacklist",
 		Usage:   "<channel>",
 
