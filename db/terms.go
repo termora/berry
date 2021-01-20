@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"math/rand"
+	"strings"
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgconn"
@@ -65,7 +66,7 @@ func (db *Db) AddTerm(t *Term) (*Term, error) {
 		t.Aliases = []string{}
 	}
 
-	err := db.Pool.QueryRow(context.Background(), "insert into public.terms (name, category, aliases, description, source) values ($1, $2, $3, $4, $5) returning id, created", t.Name, t.Category, t.Aliases, t.Description, t.Source).Scan(&t.ID, &t.Created)
+	err := db.Pool.QueryRow(context.Background(), "insert into public.terms (name, category, aliases, description, source, aliases_string) values ($1, $2, $3, $4, $5, $6) returning id, created", t.Name, t.Category, t.Aliases, t.Description, t.Source, strings.Join(t.Aliases, ", ")).Scan(&t.ID, &t.Created)
 	return t, err
 }
 
@@ -174,9 +175,9 @@ func (db *Db) UpdateTitle(id int, title string) (err error) {
 func (db *Db) UpdateAliases(id int, aliases []string) (err error) {
 	var commandTag pgconn.CommandTag
 	if len(aliases) > 0 {
-		commandTag, err = db.Pool.Exec(context.Background(), "update public.terms set aliases = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", aliases, id)
+		commandTag, err = db.Pool.Exec(context.Background(), "update public.terms set aliases = $1, aliases_string = $2, last_modified = (current_timestamp at time zone 'utc') where id = $3", aliases, strings.Join(aliases, ", "), id)
 	} else {
-		commandTag, err = db.Pool.Exec(context.Background(), "update public.terms set aliases = array[]::text[], last_modified = (current_timestamp at time zone 'utc') where id = $1", id)
+		commandTag, err = db.Pool.Exec(context.Background(), "update public.terms set aliases = array[]::text[], aliases_string = '', last_modified = (current_timestamp at time zone 'utc') where id = $1", id)
 	}
 	if err != nil {
 		return
