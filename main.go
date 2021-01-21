@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,8 +14,6 @@ import (
 	"github.com/Starshine113/berry/commands/server"
 	"github.com/Starshine113/berry/commands/static"
 	"github.com/Starshine113/berry/db"
-	"github.com/diamondburned/arikawa/v2/discord"
-	"github.com/diamondburned/arikawa/v2/gateway"
 	"github.com/diamondburned/arikawa/v2/state"
 )
 
@@ -53,32 +49,6 @@ func main() {
 	// add the message create handler
 	mc := &messageCreate{r: r, c: c, sugar: sugar}
 	s.AddHandler(mc.messageCreate)
-
-	// set status
-	s.AddHandler(func(d *gateway.ReadyEvent) {
-		st := fmt.Sprintf("%vhelp", c.Bot.Prefixes[0])
-
-		if c.Bot.Website != "" {
-			var w string
-			u, err := url.Parse(c.Bot.Website)
-			if err != nil {
-				w = c.Bot.Website
-			} else {
-				w = u.Host
-			}
-
-			st += " | " + w
-		}
-
-		if err := s.Gateway.UpdateStatus(gateway.UpdateStatusData{
-			Status: gateway.OnlineStatus,
-			Activities: &[]discord.Activity{{
-				Name: st,
-			}},
-		}); err != nil {
-			sugar.Error("Error setting status:", err)
-		}
-	})
 
 	// add static commands
 	static.Init(c, d, sugar, r)

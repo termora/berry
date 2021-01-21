@@ -6,6 +6,7 @@ require (
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
 	github.com/Starshine113/bcr v0.7.3-0.20210120142138-c529e2c9e4f7
 	github.com/Starshine113/pkgo v0.1.0
+	github.com/diamondburned/arikawa v1.3.14
 	github.com/diamondburned/arikawa/v2 v2.0.0-20210106051538-d9a159d948af
 	github.com/georgysavva/scany v0.2.7
 	github.com/google/uuid v1.1.5

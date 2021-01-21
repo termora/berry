@@ -1,11 +1,14 @@
 package admin
 
 import (
+	"sync"
 	"time"
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/berry/structs"
+	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v2/gateway"
 	"go.uber.org/zap"
 )
 
@@ -15,6 +18,8 @@ type commands struct {
 	sugar  *zap.SugaredLogger
 
 	admins []string
+
+	guilds []discord.Guild
 }
 
 func (commands) String() string {
@@ -210,6 +215,14 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Command:           c.error,
 	})
 
+	a.AddSubcommand(&bcr.Command{
+		Name:    "guilds",
+		Summary: "Get a list of all guilds and their owners",
+
+		OwnerOnly: true,
+		Command:   c.cmdGuilds,
+	})
+
 	token := a.AddSubcommand(&bcr.Command{
 		Name:    "token",
 		Summary: "Get an API token",
@@ -224,5 +237,14 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 
 		CustomPermissions: c,
 		Command:           c.refreshToken,
+	})
+
+	// set status
+	// this is in admin because of the `guild` owner command
+	var o sync.Once
+	r.Session.AddHandler(func(d *gateway.ReadyEvent) {
+		o.Do(func() {
+			c.setStatusLoop(r.Session)
+		})
 	})
 }
