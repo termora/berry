@@ -91,7 +91,7 @@ func invite(ctx *bcr.Context) string {
 		discord.PermissionUseExternalEmojis +
 		discord.PermissionAddReactions
 
-	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&scope=bot", ctx.Bot.ID, perms)
+	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&scope=applications.commands%%20bot", ctx.Bot.ID, perms)
 }
 
 func prettyDurationString(duration time.Duration) (out string) {
