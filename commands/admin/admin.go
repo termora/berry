@@ -223,6 +223,15 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Command:   c.cmdGuilds,
 	})
 
+	a.AddSubcommand(&bcr.Command{
+		Name:    "changelog",
+		Summary: "Show a list of terms added since `date`.\n`date` must be in `yyyy-mm-dd` format.",
+		Usage:   "<channel> <date>",
+
+		CustomPermissions: c,
+		Command:           c.changelog,
+	})
+
 	token := a.AddSubcommand(&bcr.Command{
 		Name:    "token",
 		Summary: "Get an API token",

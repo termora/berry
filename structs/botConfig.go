@@ -15,6 +15,8 @@ type BotConfig struct {
 		TermBaseURL  string   `json:"term_base_url"`
 		AllowedBots  []string `json:"allowed_bots"`
 
+		TermChangelogPing string `json:"term_changelog_ping"`
+
 		HelpFields []EmbedField `json:"help_fields"`
 
 		CreditFields []EmbedField `json:"credit_fields"`
