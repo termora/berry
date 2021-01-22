@@ -38,6 +38,8 @@ func (c *commands) editTerm(ctx *bcr.Context) (err error) {
 		return c.editTermDesc(ctx, t)
 	case "source":
 		return c.editTermSource(ctx, t)
+	case "image":
+		return c.editTermImage(ctx, t)
 	case "aliases":
 		return c.editTermAliases(ctx, t)
 	}
@@ -115,5 +117,21 @@ func (c *commands) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	_, err = ctx.Send("Aliases updated!", nil)
+	return
+}
+
+func (c *commands) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
+	img := strings.Join(ctx.Args[2:], " ")
+	if img == "clear" {
+		img = ""
+	}
+
+	err = c.db.UpdateImage(t.ID, img)
+	if err != nil {
+		_, err = ctx.Sendf("Error updating image: ```%v```", err)
+		return
+	}
+
+	_, err = ctx.Send("Image updated!", nil)
 	return
 }

@@ -33,6 +33,7 @@ type Term struct {
 	Created         time.Time `json:"created"`
 	LastModified    time.Time `json:"last_modified"`
 	ContentWarnings string    `json:"content_warnings,omitempty"`
+	ImageURL        string    `json:"image_url,omitempty"`
 
 	Flags TermFlag `json:"flags"`
 
@@ -113,6 +114,13 @@ func (t *Term) TermEmbed(baseURL string) *discord.Embed {
 		u = baseURL + url.PathEscape(strings.ToLower(t.Name))
 	}
 
+	var i *discord.EmbedImage
+	if t.ImageURL != "" {
+		i = &discord.EmbedImage{
+			URL: t.ImageURL,
+		}
+	}
+
 	e := &discord.Embed{
 		Title:       t.Name,
 		URL:         u,
@@ -123,6 +131,7 @@ func (t *Term) TermEmbed(baseURL string) *discord.Embed {
 		Footer: &discord.EmbedFooter{
 			Text: fmt.Sprintf("ID: %v | Category: %v (ID: %v) | Created", t.ID, t.CategoryName, t.Category),
 		},
+		Image: i,
 	}
 
 	return e
