@@ -1,13 +1,11 @@
 package search
 
 import (
-	"strings"
 	"time"
 
 	"github.com/Starshine113/bcr"
 	"github.com/Starshine113/berry/db"
 	"github.com/Starshine113/berry/structs"
-	"github.com/diamondburned/arikawa/v2/discord"
 	"go.uber.org/zap"
 )
 
@@ -22,12 +20,12 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 	c := commands{Db: db, conf: conf, Sugar: s}
 
 	r.AddCommand(&bcr.Command{
-		Name:    "search",
+		Name:    "advsearch",
 		Aliases: []string{"s"},
 
 		Summary:     "Search for a term",
-		Description: "Search for a term. Prefix your search with `!` to show the first result.",
-		Usage:       "<search term>",
+		Description: "Search for a term in a category. Prefix your search with `!` to show the first result.",
+		Usage:       "<category> <search term>",
 
 		Blacklistable: true,
 
@@ -78,101 +76,16 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 		Command:       c.term,
 	})
 
+	// aliases
+	ps := r.AddCommand(r.AliasMust("search", []string{"advsearch"}, bcr.DefaultArgTransformer("plurality", "")))
+	ps.Summary = "Search for a plurality-related term"
+	ps.Description = "Search for a term in the `plurality` category. Prefix your search with `!` to show the first result."
+	ps.Usage = "<search term>"
+
+	ls := r.AddCommand(r.AliasMust("lgbt", []string{"advsearch"}, bcr.DefaultArgTransformer("lgbtq+", "")))
+	ls.Summary = "Search for a LGBTQ+-related term"
+	ls.Description = "Search for a term in the `LGBTQ+` category. Prefix your search with `!` to show the first result."
+	ls.Usage = "<search term>"
+
 	c.initExplanations(r)
-}
-
-func (c *commands) search(ctx *bcr.Context) (err error) {
-	if err = ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("No search term provided.", nil)
-		return err
-	}
-
-	limit := 0
-	if strings.HasPrefix(ctx.RawArgs, "!") {
-		limit = 1
-		ctx.RawArgs = strings.TrimPrefix(ctx.RawArgs, "!")
-	}
-	terms, err := c.Db.Search(ctx.RawArgs, limit)
-	if err != nil {
-		return c.Db.InternalError(ctx, err)
-	}
-
-	if len(terms) == 0 {
-		_, err = ctx.Send("No results found.", nil)
-		return err
-	}
-	if len(terms) == 1 {
-		_, err = ctx.Send("", terms[0].TermEmbed(c.conf.Bot.TermBaseURL))
-		return err
-	}
-
-	termSlices := make([][]*db.Term, 0)
-
-	for i := 0; i < len(terms); i += 5 {
-		end := i + 5
-
-		if end > len(terms) {
-			end = len(terms)
-		}
-
-		termSlices = append(termSlices, terms[i:end])
-	}
-
-	embeds := make([]discord.Embed, 0)
-
-	for i, t := range termSlices {
-		embeds = append(embeds, searchResultEmbed(ctx.RawArgs, i+1, len(termSlices), len(terms), t))
-	}
-
-	msg, err := ctx.PagedEmbed(embeds, false)
-	if err != nil {
-		return err
-	}
-
-	ctx.AdditionalParams["termSlices"] = termSlices
-
-	for i, e := range emoji {
-		if i >= len(terms) {
-			return
-		}
-
-		emoji := e
-		if err := ctx.Session.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(emoji)); err != nil {
-			c.Sugar.Error("Error adding reaction:", err)
-			return err
-		}
-
-		index := i
-		ctx.AddReactionHandler(msg.ID, ctx.Author.ID, e, false, false, func(ctx *bcr.Context) {
-			page, ok := ctx.AdditionalParams["page"].(int)
-			if ok == false {
-				return
-			}
-			termSlices, ok := ctx.AdditionalParams["termSlices"].([][]*db.Term)
-			if ok == false {
-				return
-			}
-			if len(termSlices) < page {
-				ctx.Session.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
-				return
-			}
-
-			termSlice := termSlices[page]
-			if index >= len(termSlice) {
-				ctx.Session.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
-				return
-			}
-
-			err := ctx.Session.DeleteMessage(ctx.Channel.ID, msg.ID)
-			if err != nil {
-				c.Sugar.Error("Error deleting message:", err)
-			}
-			_, err = ctx.Send("", termSlice[index].TermEmbed(c.conf.Bot.TermBaseURL))
-			if err != nil {
-				c.Sugar.Error("Error sending message:", err)
-			}
-		})
-	}
-
-	return
 }
