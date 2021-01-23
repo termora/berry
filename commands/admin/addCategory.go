@@ -3,7 +3,7 @@ package admin
 import (
 	"context"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 )
 
 func (c *commands) addCategory(ctx *bcr.Context) (err error) {

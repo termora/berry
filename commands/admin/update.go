@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
 )

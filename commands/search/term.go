@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 )
 
 func (c *commands) term(ctx *bcr.Context) (err error) {

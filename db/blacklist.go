@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 )
 
 // Errors for setting the blacklist

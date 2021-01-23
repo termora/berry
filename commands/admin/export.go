@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/berry/db"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/db"
 	"github.com/diamondburned/arikawa/v2/api"
 	"github.com/diamondburned/arikawa/v2/utils/sendpart"
 )

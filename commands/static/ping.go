@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 )
 
 func (c *Commands) ping(ctx *bcr.Context) (err error) {

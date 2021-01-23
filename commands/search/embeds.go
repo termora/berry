@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Starshine113/berry/db"
+	"github.com/starshine-sys/berry/db"
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 

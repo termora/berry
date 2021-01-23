@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 )
 
 func (c *commands) setCW(ctx *bcr.Context) (err error) {

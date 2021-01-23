@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/berry/db"
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/db"
 )
 
 func (c *Commands) perms(ctx *bcr.Context) (err error) {
@@ -48,7 +48,7 @@ func (c *Commands) privacy(ctx *bcr.Context) (err error) {
 	
 	Additionally, there are daily database backups, which only include a list of blacklisted channels (as well as all terms/explanations).
 	
-	%v is open source, and its source code is available [on GitHub](https://github.com/Starshine113/Berry). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username),
+	%v is open source, and its source code is available [on GitHub](https://github.com/starshine-sys/berry). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username),
 		Color: db.EmbedColour,
 	})
 	return err

@@ -3,9 +3,9 @@ package server
 import (
 	"strings"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 
-	"github.com/Starshine113/berry/db"
+	"github.com/starshine-sys/berry/db"
 )
 
 func (c *commands) blacklistAdd(ctx *bcr.Context) (err error) {

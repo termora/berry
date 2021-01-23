@@ -4,9 +4,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/structs"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/db"
+	"github.com/starshine-sys/berry/structs"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
 	"go.uber.org/zap"

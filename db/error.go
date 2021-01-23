@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/google/uuid"

@@ -8,12 +8,12 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/berry/commands/admin"
-	"github.com/Starshine113/berry/commands/search"
-	"github.com/Starshine113/berry/commands/server"
-	"github.com/Starshine113/berry/commands/static"
-	"github.com/Starshine113/berry/db"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/commands/admin"
+	"github.com/starshine-sys/berry/commands/search"
+	"github.com/starshine-sys/berry/commands/server"
+	"github.com/starshine-sys/berry/commands/static"
+	"github.com/starshine-sys/berry/db"
 	"github.com/diamondburned/arikawa/v2/state"
 )
 

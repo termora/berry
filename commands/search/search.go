@@ -3,9 +3,9 @@ package search
 import (
 	"time"
 
-	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/berry/db"
-	"github.com/Starshine113/berry/structs"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/db"
+	"github.com/starshine-sys/berry/structs"
 	"go.uber.org/zap"
 )
 

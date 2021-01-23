@@ -1,7 +1,7 @@
 package search
 
 import (
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 )
 
 func (c *commands) random(ctx *bcr.Context) (err error) {

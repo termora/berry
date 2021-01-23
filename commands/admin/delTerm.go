@@ -3,7 +3,7 @@ package admin
 import (
 	"strconv"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 )
 
 func (c *commands) delTerm(ctx *bcr.Context) (err error) {

@@ -1,12 +1,9 @@
-module github.com/Starshine113/berry
+module github.com/starshine-sys/berry
 
 go 1.15
 
 require (
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
-	github.com/Starshine113/bcr v0.7.3-0.20210120142138-c529e2c9e4f7
-	github.com/Starshine113/pkgo v0.1.0
-	github.com/diamondburned/arikawa v1.3.14
 	github.com/diamondburned/arikawa/v2 v2.0.0-20210106051538-d9a159d948af
 	github.com/georgysavva/scany v0.2.7
 	github.com/google/uuid v1.1.5
@@ -14,6 +11,8 @@ require (
 	github.com/jackc/pgx/v4 v4.10.1
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/pkg/errors v0.9.1
+	github.com/starshine-sys/bcr v0.7.3
+	github.com/starshine-sys/pkgo v0.2.1
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c // indirect

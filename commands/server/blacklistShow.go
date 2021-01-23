@@ -3,10 +3,10 @@ package server
 import (
 	"fmt"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 	"github.com/diamondburned/arikawa/v2/discord"
 
-	"github.com/Starshine113/berry/db"
+	"github.com/starshine-sys/berry/db"
 )
 
 func (c *commands) blacklist(ctx *bcr.Context) (err error) {

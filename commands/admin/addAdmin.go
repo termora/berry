@@ -3,7 +3,7 @@ package admin
 import (
 	"strings"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 )
 
 func (c *commands) addAdmin(ctx *bcr.Context) (err error) {

@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/berry/db"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/db"
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 
@@ -70,7 +70,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name:   "Source code",
-				Value:  "[GitHub](https://github.com/Starshine113/berry)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
+				Value:  "[GitHub](https://github.com/starshine-sys/berry)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
 				Inline: true,
 			},
 		},

@@ -3,8 +3,8 @@ package admin
 import (
 	"strings"
 
-	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/berry/db"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/db"
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 

@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/Starshine113/bcr"
-	"github.com/Starshine113/pkgo"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/pkgo"
 )
 
 var pk = pkgo.NewSession(nil)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 )
 
 func (c *commands) initExplanations(r *bcr.Router) {

@@ -3,7 +3,7 @@ package admin
 import (
 	"fmt"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 )
 
 func (c *commands) token(ctx *bcr.Context) (err error) {

@@ -3,7 +3,7 @@ package admin
 import (
 	"fmt"
 
-	"github.com/Starshine113/bcr"
+	"github.com/starshine-sys/bcr"
 	"github.com/diamondburned/arikawa/v2/discord"
 )
 

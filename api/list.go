@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Starshine113/berry/db"
+	"github.com/starshine-sys/berry/db"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
