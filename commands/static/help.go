@@ -32,10 +32,10 @@ func (c *Commands) privacy(ctx *bcr.Context) (err error) {
 
 	This is the data %v collects:
 	
-	- Data about commands run: command, arguments, user ID, and channel ID, used exclusively for debugging purposes and automatically removed when the bot's logs are rotated
 	- A list of blacklisted channels per server
+	- Information about internal errors: command, user ID, and channel ID
 	
-	This is the data %v stores in memory, and which is wiped on a restart:
+	This is the data %v stores in memory, and which is wiped on a bot restart:
 	
 	- Message metadata *for its own messages*
 	- Message metadata for messages that trigger commands
@@ -95,7 +95,7 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name:  "For staff",
-				Value: fmt.Sprintf("You can blacklist most commands, with the exception of `explain`, using the following commands:\n`blacklist`: show the current blacklist\n`blacklist add`: add a channel to the blacklist\n`blacklist remove`: remove a channel from the blacklist\n\nTo stop %v from responding in a channel completely, deny it the \"Read Messages\" permission in that channel.", ctx.Bot.Username),
+				Value: fmt.Sprintf("You can blacklist most commands, with the exception of `explain`, using the following commands:\n`blacklist`: show the current blacklist\n`blacklist add`: add a channel to the blacklist\n`blacklist remove`: remove a channel from the blacklist\n\nTo stop %v from responding in a channel completely, deny them the \"Read Messages\" permission in that channel.", ctx.Bot.Username),
 			},
 		},
 	}
