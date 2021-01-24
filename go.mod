@@ -12,6 +12,7 @@ require (
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/pkg/errors v0.9.1
 	github.com/starshine-sys/bcr v0.7.4-0.20210124171320-a2820bcd0500
+	github.com/spf13/pflag v1.0.5
 	github.com/starshine-sys/pkgo v0.2.1
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0

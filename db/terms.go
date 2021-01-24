@@ -61,10 +61,16 @@ func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 }
 
 // SearchCat searches for terms from a single category
-func (db *Db) SearchCat(input string, cat, limit int) (terms []*Term, err error) {
+func (db *Db) SearchCat(input string, cat, limit int, showHidden bool) (terms []*Term, err error) {
 	if limit == 0 {
 		limit = 50
 	}
+
+	flags := FlagSearchHidden
+	if showHidden {
+		flags = 0
+	}
+
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.content_warnings, t.image_url,
 	ts_rank_cd(t.searchtext, websearch_to_tsquery('english', $1), 8) as rank,
@@ -72,7 +78,7 @@ func (db *Db) SearchCat(input string, cat, limit int) (terms []*Term, err error)
 	from public.terms as t, public.categories as c
 	where t.searchtext @@ websearch_to_tsquery('english', $1) and t.category = c.id and t.flags & $3 = 0 and t.category = $4
 	order by rank desc
-	limit $2`, input, limit, FlagSearchHidden, cat)
+	limit $2`, input, limit, flags, cat)
 	return terms, err
 }
 

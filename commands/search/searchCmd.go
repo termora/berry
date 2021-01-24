@@ -3,12 +3,27 @@ package search
 import (
 	"strings"
 
+	"github.com/diamondburned/arikawa/v2/discord"
+	flag "github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
-	"github.com/diamondburned/arikawa/v2/discord"
 )
 
 func (c *commands) search(ctx *bcr.Context) (err error) {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+
+	var (
+		showHidden bool
+	)
+
+	fs.BoolVarP(&showHidden, "show-hidden", "h", false, "")
+
+	err = fs.Parse(ctx.Args)
+	if err != nil {
+		return c.Db.InternalError(ctx, err)
+	}
+	ctx.Args = fs.Args()
+
 	if err = ctx.CheckMinArgs(2); err != nil {
 		_, err = ctx.Send("No category or search term provided.", nil)
 		return err
@@ -20,14 +35,14 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		return err
 	}
 
-	search := strings.TrimSpace(strings.TrimPrefix(ctx.RawArgs, ctx.Args[0]))
+	search := strings.TrimSpace(strings.TrimPrefix(strings.Join(ctx.Args, " "), ctx.Args[0]))
 
 	limit := 0
 	if strings.HasPrefix(search, "!") {
 		limit = 1
 		search = strings.TrimPrefix(search, "!")
 	}
-	terms, err := c.Db.SearchCat(search, category, limit)
+	terms, err := c.Db.SearchCat(search, category, limit, showHidden)
 	if err != nil {
 		return c.Db.InternalError(ctx, err)
 	}
