@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/starshine-sys/berry/db"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/starshine-sys/berry/db"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -51,14 +51,14 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 
-	e.GET("/api/v1/search/:term", r.search)
-	e.GET("/api/v1/term/:id", r.term)
-	e.GET("/api/v1/list", r.list)
-	e.GET("/api/v1/list/:id", r.listCategory)
-	e.GET("/api/v1/categories", r.categories)
-	e.GET("/api/v1/explanations", r.explanations)
+	e.GET("/v1/search/:term", r.search)
+	e.GET("/v1/term/:id", r.term)
+	e.GET("/v1/list", r.list)
+	e.GET("/v1/list/:id", r.listCategory)
+	e.GET("/v1/categories", r.categories)
+	e.GET("/v1/explanations", r.explanations)
 
-	e.POST("/api/v1/term", r.add, middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
+	e.POST("/v1/term", r.add, middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
 		return d.ValidateToken(key), nil
 	}))
 
