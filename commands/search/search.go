@@ -21,7 +21,7 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 
 	r.AddCommand(&bcr.Command{
 		Name:    "advsearch",
-		Aliases: []string{"s"},
+		Aliases: []string{"as"},
 
 		Summary:     "Search for a term",
 		Description: "Search for a term in a category. Prefix your search with `!` to show the first result.",
@@ -77,12 +77,20 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 	})
 
 	// aliases
-	ps := r.AddCommand(r.AliasMust("search", []string{"advsearch"}, bcr.DefaultArgTransformer("plurality", "")))
+	ps := r.AddCommand(r.AliasMust(
+		"search", []string{"s"},
+		[]string{"advsearch"},
+		bcr.DefaultArgTransformer("plurality", ""),
+	))
 	ps.Summary = "Search for a plurality-related term"
 	ps.Description = "Search for a term in the `plurality` category. Prefix your search with `!` to show the first result."
 	ps.Usage = "<search term>"
 
-	ls := r.AddCommand(r.AliasMust("lgbt", []string{"advsearch"}, bcr.DefaultArgTransformer("lgbtq+", "")))
+	ls := r.AddCommand(r.AliasMust(
+		"lgbt", nil,
+		[]string{"advsearch"},
+		bcr.DefaultArgTransformer("lgbtq+", ""),
+	))
 	ls.Summary = "Search for a LGBTQ+-related term"
 	ls.Description = "Search for a term in the `LGBTQ+` category. Prefix your search with `!` to show the first result."
 	ls.Usage = "<search term>"
