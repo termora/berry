@@ -1,0 +1,63 @@
+body {
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    margin: 40px auto;
+    padding: 10px;
+    max-width: 650px;
+    line-height: 1.6;
+    font-size: 18px;
+    background-color: #fff;
+    color: #444;
+    padding: 0
+}
+
+.search {
+    text-align: center;
+}
+
+.searchBox {
+    min-width: 50%;
+    max-width: 500px;
+}
+
+.searchButton {
+    max-width: 100px;
+    background-color: #01b0f4;
+    border: 1px solid #2666d6;
+    border-radius: 5px;
+    padding: 10px 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #dcddde;
+        background-color: #36393f;
+    }
+}
+
+.content {
+    margin: 10px;
+}
+
+.created {
+    font-size: 75%;
+}
+
+a:link {
+    color: #01b0f4;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #01b0f4;
+    text-decoration: underline;
+}
+
+a:active {
+    color: #01b0f4;
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #01b0f4;
+    text-decoration: underline;
+}

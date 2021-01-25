@@ -6,3 +6,4 @@ berry
 .idea
 *.code-workspace
 api/config.yaml
+site/config.yaml
