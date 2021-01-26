@@ -108,7 +108,7 @@ func (db *Db) RemoveTerm(id int) (err error) {
 func (db *Db) GetTerm(id int) (t *Term, err error) {
 	t = &Term{}
 	err = pgxscan.Get(context.Background(), db.Pool, t, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.image_url from public.terms as t, public.categories as c where t.id = $1`, id)
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.image_url from public.terms as t, public.categories as c where t.id = $1 and t.category = c.id`, id)
 	return t, err
 }
 
