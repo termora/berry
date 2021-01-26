@@ -14,15 +14,27 @@
         <h1><a href="/">{{.Conf.SiteName}}</a></h1>
         <h3>{{.Term.Name}}</h3>
         <h4>Aliases: {{if .Term.Aliases}}{{.Term.Aliases | join "," }}{{else}}none{{end}}</h4>
-        <p><strong>Description:</strong><br>
+        {{if .Term.ContentWarnings}}
+        <p><strong>Content Warning</strong></p>
+        <blockquote>
+            {{.Term.ContentWarnings | markdownParse}}
+        </blockquote>
+        {{end}}
+        <p><strong>Description</strong><br>
         <blockquote>
             {{.Term.Description | markdownParse}}
         </blockquote>
         </p>
-        <p><strong>Source:</strong>
+        <p><strong>Source</strong>
         <blockquote>
             {{.Term.Source | markdownParse}}
         </blockquote>
+        {{if .Term.Note}}
+        <p><strong>Note</strong></p>
+        <blockquote>
+            {{.Term.Note | markdownParse}}
+        </blockquote>
+        {{end}}
         </p>
         <p>ID: {{.Term.ID}}, category: {{.Term.CategoryName}} (ID: {{.Term.Category}})</p>
         <p class="created">Created: {{.Term.Created | timeToDate}}</p>

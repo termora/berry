@@ -38,5 +38,9 @@ func (s *site) term(c echo.Context) (err error) {
 		return c.NoContent(http.StatusNotFound)
 	}
 
+	t.Description = strings.ReplaceAll(t.Description, "(##", "(/term/")
+	t.Note = strings.ReplaceAll(t.Note, "(##", "(/term/")
+	t.ContentWarnings = strings.ReplaceAll(t.ContentWarnings, "(##", "(/term/")
+
 	return c.Render(http.StatusOK, "term.html", termPageData{Conf: s.conf, Term: t})
 }
