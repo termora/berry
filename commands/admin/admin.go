@@ -2,17 +2,18 @@ package admin
 
 import (
 	"sync"
-	"time"
 
-	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
-	"github.com/starshine-sys/berry/structs"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/bot"
+	"github.com/starshine-sys/berry/db"
+	"github.com/starshine-sys/berry/structs"
 	"go.uber.org/zap"
 )
 
-type commands struct {
+// Admin ...
+type Admin struct {
 	db     *db.Db
 	config *structs.BotConfig
 	sugar  *zap.SugaredLogger
@@ -22,11 +23,12 @@ type commands struct {
 	guilds []discord.Guild
 }
 
-func (commands) String() string {
+func (Admin) String() string {
 	return "Bot Admin"
 }
 
-func (c *commands) Check(ctx *bcr.Context) (bool, error) {
+// Check ...
+func (c *Admin) Check(ctx *bcr.Context) (bool, error) {
 	if c.config.Bot.AdminServer != "" {
 		if ctx.Message.GuildID.String() != c.config.Bot.AdminServer {
 			return false, nil
@@ -57,17 +59,18 @@ func (c *commands) Check(ctx *bcr.Context) (bool, error) {
 }
 
 // Init ...
-func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.Router) {
-	c := &commands{db: db, config: conf, sugar: sugar}
+func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
+	c := &Admin{db: bot.DB, config: bot.Config, sugar: bot.Sugar}
 
-	a := r.AddCommand(&bcr.Command{
+	a := bot.Router.AddCommand(&bcr.Command{
 		Name:    "admin",
 		Summary: "Admin commands",
 
 		CustomPermissions: c,
+		Hidden:            true,
 
 		Command: func(ctx *bcr.Context) (err error) {
-			_, err = ctx.Send("Nothing to see here, move along...", nil)
+			_, err = ctx.Send("Nothing to see here, move along...\n(Hint: use `admin help` for a list of subcommands!)", nil)
 			return err
 		},
 	})
@@ -171,16 +174,6 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Command: c.editTerm,
 	})
 
-	r.AddCommand(&bcr.Command{
-		Name:    "export",
-		Summary: "Export all terms",
-		Usage:   "[-gz] [-channel <ChannelID/Mention>]",
-
-		Cooldown: time.Minute,
-
-		Command: c.export,
-	})
-
 	a.AddSubcommand(&bcr.Command{
 		Name:    "addadmin",
 		Aliases: []string{"add-admin"},
@@ -232,15 +225,13 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 		Command:           c.changelog,
 	})
 
-	token := a.AddSubcommand(&bcr.Command{
+	a.AddSubcommand(&bcr.Command{
 		Name:    "token",
 		Summary: "Get an API token",
 
 		CustomPermissions: c,
 		Command:           c.token,
-	})
-
-	token.AddSubcommand(&bcr.Command{
+	}).AddSubcommand(&bcr.Command{
 		Name:    "refresh",
 		Summary: "Refresh your API token",
 
@@ -251,9 +242,12 @@ func Init(db *db.Db, sugar *zap.SugaredLogger, conf *structs.BotConfig, r *bcr.R
 	// set status
 	// this is in admin because of the `guild` owner command
 	var o sync.Once
-	r.Session.AddHandler(func(d *gateway.ReadyEvent) {
+	bot.Router.Session.AddHandler(func(d *gateway.ReadyEvent) {
 		o.Do(func() {
-			c.setStatusLoop(r.Session)
+			c.setStatusLoop(bot.Router.Session)
 		})
 	})
+
+	out = append(out, a)
+	return "Bot admin commands", out
 }

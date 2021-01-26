@@ -6,7 +6,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) token(ctx *bcr.Context) (err error) {
+func (c *Admin) token(ctx *bcr.Context) (err error) {
 	u, err := ctx.Session.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
 		c.sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
@@ -36,7 +36,7 @@ func (c *commands) token(ctx *bcr.Context) (err error) {
 	return err
 }
 
-func (c *commands) refreshToken(ctx *bcr.Context) (err error) {
+func (c *Admin) refreshToken(ctx *bcr.Context) (err error) {
 	u, err := ctx.Session.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
 		c.sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)

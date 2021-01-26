@@ -7,7 +7,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) setNote(ctx *bcr.Context) (err error) {
+func (c *Admin) setNote(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
 		_, err = ctx.Send("Not enough arguments provided: need ID and note (or \"clear\"", nil)
 		return err

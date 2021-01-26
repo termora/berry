@@ -1,4 +1,4 @@
-package admin
+package static
 
 import (
 	"bytes"
@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
 	"github.com/diamondburned/arikawa/v2/api"
 	"github.com/diamondburned/arikawa/v2/utils/sendpart"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/db"
 )
 
 const eVersion = 1
@@ -22,7 +22,7 @@ type e struct {
 	Terms      []*db.Term `json:"terms"`
 }
 
-func (c *commands) export(ctx *bcr.Context) (err error) {
+func (c *Commands) export(ctx *bcr.Context) (err error) {
 	export := e{ExportDate: time.Now().UTC(), Version: eVersion}
 
 	var gz bool
@@ -32,21 +32,21 @@ func (c *commands) export(ctx *bcr.Context) (err error) {
 
 	u, err := ctx.Session.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		c.sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		c.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?", nil)
 		return
 	}
 
-	terms, err := c.db.GetTerms(0)
+	terms, err := c.DB.GetTerms(0)
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	export.Terms = terms
 
 	b, err := json.MarshalIndent(export, "", "  ")
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 	fn := fmt.Sprintf("export-%v.json", time.Now().Format("2006-01-02-15-04-05"))
 
@@ -57,11 +57,11 @@ func (c *commands) export(ctx *bcr.Context) (err error) {
 		zw.Name = fn
 		_, err = zw.Write(b)
 		if err != nil {
-			return c.db.InternalError(ctx, err)
+			return c.DB.InternalError(ctx, err)
 		}
 		err = zw.Close()
 		if err != nil {
-			return c.db.InternalError(ctx, err)
+			return c.DB.InternalError(ctx, err)
 		}
 		fn = fn + ".gz"
 	} else {

@@ -1,9 +1,10 @@
 package server
 
 import (
-	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/bot"
+	"github.com/starshine-sys/berry/db"
 )
 
 type commands struct {
@@ -11,10 +12,10 @@ type commands struct {
 }
 
 // Init ...
-func Init(db *db.Db, r *bcr.Router) {
-	c := &commands{db: db}
+func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
+	c := &commands{db: bot.DB}
 
-	g := r.AddCommand(&bcr.Command{
+	g := bot.Router.AddCommand(&bcr.Command{
 		Name:    "blacklist",
 		Aliases: []string{"bl", "blocklist", "blocking"},
 		Summary: "Manage this server's blacklist",
@@ -42,4 +43,6 @@ func Init(db *db.Db, r *bcr.Router) {
 		Permissions: discord.PermissionManageGuild,
 		Command:     c.blacklistRemove,
 	})
+
+	return "Server management commands", append(out, g)
 }

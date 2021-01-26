@@ -8,7 +8,7 @@ import (
 	"github.com/starshine-sys/berry/db"
 )
 
-func (c *commands) aio(ctx *bcr.Context) (err error) {
+func (c *Admin) aio(ctx *bcr.Context) (err error) {
 	if ctx.CheckRequiredArgs(5); err != nil {
 		_, err = ctx.Send("Too few or too many arguments supplied.", nil)
 		return err

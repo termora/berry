@@ -7,9 +7,9 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
-	"github.com/diamondburned/arikawa/v2/discord"
 )
 
 var botVersion = "v0.4"
@@ -59,7 +59,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 					"%v\n(Since %v)\n\n**Terms:** %v\n",
 					prettyDurationString(time.Since(c.start)),
 					c.start.Format("Jan _2 2006, 15:04:05 MST"),
-					c.db.TermCount(),
+					c.DB.TermCount(),
 				),
 				Inline: false,
 			},

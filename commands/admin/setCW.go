@@ -7,7 +7,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) setCW(ctx *bcr.Context) (err error) {
+func (c *Admin) setCW(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
 		_, err = ctx.Send("Not enough arguments provided: need ID and CW (or \"clear\"", nil)
 		return err

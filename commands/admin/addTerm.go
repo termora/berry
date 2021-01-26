@@ -3,12 +3,12 @@ package admin
 import (
 	"strings"
 
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
-	"github.com/diamondburned/arikawa/v2/discord"
 )
 
-func (c *commands) addTerm(ctx *bcr.Context) (err error) {
+func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
 		_, err = ctx.Send("Please provide a term name.", nil)
 		return err

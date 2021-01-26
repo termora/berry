@@ -6,7 +6,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) addCategory(ctx *bcr.Context) (err error) {
+func (c *Admin) addCategory(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
 		_, err = ctx.Send("You need to give a category name.", nil)
 		return err

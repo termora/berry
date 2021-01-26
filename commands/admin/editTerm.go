@@ -4,13 +4,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/db"
 )
 
-func (c *commands) editTerm(ctx *bcr.Context) (err error) {
+func (c *Admin) editTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(3); err != nil {
 		_, err = ctx.Send("Not enough arguments. Valid subcommands are: `title`, `desc`, `source`, `aliases`.", nil)
 		return
@@ -48,7 +48,7 @@ func (c *commands) editTerm(ctx *bcr.Context) (err error) {
 	return
 }
 
-func (c *commands) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
+func (c *Admin) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
 	title := strings.Join(ctx.Args[2:], " ")
 	if len(title) > 200 {
 		_, err = ctx.Sendf("Title too long (%v > 200).", len(title))
@@ -65,7 +65,7 @@ func (c *commands) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
 	return
 }
 
-func (c *commands) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
+func (c *Admin) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
 	desc := strings.Join(ctx.Args[2:], " ")
 	if len(desc) > 1800 {
 		_, err = ctx.Sendf("Description too long (%v > 1800).", len(desc))
@@ -82,7 +82,7 @@ func (c *commands) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
 	return
 }
 
-func (c *commands) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
+func (c *Admin) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 	source := strings.Join(ctx.Args[2:], " ")
 	if len(source) > 200 {
 		_, err = ctx.Sendf("Source too long (%v > 200).", len(source))
@@ -99,7 +99,7 @@ func (c *commands) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 	return
 }
 
-func (c *commands) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
+func (c *Admin) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 	var aliases []string
 	if ctx.Args[2] != "clear" {
 		aliases = strings.Split(strings.Join(ctx.Args[2:], " "), "\n")
@@ -120,7 +120,7 @@ func (c *commands) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 	return
 }
 
-func (c *commands) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
+func (c *Admin) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
 	img := strings.Join(ctx.Args[2:], " ")
 	if img == "clear" {
 		img = ""

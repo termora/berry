@@ -7,7 +7,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) initExplanations(r *bcr.Router) {
+func (c *commands) initExplanations(r *bcr.Router) (out []*bcr.Command) {
 	explanations, err := c.Db.GetCmdExplanations()
 	if err != nil {
 		c.Sugar.Error("Error getting explanations:", err)
@@ -16,7 +16,7 @@ func (c *commands) initExplanations(r *bcr.Router) {
 
 	for _, e := range explanations {
 		e := e
-		r.AddCommand(&bcr.Command{
+		out = append(out, r.AddCommand(&bcr.Command{
 			Name:    e.Name,
 			Aliases: e.Aliases,
 
@@ -29,6 +29,8 @@ func (c *commands) initExplanations(r *bcr.Router) {
 				_, err = ctx.Send(e.Description, nil)
 				return err
 			},
-		})
+		}))
 	}
+
+	return out
 }

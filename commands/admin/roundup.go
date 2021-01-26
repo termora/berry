@@ -5,12 +5,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
-	"github.com/diamondburned/arikawa/v2/discord"
 )
 
-func (c *commands) changelog(ctx *bcr.Context) (err error) {
+func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
 		_, err = ctx.Send("You are missing the required arguments `channel` and/or `since`.", nil)
 		return err

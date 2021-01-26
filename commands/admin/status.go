@@ -11,7 +11,7 @@ import (
 )
 
 // this is in admin to better integrate with the `guilds` admin command
-func (c *commands) setStatusLoop(s *state.State) {
+func (c *Admin) setStatusLoop(s *state.State) {
 	st := fmt.Sprintf("%vhelp", c.config.Bot.Prefixes[0])
 	var guilds int
 	countChan := make(chan int, 1)
@@ -56,7 +56,7 @@ func (c *commands) setStatusLoop(s *state.State) {
 	}
 }
 
-func (c *commands) guildCount(s *state.State, ch chan int) {
+func (c *Admin) guildCount(s *state.State, ch chan int) {
 	for {
 		// get number of guilds and send it over c
 		g, err := s.Session.Client.Guilds(0)

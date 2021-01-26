@@ -8,13 +8,14 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/diamondburned/arikawa/v2/state"
 	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/bot"
 	"github.com/starshine-sys/berry/commands/admin"
 	"github.com/starshine-sys/berry/commands/search"
 	"github.com/starshine-sys/berry/commands/server"
 	"github.com/starshine-sys/berry/commands/static"
 	"github.com/starshine-sys/berry/db"
-	"github.com/diamondburned/arikawa/v2/state"
 )
 
 var sugar *zap.SugaredLogger
@@ -46,21 +47,16 @@ func main() {
 	// set blacklist function
 	r.BlacklistFunc = d.CtxInBlacklist
 
-	// add the message create handler
-	mc := &messageCreate{r: r, c: c, sugar: sugar}
-	s.AddHandler(mc.messageCreate)
-
+	// create the bot instance
+	bot := bot.New(sugar, c, r, d)
+	// add search commands
+	bot.Add(search.Init)
 	// add static commands
-	static.Init(c, d, sugar, r)
-
-	// add term commands
-	search.Init(d, c, sugar, r)
-
+	bot.Add(static.Init)
 	// add server commands
-	server.Init(d, r)
-
+	bot.Add(server.Init)
 	// add admin commands
-	admin.Init(d, sugar, c, r)
+	bot.Add(admin.Init)
 
 	// open a connection to Discord
 	if err = s.Open(); err != nil {

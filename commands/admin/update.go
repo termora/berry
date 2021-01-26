@@ -6,12 +6,12 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/starshine-sys/bcr"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
+	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) update(ctx *bcr.Context) (err error) {
+func (c *Admin) update(ctx *bcr.Context) (err error) {
 	_, err = ctx.Send("Updating Git repository...", nil)
 	if err != nil {
 		return err
@@ -40,7 +40,7 @@ func (c *commands) update(ctx *bcr.Context) (err error) {
 	return
 }
 
-func (c *commands) restart(ctx *bcr.Context) (err error) {
+func (c *Admin) restart(ctx *bcr.Context) (err error) {
 	ctx.Session.Gateway.UpdateStatus(gateway.UpdateStatusData{
 		Status: gateway.IdleStatus,
 		Activities: &[]discord.Activity{{

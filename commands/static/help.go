@@ -99,16 +99,16 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 			},
 		},
 	}
-	if c.config.Bot.ServerInvite != "" {
+	if c.Config.Bot.ServerInvite != "" {
 		e.Fields = append(e.Fields, discord.EmbedField{
 			Name:  "Support server",
-			Value: fmt.Sprintf("Use this link to join the support server, for bot questions and term additions/requests: %v", c.config.Bot.ServerInvite),
+			Value: fmt.Sprintf("Use this link to join the support server, for bot questions and term additions/requests: %v", c.Config.Bot.ServerInvite),
 		})
 	}
 
 	// if custom help fields are defined, add those
-	if len(c.config.Bot.HelpFields) != 0 {
-		for _, f := range c.config.Bot.HelpFields {
+	if len(c.Config.Bot.HelpFields) != 0 {
+		for _, f := range c.Config.Bot.HelpFields {
 			e.Fields = append(e.Fields, discord.EmbedField{
 				Name:  f.Name,
 				Value: f.Value,

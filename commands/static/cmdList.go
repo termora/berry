@@ -2,64 +2,69 @@ package static
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 
-	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/bot"
+	"github.com/starshine-sys/berry/db"
 )
 
-type cmdList []*bcr.Command
-
-func (c cmdList) Len() int      { return len(c) }
-func (c cmdList) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
-func (c cmdList) Less(i, j int) bool {
-	return sort.StringsAreSorted([]string{c[i].Name, c[j].Name})
-}
-
 func (c *Commands) commandList(ctx *bcr.Context) (err error) {
-	var cmds cmdList = ctx.Router.Commands()
-	sort.Sort(cmds)
-
-	cmdSlices := make([][]*bcr.Command, 0)
-
-	for i := 0; i < len(cmds); i += 10 {
-		end := i + 10
-
-		if end > len(cmds) {
-			end = len(cmds)
-		}
-
-		cmdSlices = append(cmdSlices, cmds[i:end])
-	}
-
 	embeds := make([]discord.Embed, 0)
 
-	for i, slice := range cmdSlices {
-		var s strings.Builder
-		for _, c := range slice {
-			s.WriteString(fmt.Sprintf("`%v%v`: %v\n",
+	// get an accurate page count
+	var modCount int
+	for _, m := range c.Modules {
+		modCount += commandCount(m)
+	}
+
+	for i, mod := range c.Modules {
+		cmds := make([]string, 0)
+		for _, cmd := range mod.Commands() {
+			if cmd.Hidden {
+				continue
+			}
+			cmds = append(cmds, fmt.Sprintf("`%v%v`: %v",
 				ifThing(
-					c.CustomPermissions == nil && c.Permissions == 0 && !c.OwnerOnly,
+					cmd.CustomPermissions == nil && cmd.Permissions == 0 && !cmd.OwnerOnly,
 					"", "[!] ",
-				), c.Name, c.Summary,
+				), cmd.Name, cmd.Summary,
 			))
 		}
 
+		// if the module has no commands, skip this embed
+		if len(cmds) == 0 {
+			continue
+		}
+
 		embeds = append(embeds, discord.Embed{
-			Title:       fmt.Sprintf("List of commands (%v)", len(cmds)),
-			Description: s.String(),
+			Title:       fmt.Sprintf("%v (%v)", mod.String(), len(mod.Commands())),
+			Description: strings.Join(cmds, "\n"),
 			Color:       db.EmbedColour,
 
 			Footer: &discord.EmbedFooter{
-				Text: fmt.Sprintf("Commands marked with [!] need extra permissions. Page %v/%v", i+1, len(cmdSlices)),
+				Text: fmt.Sprintf("Commands marked with [!] need extra permissions. Page %v/%v", i+1, modCount),
 			},
 		})
 	}
 
 	_, err = ctx.PagedEmbed(embeds, false)
 	return err
+}
+
+func commandCount(m bot.Module) int {
+	var c int
+	for _, i := range m.Commands() {
+		if !i.Hidden {
+			c++
+		}
+	}
+
+	if c == 0 {
+		return 0
+	}
+	return 1
 }
 
 func ifThing(b bool, t, f string) string {

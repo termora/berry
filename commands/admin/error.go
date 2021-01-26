@@ -3,11 +3,11 @@ package admin
 import (
 	"fmt"
 
-	"github.com/starshine-sys/bcr"
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) error(ctx *bcr.Context) (err error) {
+func (c *Admin) error(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
 		_, err = ctx.Send("You didn't give an error ID.", nil)
 		return err

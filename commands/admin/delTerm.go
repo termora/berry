@@ -6,7 +6,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) delTerm(ctx *bcr.Context) (err error) {
+func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckRequiredArgs(1); err != nil {
 		_, err = ctx.Send("No term ID provided.", nil)
 		return err

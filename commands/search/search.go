@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/bot"
 	"github.com/starshine-sys/berry/db"
 	"github.com/starshine-sys/berry/structs"
 	"go.uber.org/zap"
@@ -16,10 +17,10 @@ type commands struct {
 }
 
 // Init ...
-func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Router) {
-	c := commands{Db: db, conf: conf, Sugar: s}
+func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
+	c := commands{Db: bot.DB, conf: bot.Config, Sugar: bot.Sugar}
 
-	r.AddCommand(&bcr.Command{
+	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "advsearch",
 		Aliases: []string{"as"},
 
@@ -30,9 +31,9 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 		Blacklistable: true,
 
 		Command: c.search,
-	})
+	}))
 
-	r.AddCommand(&bcr.Command{
+	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "random",
 		Aliases: []string{"r"},
 
@@ -42,9 +43,9 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 		Blacklistable: true,
 
 		Command: c.random,
-	})
+	}))
 
-	r.AddCommand(&bcr.Command{
+	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "explain",
 		Aliases: []string{"e", "ex"},
 
@@ -55,18 +56,18 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 		Blacklistable: false,
 
 		Command: c.explanation,
-	})
+	}))
 
-	r.AddCommand(&bcr.Command{
+	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "list",
 		Summary: "List all terms",
 
 		Cooldown:      3 * time.Second,
 		Blacklistable: true,
 		Command:       c.list,
-	})
+	}))
 
-	r.AddCommand(&bcr.Command{
+	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "post",
 		Summary: "Post a single term",
 		Usage:   "<term ID> [channel]",
@@ -74,10 +75,10 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 		Cooldown:      3 * time.Second,
 		Blacklistable: true,
 		Command:       c.term,
-	})
+	}))
 
 	// aliases
-	ps := r.AddCommand(r.AliasMust(
+	ps := bot.Router.AddCommand(bot.Router.AliasMust(
 		"search", []string{"s"},
 		[]string{"advsearch"},
 		bcr.DefaultArgTransformer("plurality", ""),
@@ -86,7 +87,7 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 	ps.Description = "Search for a term in the `plurality` category. Prefix your search with `!` to show the first result."
 	ps.Usage = "<search term>"
 
-	ls := r.AddCommand(r.AliasMust(
+	ls := bot.Router.AddCommand(bot.Router.AliasMust(
 		"lgbt", nil,
 		[]string{"advsearch"},
 		bcr.DefaultArgTransformer("lgbtq+", ""),
@@ -95,5 +96,7 @@ func Init(db *db.Db, conf *structs.BotConfig, s *zap.SugaredLogger, r *bcr.Route
 	ls.Description = "Search for a term in the `LGBTQ+` category. Prefix your search with `!` to show the first result."
 	ls.Usage = "<search term>"
 
-	c.initExplanations(r)
+	list = append(list, c.initExplanations(bot.Router)...)
+	list = append(list, ps, ls)
+	return "Search commands", list
 }

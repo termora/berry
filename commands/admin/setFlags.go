@@ -3,12 +3,12 @@ package admin
 import (
 	"strconv"
 
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
-	"github.com/diamondburned/arikawa/v2/discord"
 )
 
-func (c *commands) setFlags(ctx *bcr.Context) (err error) {
+func (c *Admin) setFlags(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckRequiredArgs(2); err != nil {
 		_, err = ctx.Send("", &discord.Embed{
 			Title: "Flags",

@@ -5,26 +5,22 @@ import (
 	"time"
 
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
-	"github.com/starshine-sys/berry/structs"
-	"go.uber.org/zap"
+	"github.com/starshine-sys/berry/bot"
 )
 
 // Commands ...
 type Commands struct {
-	config *structs.BotConfig
-	start  time.Time
-	sugar  *zap.SugaredLogger
-	db     *db.Db
+	*bot.Bot
 
+	start    time.Time
 	cmdCount int
 	cmdMutex sync.RWMutex
 }
 
 // Init ...
-func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router) *Commands {
-	c := &Commands{config: conf, start: time.Now(), sugar: s, db: d}
-	r.AddCommand(&bcr.Command{
+func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
+	c := &Commands{Bot: bot, start: time.Now()}
+	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name: "ping",
 
 		Summary:  "Check the bot's message latency",
@@ -32,9 +28,9 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 
 		Blacklistable: true,
 		Command:       c.ping,
-	})
+	}))
 
-	r.AddCommand(&bcr.Command{
+	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name: "about",
 
 		Summary:  "Some info about the bot",
@@ -42,9 +38,9 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 
 		Blacklistable: true,
 		Command:       c.about,
-	})
+	}))
 
-	r.AddCommand(&bcr.Command{
+	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name: "credits",
 
 		Summary:  "A list of people who helped create the bot",
@@ -52,9 +48,9 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 
 		Blacklistable: true,
 		Command:       c.credits,
-	})
+	}))
 
-	r.AddCommand(&bcr.Command{
+	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name:    "hello",
 		Aliases: []string{"Hi"},
 
@@ -63,9 +59,9 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 
 		Blacklistable: true,
 		Command:       c.hello,
-	})
+	}))
 
-	help := r.AddCommand(&bcr.Command{
+	help := bot.Router.AddCommand(&bcr.Command{
 		Name: "help",
 
 		Summary:     "Show info about how to use the bot",
@@ -119,7 +115,7 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 		Command:       c.commandList,
 	})
 
-	r.AddCommand(&bcr.Command{
+	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name: "invite",
 
 		Summary:  "Get an invite link",
@@ -127,14 +123,25 @@ func Init(conf *structs.BotConfig, d *db.Db, s *zap.SugaredLogger, r *bcr.Router
 
 		Blacklistable: true,
 		Command:       c.cmdInvite,
-	})
+	}))
 
-	return c
+	o = append(o, bot.Router.AddCommand(&bcr.Command{
+		Name:    "export",
+		Summary: "Export all terms",
+		Usage:   "[-gz] [-channel <ChannelID/Mention>]",
+
+		Cooldown: time.Minute,
+
+		Command: c.export,
+	}))
+
+	o = append(o, help)
+	return "Static commands", o
 }
 
 // PostFunc logs when a command is used
 func (c *Commands) PostFunc(ctx *bcr.Context) {
-	c.sugar.Debugf("Command executed: `%v` (arguments %v) by %v (channel %v, guild %v)", ctx.Cmd.Name, ctx.Args, ctx.Author.ID, ctx.Channel.ID, ctx.Message.GuildID)
+	c.Sugar.Debugf("Command executed: `%v` (arguments %v) by %v (channel %v, guild %v)", ctx.Cmd.Name, ctx.Args, ctx.Author.ID, ctx.Channel.ID, ctx.Message.GuildID)
 	c.cmdMutex.Lock()
 	c.cmdCount++
 	c.cmdMutex.Unlock()

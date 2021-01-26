@@ -5,12 +5,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/diamondburned/arikawa/v2/bot/extras/shellwords"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
-	"github.com/diamondburned/arikawa/v2/bot/extras/shellwords"
 )
 
-func (c *commands) addExplanation(ctx *bcr.Context) (err error) {
+func (c *Admin) addExplanation(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
 		_, err = ctx.Send("Not enough arguments provided.", nil)
 		return err
@@ -39,7 +39,7 @@ func (c *commands) addExplanation(ctx *bcr.Context) (err error) {
 	return err
 }
 
-func (c *commands) toggleExplanationCmd(ctx *bcr.Context) (err error) {
+func (c *Admin) toggleExplanationCmd(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
 		_, err = ctx.Send("Not enough arguments provided.", nil)
 		return err
