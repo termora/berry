@@ -31,6 +31,9 @@ func funcMap() template.FuncMap {
 					[]byte(s),
 					blackfriday.WithExtensions(blackfriday.Autolink|blackfriday.Strikethrough|blackfriday.HardLineBreak))))
 		},
+		"sanitize": func(s string) template.HTML {
+			return template.HTML(bluemonday.UGCPolicy().Sanitize(s))
+		},
 		"resultsNum": func(s []*db.Term) int {
 			return len(s)
 		},

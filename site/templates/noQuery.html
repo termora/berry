@@ -13,7 +13,11 @@
     <div class="404">
         <h1><a href="/">{{.Conf.SiteName}}</a></h1>
         <h3>Search</h3>
-        <p>Either no results were found, or you did not input a query.</p>
+        {{if .Query}}
+        <p>No results were found for <code>{{.Query}}</code>. <a href="/">Try searching for something else?</a></p>
+        {{else}}
+        <p>You did not input a query.</p>
+        {{end}}
     </div>
 
     <div class="footer">

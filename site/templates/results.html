@@ -12,7 +12,9 @@
 <body>
     <h1><a href="/">Termora</a></h1>
     <div class="terms">
-        <h3>Results ({{.Terms | resultsNum}})</h3>
+        <h3>Results for
+            <code>{{.Query}}</code> ({{.Terms | resultsNum}})
+        </h3>
         <div class="results">
             {{range .Terms}}
             <p>

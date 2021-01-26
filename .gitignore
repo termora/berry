@@ -1,9 +1,14 @@
-config.yaml
-config.json
-termbot
-api/api
-berry
 .idea
 *.code-workspace
+
+# config files
+config.yaml
+config.json
 api/config.yaml
 site/config.yaml
+
+# binaries
+termbot
+api/api
+site/site
+berry
