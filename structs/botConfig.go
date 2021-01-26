@@ -7,13 +7,14 @@ type BotConfig struct {
 		DatabaseURL string `json:"database_url"`
 	}
 	Bot struct {
-		Prefixes     []string
-		BotOwners    []string `json:"bot_owners"`
-		AdminServer  string   `json:"admin_server"`
-		ServerInvite string   `json:"server_invite"`
-		Website      string
-		TermBaseURL  string   `json:"term_base_url"`
-		AllowedBots  []string `json:"allowed_bots"`
+		Prefixes       []string
+		BotOwners      []string `json:"bot_owners"`
+		AdminServer    string   `json:"admin_server"`
+		ServerInvite   string   `json:"server_invite"`
+		Website        string
+		ShowGuildCount bool     `json:"show_guild_count"`
+		TermBaseURL    string   `json:"term_base_url"`
+		AllowedBots    []string `json:"allowed_bots"`
 
 		TermChangelogPing string `json:"term_changelog_ping"`
 

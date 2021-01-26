@@ -36,6 +36,11 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		// wait a minute to switch to other status
 		time.Sleep(1 * time.Minute)
 
+		// if the guild count is disabled, loop immediately
+		if !c.config.Bot.ShowGuildCount {
+			continue
+		}
+
 		select {
 		case g := <-countChan:
 			guilds = g
