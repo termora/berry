@@ -39,6 +39,8 @@ func New(s *zap.SugaredLogger, config *structs.BotConfig, r *bcr.Router, db *db.
 	}
 
 	b.Router.Session.AddHandler(b.MessageCreate)
+	b.Router.Session.AddHandler(b.GuildCreate)
+	b.Router.Session.AddHandler(b.GuildDelete)
 	return b
 }
 

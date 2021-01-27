@@ -2,22 +2,33 @@ package db
 
 import "context"
 
-// CreateServerIfNotExists ...
-func (db *Db) CreateServerIfNotExists(guildID string) (err error) {
-	var exists bool
+// CreateServerIfNotExists returns true if the server exists
+func (db *Db) CreateServerIfNotExists(guildID string) (exists bool, err error) {
 	err = db.Pool.QueryRow(context.Background(), "select exists (select from public.servers where id = $1)", guildID).Scan(&exists)
 	if err != nil {
-		return err
+		return exists, err
 	}
 	if !exists {
 		commandTag, err := db.Pool.Exec(context.Background(), "insert into public.servers (id) values ($1)", guildID)
 		if err != nil {
-			return err
+			return exists, err
 		}
 		if commandTag.RowsAffected() != 1 {
-			return ErrorNoRowsAffected
+			return exists, ErrorNoRowsAffected
 		}
+		return exists, err
+	}
+	return exists, nil
+}
+
+// DeleteServer deletes a server's database entry
+func (db *Db) DeleteServer(guildID string) (err error) {
+	commandTag, err := db.Pool.Exec(context.Background(), "delete from public.servers where id = $1", guildID)
+	if err != nil {
 		return err
 	}
-	return nil
+	if commandTag.RowsAffected() != 1 {
+		return ErrorNoRowsAffected
+	}
+	return err
 }

@@ -1,5 +1,7 @@
 package structs
 
+import "github.com/diamondburned/arikawa/v2/discord"
+
 // BotConfig ...
 type BotConfig struct {
 	Auth struct {
@@ -7,19 +9,22 @@ type BotConfig struct {
 		DatabaseURL string `json:"database_url"`
 	}
 	Bot struct {
-		Prefixes       []string
-		BotOwners      []string `json:"bot_owners"`
-		AdminServer    string   `json:"admin_server"`
-		ServerInvite   string   `json:"server_invite"`
-		Website        string
-		ShowGuildCount bool     `json:"show_guild_count"`
-		TermBaseURL    string   `json:"term_base_url"`
-		AllowedBots    []string `json:"allowed_bots"`
+		Prefixes []string
+
+		BotOwners   []string `json:"bot_owners"`
+		AdminServer string   `json:"admin_server"`
+
+		ServerInvite string `json:"server_invite"`
+		TermBaseURL  string `json:"term_base_url"`
+		Website      string
+
+		ShowGuildCount bool              `json:"show_guild_count"`
+		AllowedBots    []string          `json:"allowed_bots"`
+		JoinLogChannel discord.ChannelID `json:"join_log_channel"`
 
 		TermChangelogPing string `json:"term_changelog_ping"`
 
-		HelpFields []EmbedField `json:"help_fields"`
-
+		HelpFields   []EmbedField `json:"help_fields"`
 		CreditFields []EmbedField `json:"credit_fields"`
 	}
 }
