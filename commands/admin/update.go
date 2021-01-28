@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"time"
 
+	flag "github.com/spf13/pflag"
+
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
 	"github.com/starshine-sys/bcr"
@@ -41,6 +43,16 @@ func (c *Admin) update(ctx *bcr.Context) (err error) {
 }
 
 func (c *Admin) restart(ctx *bcr.Context) (err error) {
+	var silent bool
+
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+	fs.BoolVarP(&silent, "silent", "s", false, "If this flag is used, don't set the bot's status")
+	err = fs.Parse(ctx.Args)
+	if err != nil {
+		return c.db.InternalError(ctx, err)
+	}
+	ctx.Args = fs.Args()
+
 	if len(ctx.Args) > 0 {
 		t, err := time.ParseDuration(ctx.Args[0])
 		if err == nil {
@@ -52,13 +64,15 @@ func (c *Admin) restart(ctx *bcr.Context) (err error) {
 			}
 
 			// set status
-			c.stopStatus <- true
-			ctx.Session.Gateway.UpdateStatus(gateway.UpdateStatusData{
-				Status: gateway.OnlineStatus,
-				Activities: &[]discord.Activity{{
-					Name: fmt.Sprintf("⏲️ Restart scheduled for %v", time.Now().UTC().Add(t).Format("15:04:05 MST")),
-				}},
-			})
+			if !silent {
+				c.stopStatus <- true
+				ctx.Session.Gateway.UpdateStatus(gateway.UpdateStatusData{
+					Status: gateway.OnlineStatus,
+					Activities: &[]discord.Activity{{
+						Name: fmt.Sprintf("⏲️ Restart scheduled for %v", time.Now().UTC().Add(t).Format("15:04:05 MST")),
+					}},
+				})
+			}
 
 			time.Sleep(t)
 		}
