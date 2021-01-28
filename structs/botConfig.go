@@ -14,9 +14,13 @@ type BotConfig struct {
 		BotOwners   []string `json:"bot_owners"`
 		AdminServer string   `json:"admin_server"`
 
-		ServerInvite string `json:"server_invite"`
-		TermBaseURL  string `json:"term_base_url"`
-		Website      string
+		Support struct {
+			Invite         string
+			SupportChannel string `json:"support_channel"`
+		}
+
+		TermBaseURL string `json:"term_base_url"`
+		Website     string
 
 		ShowGuildCount bool              `json:"show_guild_count"`
 		AllowedBots    []string          `json:"allowed_bots"`
