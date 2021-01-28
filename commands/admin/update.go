@@ -41,6 +41,19 @@ func (c *Admin) update(ctx *bcr.Context) (err error) {
 }
 
 func (c *Admin) restart(ctx *bcr.Context) (err error) {
+	if len(ctx.Args) > 0 {
+		t, err := time.ParseDuration(ctx.Args[0])
+		if err == nil {
+			c.sugar.Infof("Restart scheduled in %v by %v#%v (%v)", t.Round(time.Second), ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID)
+
+			_, err = ctx.Sendf("Restart scheduled in %v.", t.Round(time.Second))
+			if err != nil {
+				c.sugar.Error("Error sending message:", err)
+			}
+			time.Sleep(t)
+		}
+	}
+
 	ctx.Session.Gateway.UpdateStatus(gateway.UpdateStatusData{
 		Status: gateway.IdleStatus,
 		Activities: &[]discord.Activity{{
@@ -52,7 +65,7 @@ func (c *Admin) restart(ctx *bcr.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	c.sugar.Infof("Kill command received, shutting down...")
+	c.sugar.Infof("Restart command received from %v#%v (%v), shutting down...", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID)
 
 	ctx.Router.Session.Close()
 	c.sugar.Infof("Disconnected from Discord.")
