@@ -101,6 +101,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Name:    "delterm",
 		Aliases: []string{"del-term"},
 		Summary: "Delete a term",
+		Usage:   "<id>",
 
 		CustomPermissions: c,
 
@@ -143,6 +144,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	a.AddSubcommand(&bcr.Command{
 		Name:    "setflags",
 		Summary: "Set a term's flags",
+		Usage:   "<id> <flag mask>",
 
 		CustomPermissions: c,
 
@@ -152,6 +154,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	a.AddSubcommand(&bcr.Command{
 		Name:    "setcw",
 		Summary: "Set a term's CW",
+		Usage:   "<id> <content warning>",
 
 		CustomPermissions: c,
 
@@ -161,6 +164,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	a.AddSubcommand(&bcr.Command{
 		Name:    "setnote",
 		Summary: "Set a term's note",
+		Usage:   "<id> <note>",
 
 		CustomPermissions: c,
 
@@ -171,6 +175,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Name:    "editterm",
 		Aliases: []string{"edit-term"},
 		Summary: "Edit a term",
+		Usage:   "<part to edit> <id> <text>",
 
 		CustomPermissions: c,
 
@@ -196,8 +201,10 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	})
 
 	a.AddSubcommand(&bcr.Command{
-		Name:    "restart",
-		Summary: "Restart the bot",
+		Name:        "restart",
+		Summary:     "Restart the bot",
+		Description: "If the `-s`/`--silent` flag is set, don't change the bot's status",
+		Usage:       "[delay] [-s/--silent]",
 
 		OwnerOnly: true,
 		Command:   c.restart,
@@ -206,6 +213,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	a.AddSubcommand(&bcr.Command{
 		Name:    "error",
 		Summary: "Get an error by ID",
+		Usage:   "<error ID>",
 
 		CustomPermissions: c,
 		Command:           c.error,
