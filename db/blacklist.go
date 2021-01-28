@@ -21,11 +21,6 @@ func (db *Db) IsBlacklisted(guildID, channelID string) (b bool) {
 
 // AddToBlacklist adds the given channelID to the blacklist for guildID
 func (db *Db) AddToBlacklist(guildID string, channelIDs []string) (err error) {
-	_, err = db.CreateServerIfNotExists(guildID)
-	if err != nil {
-		return err
-	}
-
 	for _, channelID := range channelIDs {
 		if db.IsBlacklisted(guildID, channelID) {
 			return ErrorAlreadyBlacklisted
@@ -43,11 +38,6 @@ func (db *Db) AddToBlacklist(guildID string, channelIDs []string) (err error) {
 
 // RemoveFromBlacklist removes the given channelID from the blacklist for guildID
 func (db *Db) RemoveFromBlacklist(guildID, channelID string) (err error) {
-	_, err = db.CreateServerIfNotExists(guildID)
-	if err != nil {
-		return err
-	}
-
 	if !db.IsBlacklisted(guildID, channelID) {
 		return ErrorNotBlacklisted
 	}
@@ -63,11 +53,6 @@ func (db *Db) RemoveFromBlacklist(guildID, channelID string) (err error) {
 
 // GetBlacklist returns the channel blacklist for guildID
 func (db *Db) GetBlacklist(guildID string) (b []string, err error) {
-	_, err = db.CreateServerIfNotExists(guildID)
-	if err != nil {
-		return b, err
-	}
-
 	err = db.Pool.QueryRow(context.Background(), "select blacklist from public.servers where id = $1", guildID).Scan(&b)
 	return b, err
 }

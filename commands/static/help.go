@@ -30,27 +30,27 @@ func (c *Commands) privacy(ctx *bcr.Context) (err error) {
 		Title: "Privacy",
 		Description: fmt.Sprintf(`We're not lawyers, we don't want to write a document that no one will (or even can) read.
 
-	This is the data %v collects:
-	
-	- A list of blacklisted channels per server
-	- Information about internal errors: command, user ID, and channel ID
-	
-	This is the data %v stores in memory, and which is wiped on a bot restart:
-	
-	- Message metadata *for its own messages*
-	- Message metadata for messages that trigger commands
-	
-	This is the data %v does *not* collect:
-	
-	- Any message contents
-	- Any user information
-	- Information about messages that do not trigger commands
-	
-	Additionally, there are daily database backups, which only include a list of blacklisted channels (as well as all terms/explanations).
+This is the data %v collects:
 
-	To delete server information from the database, simply have the bot leave the server, through kicking or banning it. Do note that this does *not* delete server information from database backups, only the live database (and any later backups).
-	
-	%v is open source, and its source code is available [on GitHub](https://github.com/starshine-sys/berry). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username),
+- A list of blacklisted channels per server
+- Information about internal errors: command, user ID, and channel ID
+
+This is the data %v stores in memory, and which is wiped on a bot restart:
+
+- Message metadata *for its own messages*
+- Message metadata for messages that trigger commands
+
+This is the data %v does *not* collect:
+
+- Any message contents
+- Any user information
+- Information about messages that do not trigger commands
+
+Additionally, there are daily database backups, which only include a list of blacklisted channels (as well as all terms/explanations).
+
+To delete server information from the database, simply have the bot leave the server, through kicking or banning it. Do note that this does *not* delete server information from database backups, only the live database (and any later backups).
+
+%v is open source, and its source code is available [on GitHub](https://github.com/starshine-sys/berry). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username),
 		Color: db.EmbedColour,
 	})
 	return err
@@ -101,10 +101,10 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 			},
 		},
 	}
-	if c.Config.Bot.ServerInvite != "" {
+	if c.Config.Bot.Support.Invite != "" {
 		e.Fields = append(e.Fields, discord.EmbedField{
 			Name:  "Support server",
-			Value: fmt.Sprintf("Use this link to join the support server, for bot questions and term additions/requests: %v", c.Config.Bot.ServerInvite),
+			Value: fmt.Sprintf("Use this link to join the support server, for bot questions and term additions/requests: %v", c.Config.Bot.Support.Invite),
 		})
 	}
 
