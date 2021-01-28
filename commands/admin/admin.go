@@ -21,6 +21,8 @@ type Admin struct {
 	admins []string
 
 	guilds []discord.Guild
+
+	stopStatus chan bool
 }
 
 func (Admin) String() string {
@@ -61,6 +63,7 @@ func (c *Admin) Check(ctx *bcr.Context) (bool, error) {
 // Init ...
 func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	c := &Admin{db: bot.DB, config: bot.Config, sugar: bot.Sugar}
+	c.stopStatus = make(chan bool, 1)
 
 	a := bot.Router.AddCommand(&bcr.Command{
 		Name:    "admin",

@@ -19,6 +19,13 @@ func (c *Admin) setStatusLoop(s *state.State) {
 	go c.guildCount(s, countChan)
 
 	for {
+		select {
+		case <-c.stopStatus:
+			c.sugar.Infof("Status loop stopped.")
+			return
+		default:
+		}
+
 		status := fmt.Sprintf("%v | %v", st, urlParse(c.config.Bot.Website))
 		if c.config.Bot.Website == "" {
 			status = st
@@ -42,6 +49,9 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		}
 
 		select {
+		case <-c.stopStatus:
+			c.sugar.Infof("Status loop stopped.")
+			return
 		case g := <-countChan:
 			guilds = g
 		default:

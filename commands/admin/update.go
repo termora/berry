@@ -50,6 +50,16 @@ func (c *Admin) restart(ctx *bcr.Context) (err error) {
 			if err != nil {
 				c.sugar.Error("Error sending message:", err)
 			}
+
+			// set status
+			c.stopStatus <- true
+			ctx.Session.Gateway.UpdateStatus(gateway.UpdateStatusData{
+				Status: gateway.OnlineStatus,
+				Activities: &[]discord.Activity{{
+					Name: fmt.Sprintf("⏲️ Restart scheduled for %v", time.Now().UTC().Add(t).Format("15:04:05 MST")),
+				}},
+			})
+
 			time.Sleep(t)
 		}
 	}
