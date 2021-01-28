@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/starshine-sys/bcr"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/google/uuid"
+	"github.com/starshine-sys/bcr"
 )
 
 // Error ...
@@ -32,11 +32,18 @@ func (db *Db) InternalError(ctx *bcr.Context, e error) error {
 		panic(err)
 	}
 
+	s := "An internal error has occurred. If this issue persists, please contact the bot developer with the error code above."
+	if db.Config != nil {
+		if db.Config.Bot.Support.Invite != "" {
+			s = fmt.Sprintf("An internal error has occurred. If this issue persists, please contact the bot developer in the [support server](%v) with the error code above.", db.Config.Bot.Support.Invite)
+		}
+	}
+
 	_, err = ctx.Send(
 		fmt.Sprintf("Error code: ``%v``", bcr.EscapeBackticks(id.String())),
 		&discord.Embed{
 			Title:       "Internal error occurred",
-			Description: "An internal error has occurred. If this issue persists, please contact the bot developer with the error code above.",
+			Description: s,
 			Color:       0xE74C3C,
 
 			Footer: &discord.EmbedFooter{

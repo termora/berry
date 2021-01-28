@@ -8,6 +8,7 @@ import (
 
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/starshine-sys/berry/structs"
 	"go.uber.org/zap"
 )
 
@@ -36,6 +37,8 @@ type Db struct {
 	Pool       *pgxpool.Pool
 	Sugar      *zap.SugaredLogger
 	GuildCache *ttlcache.Cache
+
+	Config *structs.BotConfig
 }
 
 // Init ...

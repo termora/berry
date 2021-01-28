@@ -34,6 +34,7 @@ func main() {
 	if err != nil {
 		sugar.Fatalf("Error connecting to database: %v", err)
 	}
+	d.Config = c
 	sugar.Info("Connected to database.")
 
 	s, err := state.NewWithIntents("Bot "+c.Auth.Token, bcr.RequiredIntents)
