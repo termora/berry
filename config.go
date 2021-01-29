@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"io/ioutil"
 	"os"
 
@@ -11,24 +10,26 @@ import (
 )
 
 func getConfig(sugar *zap.SugaredLogger) (config *structs.BotConfig) {
-	token := flag.String("token", "", "Override the token in config.json")
-	databaseURL := flag.String("db", "", "Override the database URL in config.json")
-	flag.Parse()
-
 	config = &structs.BotConfig{}
+	fn := "config.json"
+	if os.Getenv("TERMBOT_CONFIG") != "" {
+		fn = os.Getenv("TERMBOT_CONFIG")
+	}
 
-	if _, err := os.Stat("config.json"); os.IsNotExist(err) {
-		sampleConf, err := ioutil.ReadFile("config.sample.json")
-		if err != nil {
-			panic(err)
+	if fn == "config.json" {
+		if _, err := os.Stat("config.json"); os.IsNotExist(err) {
+			sampleConf, err := ioutil.ReadFile("config.sample.json")
+			if err != nil {
+				panic(err)
+			}
+			err = ioutil.WriteFile("config.json", sampleConf, 0644)
+			if err != nil {
+				panic(err)
+			}
+			sugar.Errorf("config.json was not found, created sample configuration.")
+			os.Exit(1)
+			return nil
 		}
-		err = ioutil.WriteFile("config.json", sampleConf, 0644)
-		if err != nil {
-			panic(err)
-		}
-		sugar.Errorf("config.json was not found, created sample configuration.")
-		os.Exit(1)
-		return nil
 	}
 	configFile, err := ioutil.ReadFile("config.json")
 	if err != nil {
@@ -37,12 +38,6 @@ func getConfig(sugar *zap.SugaredLogger) (config *structs.BotConfig) {
 	err = json.Unmarshal(configFile, &config)
 	sugar.Infof("Loaded configuration file.")
 
-	if *token != "" {
-		config.Auth.Token = *token
-	}
-	if *databaseURL != "" {
-		config.Auth.DatabaseURL = *databaseURL
-	}
 	if os.Getenv("TERMBOT_DB_URL") != "" {
 		config.Auth.DatabaseURL = os.Getenv("TERMBOT_DB_URL")
 	}

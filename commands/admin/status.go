@@ -30,6 +30,9 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		if c.config.Bot.Website == "" {
 			status = st
 		}
+		if c.config.Sharded {
+			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID(), s.Gateway.Identifier.Shard.NumShards())
+		}
 
 		if err := s.Gateway.UpdateStatus(gateway.UpdateStatusData{
 			Status: gateway.OnlineStatus,
@@ -57,10 +60,15 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		default:
 		}
 
+		status = fmt.Sprintf("%v | in %v servers", st, guilds)
+		if c.config.Sharded {
+			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID(), s.Gateway.Identifier.Shard.NumShards())
+		}
+
 		if err := s.Gateway.UpdateStatus(gateway.UpdateStatusData{
 			Status: gateway.OnlineStatus,
 			Activities: &[]discord.Activity{{
-				Name: fmt.Sprintf("%v | in %v servers", st, guilds),
+				Name: status,
 			}},
 		}); err != nil {
 			c.sugar.Error("Error setting status:", err)

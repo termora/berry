@@ -31,6 +31,14 @@ type BotConfig struct {
 		HelpFields   []EmbedField `json:"help_fields"`
 		CreditFields []EmbedField `json:"credit_fields"`
 	}
+
+	// Fields used for sharding
+	Sharded   bool `json:"-"`
+	Shard     int  `json:"-"`
+	NumShards int  `json:"-"`
+
+	// Debug will print more logs
+	Debug bool `json:"-"`
 }
 
 // EmbedField ...

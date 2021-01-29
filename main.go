@@ -9,6 +9,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/diamondburned/arikawa/v2/state"
+	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/bot"
 	"github.com/starshine-sys/berry/commands/admin"
@@ -30,6 +31,14 @@ func main() {
 
 	c := getConfig(sugar)
 
+	// command-line flags, mostly sharding
+	pflag.BoolVarP(&c.Debug, "debug", "d", false, "Debug logging")
+	pflag.IntVarP(&c.Shard, "shard", "s", 0, "Shard number")
+	pflag.IntVarP(&c.NumShards, "shard-count", "c", 1, "Number of shards")
+	pflag.Parse()
+	c.Sharded = c.NumShards != 1
+
+	// connect to the database
 	d, err := db.Init(c.Auth.DatabaseURL, sugar)
 	if err != nil {
 		sugar.Fatalf("Error connecting to database: %v", err)
@@ -37,11 +46,18 @@ func main() {
 	d.Config = c
 	sugar.Info("Connected to database.")
 
+	// create a new state
 	s, err := state.NewWithIntents("Bot "+c.Auth.Token, bcr.RequiredIntents)
 	if err != nil {
 		log.Fatalln("Error creating state:", err)
 	}
 
+	// if the bot is sharded, set the number and count
+	if c.Sharded {
+		s.Gateway.Identifier.SetShard(c.Shard, c.NumShards)
+	}
+
+	// create a new router and set the default embed colour
 	r := bcr.NewRouter(s, c.Bot.BotOwners, c.Bot.Prefixes)
 	r.EmbedColor = db.EmbedColour
 
