@@ -12,7 +12,9 @@ import (
 	"github.com/starshine-sys/berry/db"
 )
 
-var botVersion = "v0.4"
+// uh this isn't semver, this is just. increment the number when we feel like it i guess
+const botVersion = "v5"
+
 var gitVer string
 
 func init() {
