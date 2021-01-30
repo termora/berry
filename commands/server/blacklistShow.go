@@ -3,8 +3,8 @@ package server
 import (
 	"fmt"
 
-	"github.com/starshine-sys/bcr"
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/starshine-sys/bcr"
 
 	"github.com/starshine-sys/berry/db"
 )
@@ -16,6 +16,7 @@ func (c *commands) blacklist(ctx *bcr.Context) (err error) {
 		return err
 	}
 	var x string
+	// append all channel IDs (as mentions) to x
 	for _, c := range b {
 		x += fmt.Sprintf("<#%v>\n", c)
 	}

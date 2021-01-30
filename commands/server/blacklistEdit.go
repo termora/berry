@@ -14,6 +14,7 @@ func (c *commands) blacklistAdd(ctx *bcr.Context) (err error) {
 		return err
 	}
 
+	// parse all channels passed to the command
 	channels, n := ctx.GreedyChannelParser(ctx.Args)
 	if n == 0 {
 		_, err = ctx.Send("None of the channels you gave were found.", nil)
