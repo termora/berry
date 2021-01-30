@@ -13,16 +13,18 @@ import (
 func (c *Commands) commandList(ctx *bcr.Context) (err error) {
 	embeds := make([]discord.Embed, 0)
 
-	// get an accurate page count
+	// get an accurate page count, modules with 0 non-hidden commands don't show up at all
 	var modCount int
 	for _, m := range c.Modules {
 		modCount += commandCount(m)
 	}
 
+	// create a list of commands per module
 	for i, mod := range c.Modules {
 		cmds := make([]string, 0)
 		for _, cmd := range mod.Commands() {
 			if cmd.Hidden {
+				// skip hidden commands
 				continue
 			}
 			cmds = append(cmds, fmt.Sprintf("`%v%v`: %v",

@@ -13,13 +13,13 @@ func (c *Commands) perms(ctx *bcr.Context) (err error) {
 	_, err = ctx.Send("", &discord.Embed{
 		Title: "Required permissions",
 		Description: fmt.Sprintf(`%v requires the following permissions to function correctly:
-	- **Read Messages** & **Send Messages**: to respond to commands
-	- **Read Message History**: for the %vsearch command to work
-	- **Manage Messages**: to delete reactions on menus
-	- **Embed Links**: to send responses for most commands
-	- **Attach Files**: to send a glossary export
-	- **Add Reactions**: for menus to work
-	- **Use External Emojis**: to use custom emotes in a couple of commands`, ctx.Bot.Username, ctx.Router.Prefixes[0]),
+- **Read Messages** & **Send Messages**: to respond to commands
+- **Read Message History**: for the %vsearch command to work
+- **Manage Messages**: to delete reactions on menus
+- **Embed Links**: to send responses for most commands
+- **Attach Files**: to send a glossary export
+- **Add Reactions**: for menus to work
+- **Use External Emojis**: to use custom emotes in a couple of commands`, ctx.Bot.Username, ctx.Router.Prefixes[0]),
 		Color: db.EmbedColour,
 	})
 	return

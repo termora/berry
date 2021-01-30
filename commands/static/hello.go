@@ -18,6 +18,8 @@ func (c *Commands) hello(ctx *bcr.Context) (err error) {
 
 	var name string
 	m, err := pk.GetMessage(ctx.Message.ID.String())
+	// if there's a non-nil error, chances are PK hasn't registered the message yet
+	// so just fall back to a normal user
 	if err != nil {
 		member, err := ctx.ParseMember(ctx.Author.ID.String())
 		if err != nil {

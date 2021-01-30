@@ -1,7 +1,6 @@
 package static
 
 import (
-	"sync"
 	"time"
 
 	"github.com/starshine-sys/bcr"
@@ -12,9 +11,7 @@ import (
 type Commands struct {
 	*bot.Bot
 
-	start    time.Time
-	cmdCount int
-	cmdMutex sync.RWMutex
+	start time.Time
 }
 
 // Init ...
@@ -138,12 +135,4 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 
 	o = append(o, help)
 	return "Static commands", o
-}
-
-// PostFunc logs when a command is used
-func (c *Commands) PostFunc(ctx *bcr.Context) {
-	c.Sugar.Debugf("Command executed: `%v` (arguments %v) by %v (channel %v, guild %v)", ctx.Cmd.Name, ctx.Args, ctx.Author.ID, ctx.Channel.ID, ctx.Message.GuildID)
-	c.cmdMutex.Lock()
-	c.cmdCount++
-	c.cmdMutex.Unlock()
 }

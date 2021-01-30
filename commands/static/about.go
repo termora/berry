@@ -19,6 +19,7 @@ var gitVer string
 
 func init() {
 	git := exec.Command("git", "rev-parse", "--short", "HEAD")
+	// ignoring errors *should* be fine? if there's no output we just fall back to "unknown"
 	b, _ := git.Output()
 	gitVer = string(b)
 	if gitVer == "" {
@@ -27,8 +28,6 @@ func init() {
 }
 
 func (c *Commands) about(ctx *bcr.Context) (err error) {
-	c.cmdMutex.RLock()
-	defer c.cmdMutex.RUnlock()
 	embed := &discord.Embed{
 		Title: "About",
 		Color: db.EmbedColour,
@@ -72,7 +71,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name:   "Source code",
-				Value:  "[GitHub](https://github.com/starshine-sys/berry)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
+				Value:  "[GitHub](https://git.termora.org/termora/berry)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
 				Inline: true,
 			},
 		},
