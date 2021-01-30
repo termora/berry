@@ -62,7 +62,8 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 	}))
 
 	help := bot.Router.AddCommand(&bcr.Command{
-		Name: "help",
+		Name:    "help",
+		Aliases: []string{"h"},
 
 		Summary:     "Show info about how to use the bot",
 		Description: "Show info about how to use the bot. If a command name is given as an argument, show the help for that command.",
