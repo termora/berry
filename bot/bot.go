@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// Bot ...
+// Bot is the main bot struct
 type Bot struct {
 	Sugar  *zap.SugaredLogger
 	Config *structs.BotConfig
@@ -20,14 +20,11 @@ type Bot struct {
 	Modules []Module
 }
 
-// Module ...
+// Module is a single module/category of commands
 type Module interface {
 	String() string
 	Commands() []*bcr.Command
 }
-
-// AddFunc ...
-type AddFunc func(*Bot) (string, []*bcr.Command)
 
 // New creates a new instance of Bot
 func New(s *zap.SugaredLogger, config *structs.BotConfig, r *bcr.Router, db *db.Db) *Bot {
@@ -38,6 +35,7 @@ func New(s *zap.SugaredLogger, config *structs.BotConfig, r *bcr.Router, db *db.
 		DB:     db,
 	}
 
+	// add the required handlers
 	b.Router.Session.AddHandler(b.MessageCreate)
 	b.Router.Session.AddHandler(b.GuildCreate)
 	b.Router.Session.AddHandler(b.GuildDelete)
@@ -45,9 +43,13 @@ func New(s *zap.SugaredLogger, config *structs.BotConfig, r *bcr.Router, db *db.
 }
 
 // Add adds a module to the bot
-func (bot *Bot) Add(f AddFunc) {
+func (bot *Bot) Add(f func(*Bot) (string, []*bcr.Command)) {
 	m, c := f(bot)
+
+	// sort the list of commands
 	sort.Sort(bcr.Commands(c))
+
+	// add the module
 	bot.Modules = append(bot.Modules, &botModule{
 		name:     m,
 		commands: c,

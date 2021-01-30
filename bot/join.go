@@ -7,7 +7,7 @@ import (
 	"github.com/diamondburned/arikawa/v2/gateway"
 )
 
-// GuildCreate ...
+// GuildCreate logs the bot joining a server, and creates a database entry if one doesn't exist
 func (bot *Bot) GuildCreate(g *gateway.GuildCreateEvent) {
 	// create the server if it doesn't exist
 	exists, err := bot.DB.CreateServerIfNotExists(g.ID.String())
@@ -37,7 +37,7 @@ func (bot *Bot) GuildCreate(g *gateway.GuildCreateEvent) {
 	return
 }
 
-// GuildDelete ...
+// GuildDelete logs the bot leaving a server and deletes the database entry
 func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 	// if the guild's just unavailable, return, we didn't leave it
 	if g.Unavailable {

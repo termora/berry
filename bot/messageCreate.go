@@ -6,7 +6,7 @@ import (
 	"github.com/diamondburned/arikawa/v2/gateway"
 )
 
-// MessageCreate ...
+// MessageCreate is run when a message is created and handles commands
 func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	var err error
 
@@ -23,6 +23,8 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 		}
 	}()
 
+	// if the bot user isn't set yet, do that here
+	// we can't do it when initialising the router because the connection to Discord will error
 	if bot.Router.Bot == nil {
 		err = bot.Router.SetBotUser()
 		if err != nil {
