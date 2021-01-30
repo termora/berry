@@ -8,6 +8,7 @@ import (
 )
 
 func (c *commands) initExplanations(r *bcr.Router) (out []*bcr.Command) {
+	// get explanations *that are marked as being able to be invoked as commands*
 	explanations, err := c.Db.GetCmdExplanations()
 	if err != nil {
 		c.Sugar.Error("Error getting explanations:", err)
@@ -15,7 +16,9 @@ func (c *commands) initExplanations(r *bcr.Router) (out []*bcr.Command) {
 	}
 
 	for _, e := range explanations {
+		// reassign the variable, otherwise we don't send the correct description
 		e := e
+		// add the command
 		out = append(out, r.AddCommand(&bcr.Command{
 			Name:    e.Name,
 			Aliases: e.Aliases,
@@ -32,5 +35,6 @@ func (c *commands) initExplanations(r *bcr.Router) (out []*bcr.Command) {
 		}))
 	}
 
+	// return all the commands
 	return out
 }

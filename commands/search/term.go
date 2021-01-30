@@ -45,6 +45,7 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		return
 	}
 
+	// get permissions
 	perms, err := ctx.Session.Permissions(channel.ID, ctx.Author.ID)
 	if err != nil {
 		c.Sugar.Errorf("Error getting perms for %v in %v: %v", ctx.Author.ID, channel.ID, err)
@@ -52,6 +53,7 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		return
 	}
 
+	// check permissions: the user needs send messages and view channel in the channel they want to use it in
 	if perms&discord.PermissionSendMessages != discord.PermissionSendMessages || perms&discord.PermissionViewChannel != discord.PermissionViewChannel {
 		_, err = ctx.Sendf("❌ Error: this command requires the `%v` permissions in the channel you're posting to.", strings.Join(bcr.PermStrings(discord.PermissionSendMessages|discord.PermissionViewChannel), ", "))
 		return

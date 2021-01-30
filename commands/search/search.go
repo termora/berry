@@ -83,6 +83,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		[]string{"advsearch"},
 		bcr.DefaultArgTransformer("plurality", ""),
 	))
+	// we need to set these manually, the default description doesn't cut it
 	ps.Summary = "Search for a plurality-related term"
 	ps.Description = "Search for a term in the `plurality` category. Prefix your search with `!` to show the first result."
 	ps.Usage = "<search term>"
@@ -92,6 +93,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		[]string{"advsearch"},
 		bcr.DefaultArgTransformer("lgbtq+", ""),
 	))
+	// same as above
 	ls.Summary = "Search for a LGBTQ+-related term"
 	ls.Description = "Search for a term in the `LGBTQ+` category. Prefix your search with `!` to show the first result."
 	ls.Usage = "<search term>"

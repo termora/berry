@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
-	"github.com/diamondburned/arikawa/v2/discord"
 )
 
 func (c *commands) list(ctx *bcr.Context) (err error) {
@@ -19,8 +19,9 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 		s = append(s, fmt.Sprintf("`%v`: %v", t.ID, t.Name))
 	}
 
+	// create pages of slices
 	termSlices := make([][]string, 0)
-
+	// 15 terms each
 	for i := 0; i < len(s); i += 15 {
 		end := i + 15
 
@@ -31,6 +32,7 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 		termSlices = append(termSlices, s[i:end])
 	}
 
+	// create the embeds and send them
 	embeds := make([]discord.Embed, 0)
 
 	for i, s := range termSlices {

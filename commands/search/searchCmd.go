@@ -29,6 +29,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		return err
 	}
 
+	// get the category ID
 	category, err := c.Db.CategoryID(ctx.Args[0])
 	if err != nil {
 		_, err = ctx.Sendf("The category you specified (``%v``) was not found.", bcr.EscapeBackticks(ctx.Args[0]))
@@ -38,6 +39,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	search := strings.TrimSpace(strings.TrimPrefix(strings.Join(ctx.Args, " "), ctx.Args[0]))
 
 	limit := 0
+	// if the query starts with !, only show the first result
 	if strings.HasPrefix(search, "!") {
 		limit = 1
 		search = strings.TrimPrefix(search, "!")
@@ -51,6 +53,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		_, err = ctx.Send("No results found.", nil)
 		return err
 	}
+	// if there's only one term, just show that one
 	if len(terms) == 1 {
 		_, err = ctx.Send("", terms[0].TermEmbed(c.conf.Bot.TermBaseURL))
 		return err

@@ -4,14 +4,17 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/starshine-sys/berry/db"
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/starshine-sys/berry/db"
 )
 
 var emoji = []string{"1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"}
 
 func searchResultEmbed(search string, page, total, totalTerms int, s []*db.Term) discord.Embed {
 	var desc string
+
+	// add ellipses to headlines if they're needed
+	// this isn't 100% accurate but it's close enough
 	for i, t := range s {
 		h := t.Headline
 		if !strings.HasPrefix(t.Description, h[:10]) {
@@ -27,6 +30,7 @@ func searchResultEmbed(search string, page, total, totalTerms int, s []*db.Term)
 		desc += fmt.Sprintf("%v **%v**\n%v\n\n", emoji[i], name, h)
 	}
 
+	// only show this if there's more than one page
 	v := []discord.EmbedField{{
 		Name:  "Usage",
 		Value: "Use ⬅️ ➡️ to navigate between pages and the numbers to choose a term.",

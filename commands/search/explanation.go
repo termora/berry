@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
-	"github.com/diamondburned/arikawa/v2/discord"
 )
 
 func (c *commands) explanation(ctx *bcr.Context) (err error) {
@@ -14,6 +14,8 @@ func (c *commands) explanation(ctx *bcr.Context) (err error) {
 	if err != nil {
 		return c.Db.InternalError(ctx, err)
 	}
+
+	// just cycle through all of these, it's fine (probably)
 	if ctx.RawArgs != "" {
 		for _, e := range ex {
 			if strings.ToLower(ctx.RawArgs) == e.Name {
