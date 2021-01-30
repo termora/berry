@@ -24,6 +24,7 @@ func (c *Admin) setNote(ctx *bcr.Context) (err error) {
 	}
 
 	note := strings.TrimSpace(strings.TrimPrefix(ctx.RawArgs, ctx.Args[0]))
+	// if the input is "clear", remove the note
 	if note == "clear" {
 		note = ""
 	}

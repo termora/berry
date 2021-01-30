@@ -22,6 +22,8 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 		return err
 	}
 
+	// oh gods there's so much nesting there's no way we're gonna comment this
+	// whoever sees this later, good luck, please burn this - Jake
 	ctx.AddMessageHandler(ctx.Channel.ID, ctx.Author.ID, func(ctx *bcr.Context, m discord.Message) {
 		if m.Content == "cancel" {
 			ctx.Send("Term creation cancelled.", nil)

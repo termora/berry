@@ -21,17 +21,20 @@ func (c *Admin) cmdGuilds(ctx *bcr.Context) (err error) {
 			"Name = %v\nID = %v", g.Name, g.ID,
 		))
 	}
-	s := strings.Join(b, "\n###\n")
+	s := strings.Join(b, "\n\n")
 
+	// if the whole thing fits in a Discord message, send it as that
+	// used to be formatted as ini but quotation marks break that
 	if len(s) <= 2000 {
 		_, err = ctx.Send("", &discord.Embed{
 			Title:       fmt.Sprintf("Guilds (%v)", len(c.guilds)),
-			Description: "```ini\n" + s + "\n```",
+			Description: "```\n" + s + "\n```",
 			Color:       db.EmbedColour,
 		})
 		return err
 	}
 
+	// otherwise, compress and upload it
 	fn := "guilds.txt"
 	buf := new(bytes.Buffer)
 	zw := gzip.NewWriter(buf)

@@ -23,11 +23,14 @@ func (c *Admin) setCW(ctx *bcr.Context) (err error) {
 		return c.db.InternalError(ctx, err)
 	}
 
+	// h
+	// didn't we have a helper function for this??? oh well
 	cw := strings.TrimSpace(strings.TrimPrefix(ctx.RawArgs, ctx.Args[0]))
 	if cw == "clear" {
 		cw = ""
 	}
 
+	// if it's too long, return
 	if len(cw) > 1000 {
 		_, err = ctx.Sendf("❌ The CW you gave is too long (%v > 1000 characters).", len(cw))
 		return

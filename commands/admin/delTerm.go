@@ -27,12 +27,17 @@ func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 		return err
 	}
 
+	// confirm deleting the term
 	ctx.AddYesNoHandler(*m, ctx.Author.ID, func(ctx *bcr.Context) {
 		err = c.db.RemoveTerm(id)
 		if err != nil {
 			c.sugar.Error("Error removing term:", err)
 			c.db.InternalError(ctx, err)
 			return
+		}
+		_, err = ctx.Send("✅ Term deleted.", nil)
+		if err != nil {
+			c.sugar.Error("Error sending message:", err)
 		}
 	}, func(ctx *bcr.Context) {
 		ctx.Send("Cancelled.", nil)

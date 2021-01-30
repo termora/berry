@@ -22,6 +22,8 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 		_, err = ctx.Send("That channel could not be found.", nil)
 		return
 	}
+
+	// make sure the channel's in the server the command is run in
 	if ch.GuildID != ctx.Message.GuildID {
 		_, err = ctx.Send("That channel is not in this server.", nil)
 		return
@@ -34,6 +36,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 		return err
 	}
 
+	// get terms since the specified date
 	t, err := c.db.TermsSince(date)
 	if err != nil {
 		return c.db.InternalError(ctx, err)
@@ -72,6 +75,8 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 		date.Format("January 02"), len(t),
 		c.db.TermCount(), strings.Join(terms, ", "),
 	)
+
+	// if it won't fit in a single embed (which is *very* unlikely), split it into 2000-character-ish chunks
 	if len(s) >= 2000 {
 		s = fmt.Sprintf("Since %v, **%v** new terms have been added, for a total of **%v** terms!", date.Format("January 02"), len(t), c.db.TermCount())
 
@@ -96,6 +101,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 		return err
 	}
 
+	// if it didn't fit in one message, send all the others
 	if len(msgs) > 0 {
 		for _, m := range msgs {
 			time.Sleep(500 * time.Millisecond)

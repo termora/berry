@@ -9,20 +9,28 @@ import (
 )
 
 func (c *Admin) aio(ctx *bcr.Context) (err error) {
+	// this command requires 5 arguments exactly
 	if ctx.CheckRequiredArgs(5); err != nil {
 		_, err = ctx.Send("Too few or too many arguments supplied.", nil)
 		return err
 	}
 
+	// 0: name
+	// 1: category
+	// 2: description
+	// 3: aliases
+	// 4: source
 	name := ctx.Args[0]
 	catName := ctx.Args[1]
 	description := ctx.Args[2]
+
 	var aliases []string
 	if ctx.Args[3] == "none" {
 		aliases = []string{}
 	} else {
 		aliases = strings.Split(ctx.Args[3], ",")
 	}
+
 	source := ctx.Args[4]
 
 	category, err := c.db.CategoryID(catName)
@@ -34,6 +42,7 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 		return
 	}
 
+	// create and add the term object
 	t := &db.Term{
 		Name:        name,
 		Category:    category,

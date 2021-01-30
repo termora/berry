@@ -16,9 +16,12 @@ func (c *Admin) setStatusLoop(s *state.State) {
 	var guilds int
 	countChan := make(chan int, 1)
 
+	// spin off a function to fetch the guild count (well, actually fetch all guilds)
+	// it's also used by `t!admin guilds`, which is why we run this even if the server count isn't shown in the bot's status
 	go c.guildCount(s, countChan)
 
 	for {
+		// if something else set a static status, return
 		select {
 		case <-c.stopStatus:
 			c.sugar.Infof("Status loop stopped.")
@@ -26,10 +29,12 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		default:
 		}
 
+		// add the website to the status, if it's not empty
 		status := fmt.Sprintf("%v | %v", st, urlParse(c.config.Bot.Website))
 		if c.config.Bot.Website == "" {
 			status = st
 		}
+		// if the bot is sharded, also add the shard number to the status
 		if c.config.Sharded {
 			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID(), s.Gateway.Identifier.Shard.NumShards())
 		}
@@ -51,6 +56,7 @@ func (c *Admin) setStatusLoop(s *state.State) {
 			continue
 		}
 
+		// same as above--if a static status was set, return
 		select {
 		case <-c.stopStatus:
 			c.sugar.Infof("Status loop stopped.")
@@ -88,6 +94,7 @@ func (c *Admin) guildCount(s *state.State, ch chan int) {
 			ch <- 0
 		} else {
 			ch <- len(g)
+			// set the list of guilds in c, used for the `guilds` admin command
 			c.guilds = g
 		}
 

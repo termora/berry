@@ -31,6 +31,7 @@ func (c *Admin) editTerm(ctx *bcr.Context) (err error) {
 		return c.db.InternalError(ctx, err)
 	}
 
+	// these should probably be actual subcommands but then we'd have to duplicate the code above 5 times
 	switch ctx.Args[0] {
 	case "name", "title":
 		return c.editTermTitle(ctx, t)

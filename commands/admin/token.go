@@ -25,6 +25,7 @@ func (c *Admin) token(ctx *bcr.Context) (err error) {
 	if err != nil {
 		return err
 	}
+
 	_, err = ctx.Session.SendMessage(u.ID, token, nil)
 	if err != nil {
 		return err
@@ -55,6 +56,7 @@ func (c *Admin) refreshToken(ctx *bcr.Context) (err error) {
 	if err != nil {
 		return err
 	}
+
 	_, err = ctx.Session.SendMessage(u.ID, token, nil)
 	if err != nil {
 		return err

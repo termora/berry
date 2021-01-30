@@ -9,6 +9,7 @@ import (
 )
 
 func (c *Admin) setFlags(ctx *bcr.Context) (err error) {
+	// if there's not enough arguments, return the help
 	if err = ctx.CheckRequiredArgs(2); err != nil {
 		_, err = ctx.Send("", &discord.Embed{
 			Title: "Flags",
