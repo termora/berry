@@ -17,17 +17,21 @@ func (r *api) search(c echo.Context) (err error) {
 		}
 		return c.NoContent(http.StatusInternalServerError)
 	}
+
 	if len(terms) == 0 {
 		return c.NoContent(http.StatusNoContent)
 	}
+
 	return c.JSON(http.StatusOK, terms)
 }
 
 func (r *api) term(c echo.Context) (err error) {
+	// parse the id
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
+
 	term, err := r.db.GetTerm(id)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
@@ -35,5 +39,6 @@ func (r *api) term(c echo.Context) (err error) {
 		}
 		return c.NoContent(http.StatusInternalServerError)
 	}
+
 	return c.JSON(http.StatusOK, term)
 }

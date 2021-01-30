@@ -31,6 +31,7 @@ func main() {
 	defer logger.Sync() // flushes buffer, if any
 	sugar := logger.Sugar()
 
+	// read config
 	var c conf
 
 	configFile, err := ioutil.ReadFile("config.yaml")
@@ -40,17 +41,22 @@ func main() {
 	err = yaml.Unmarshal(configFile, &c)
 	sugar.Info("Loaded configuration file.")
 
+	// connect to the database
 	d, err := db.Init(c.DatabaseURL, sugar)
 	if err != nil {
 		sugar.Fatalf("Error connecting to database: %v", err)
 	}
 	sugar.Info("Connected to database.")
 
+	// create the API
 	r := api{db: d, conf: c, sugar: sugar}
 
+	// create the router
 	e := echo.New()
+	// add logging
 	e.Use(middleware.Logger())
 
+	// add the routes
 	e.GET("/v1/search/:term", r.search)
 	e.GET("/v1/term/:id", r.term)
 	e.GET("/v1/list", r.list)
@@ -58,6 +64,7 @@ func main() {
 	e.GET("/v1/categories", r.categories)
 	e.GET("/v1/explanations", r.explanations)
 
+	// the POST /term route requires a token
 	e.POST("/v1/term", r.add, middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
 		return d.ValidateToken(key), nil
 	}))
@@ -69,12 +76,14 @@ func main() {
 		port = "1300"
 	}
 
+	// run the server
 	go func() {
 		if err := e.Start(":" + c.Port); err != nil {
 			sugar.Info("Shutting down server")
 		}
 	}()
 
+	// gracefully catch interrupts
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
