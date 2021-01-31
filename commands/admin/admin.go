@@ -31,13 +31,20 @@ func (Admin) String() string {
 
 // Check ...
 func (c *Admin) Check(ctx *bcr.Context) (bool, error) {
-	if c.config.Bot.AdminServer != "" {
-		if ctx.Message.GuildID.String() != c.config.Bot.AdminServer {
+	if c.config.Bot.AdminServers != nil {
+		var inServer bool
+		for _, s := range c.config.Bot.AdminServers {
+			if ctx.Message.GuildID == s {
+				inServer = true
+				break
+			}
+		}
+		if !inServer {
 			return false, nil
 		}
 	}
 	for _, id := range c.config.Bot.BotOwners {
-		if id == ctx.Author.ID.String() {
+		if id == ctx.Author.ID {
 			return true, nil
 		}
 	}

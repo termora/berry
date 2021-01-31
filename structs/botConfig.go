@@ -11,8 +11,8 @@ type BotConfig struct {
 	Bot struct {
 		Prefixes []string
 
-		BotOwners   []string `json:"bot_owners"`
-		AdminServer string   `json:"admin_server"`
+		BotOwners    []discord.UserID  `json:"bot_owners"`
+		AdminServers []discord.GuildID `json:"admin_servers"`
 
 		Support struct {
 			Invite         string
@@ -23,7 +23,7 @@ type BotConfig struct {
 		Website     string
 
 		ShowGuildCount bool              `json:"show_guild_count"`
-		AllowedBots    []string          `json:"allowed_bots"`
+		AllowedBots    []discord.UserID  `json:"allowed_bots"`
 		JoinLogChannel discord.ChannelID `json:"join_log_channel"`
 
 		TermChangelogPing string `json:"term_changelog_ping"`

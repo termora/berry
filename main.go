@@ -58,7 +58,11 @@ func main() {
 	}
 
 	// create a new router and set the default embed colour
-	r := bcr.NewRouter(s, c.Bot.BotOwners, c.Bot.Prefixes)
+	owners := make([]string, 0)
+	for _, u := range c.Bot.BotOwners {
+		owners = append(owners, u.String())
+	}
+	r := bcr.NewRouter(s, owners, c.Bot.Prefixes)
 	r.EmbedColor = db.EmbedColour
 
 	// set blacklist function

@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
 )
 
@@ -35,7 +36,7 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	}
 
 	// if message was sent by a bot return, unless it's in the list of allowed bots
-	if m.Author.Bot && !inSlice(bot.Config.Bot.AllowedBots, m.Author.ID.String()) {
+	if m.Author.Bot && !inSlice(bot.Config.Bot.AllowedBots, m.Author.ID) {
 		return
 	}
 
@@ -52,7 +53,7 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	}
 }
 
-func inSlice(slice []string, s string) bool {
+func inSlice(slice []discord.UserID, s discord.UserID) bool {
 	for _, i := range slice {
 		if i == s {
 			return true
