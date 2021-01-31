@@ -4,6 +4,7 @@ package bot
 import (
 	"sort"
 
+	"github.com/diamondburned/arikawa/v2/utils/handler"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
 	"github.com/starshine-sys/berry/structs"
@@ -35,10 +36,14 @@ func New(s *zap.SugaredLogger, config *structs.BotConfig, r *bcr.Router, db *db.
 		DB:     db,
 	}
 
+	// create a pre-handler
+	b.Router.Session.PreHandler = handler.New()
+	b.Router.Session.PreHandler.Synchronous = true
+
 	// add the required handlers
 	b.Router.Session.AddHandler(b.MessageCreate)
 	b.Router.Session.AddHandler(b.GuildCreate)
-	b.Router.Session.AddHandler(b.GuildDelete)
+	b.Router.Session.PreHandler.AddHandler(b.GuildDelete)
 	return b
 }
 

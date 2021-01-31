@@ -43,7 +43,6 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 	if g.Unavailable {
 		return
 	}
-	bot.Sugar.Infof("Left guild %v.", g.ID)
 
 	// delete the server's database entry
 	err := bot.DB.DeleteServer(g.ID.String())
@@ -51,12 +50,42 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 		bot.Sugar.Errorf("Error deleting database entry for %v: %v", g.ID, err)
 	}
 
+	guild, err := bot.Router.Session.Guild(g.ID)
+	if err != nil {
+		// didn't find the guild, so just run this normally
+		bot.guildDeleteNoState(g)
+		return
+	}
+
+	// otherwise, use the cached guild
+	bot.Sugar.Infof("Left guild %v (%v, owned by %v).", guild.Name, guild.ID, guild.OwnerID)
+
 	// if there's no channel to log joins/leaves to, return
 	if bot.Config.Bot.JoinLogChannel == 0 {
 		return
 	}
 
 	_, err = bot.Router.Session.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
+		Content:         fmt.Sprintf("<a:ablobleave:803960446251171901> Left guild **%v** (%v, owned by <@%v>/%v)", guild.Name, guild.ID, guild.OwnerID, guild.OwnerID),
+		AllowedMentions: &api.AllowedMentions{Parse: nil},
+	})
+	if err != nil {
+		bot.Sugar.Errorf("Error sending log message: %v", err)
+	}
+	return
+}
+
+// this is run if the left guild isn't found in the state
+// which gives us almost no info, only the ID
+func (bot *Bot) guildDeleteNoState(g *gateway.GuildDeleteEvent) {
+	bot.Sugar.Infof("Left guild %v.", g.ID)
+
+	// if there's no channel to log joins/leaves to, return
+	if bot.Config.Bot.JoinLogChannel == 0 {
+		return
+	}
+
+	_, err := bot.Router.Session.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
 		Content:         fmt.Sprintf("<a:ablobleave:803960446251171901> Left guild **%v**", g.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
