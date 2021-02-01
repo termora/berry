@@ -7,6 +7,7 @@ type BotConfig struct {
 	Auth struct {
 		Token       string
 		DatabaseURL string `json:"database_url"`
+		SentryURL   string `json:"sentry_url"`
 	}
 	Bot struct {
 		Prefixes []string
@@ -36,6 +37,9 @@ type BotConfig struct {
 	Sharded   bool `json:"-"`
 	Shard     int  `json:"-"`
 	NumShards int  `json:"-"`
+
+	// UseSentry: when false, don't use Sentry for logging errors
+	UseSentry bool `json:"-"`
 
 	// Debug will print more logs
 	Debug bool `json:"-"`

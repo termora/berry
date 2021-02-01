@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/diamondburned/arikawa/v2/utils/handler"
+	"github.com/getsentry/sentry-go"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
 	"github.com/starshine-sys/berry/structs"
@@ -19,6 +20,9 @@ type Bot struct {
 	DB     *db.Db
 
 	Modules []Module
+
+	Sentry    *sentry.Hub
+	UseSentry bool
 }
 
 // Module is a single module/category of commands
@@ -28,12 +32,14 @@ type Module interface {
 }
 
 // New creates a new instance of Bot
-func New(s *zap.SugaredLogger, config *structs.BotConfig, r *bcr.Router, db *db.Db) *Bot {
+func New(s *zap.SugaredLogger, config *structs.BotConfig, r *bcr.Router, db *db.Db, hub *sentry.Hub) *Bot {
 	b := &Bot{
-		Sugar:  s,
-		Config: config,
-		Router: r,
-		DB:     db,
+		Sugar:     s,
+		Config:    config,
+		Router:    r,
+		DB:        db,
+		Sentry:    hub,
+		UseSentry: hub != nil,
 	}
 
 	// create a pre-handler

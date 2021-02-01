@@ -12,7 +12,7 @@ import (
 
 func (c *Admin) editTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(3); err != nil {
-		_, err = ctx.Send("Not enough arguments. Valid subcommands are: `title`, `desc`, `source`, `aliases`.", nil)
+		_, err = ctx.Send("Not enough arguments. Valid subcommands are: `title`, `desc`, `source`, `aliases`, `image`.", nil)
 		return
 	}
 
@@ -45,7 +45,7 @@ func (c *Admin) editTerm(ctx *bcr.Context) (err error) {
 		return c.editTermAliases(ctx, t)
 	}
 
-	_, err = ctx.Send("Invalid subcommand supplied.\nValid subcommands are: `title`, `desc`, `source`, `aliases`.", nil)
+	_, err = ctx.Send("Invalid subcommand supplied.\nValid subcommands are: `title`, `desc`, `source`, `aliases`, `image`.", nil)
 	return
 }
 

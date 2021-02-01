@@ -5,6 +5,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
+	"github.com/starshine-sys/berry/db"
 )
 
 // MessageCreate is run when a message is created and handles commands
@@ -49,7 +50,13 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 
 	// check if the message might be a command
 	if bot.Router.MatchPrefix(m.Content) {
-		bot.Router.Execute(ctx)
+		err = bot.Router.Execute(ctx)
+		if err != nil {
+			if db.IsOurProblem(err) {
+				bot.Sentry.CaptureException(err)
+			}
+			bot.Sugar.Error(err)
+		}
 	}
 }
 

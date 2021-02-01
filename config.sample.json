@@ -1,7 +1,8 @@
 {
     "auth": {
         "token": "longDiscordString",
-        "database_url": "postgresql://postgres:postgres@localhost/postgres"
+        "database_url": "postgresql://postgres:postgres@localhost/postgres",
+        "sentry_url": "https://sentry.io"
     },
     "bot": {
         "prefixes": [

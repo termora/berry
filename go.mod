@@ -9,6 +9,7 @@ require (
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
 	github.com/diamondburned/arikawa/v2 v2.0.0
 	github.com/georgysavva/scany v0.2.7
+	github.com/getsentry/sentry-go v0.9.0
 	github.com/google/uuid v1.1.5
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect

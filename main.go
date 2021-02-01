@@ -5,7 +5,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
+	"github.com/getsentry/sentry-go"
 	"go.uber.org/zap"
 
 	"github.com/diamondburned/arikawa/v2/state"
@@ -19,15 +21,13 @@ import (
 	"github.com/starshine-sys/berry/db"
 )
 
-var sugar *zap.SugaredLogger
-
 func main() {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		panic(err)
 	}
 	zap.RedirectStdLog(logger)
-	sugar = logger.Sugar()
+	sugar := logger.Sugar()
 
 	c := getConfig(sugar)
 
@@ -38,11 +38,29 @@ func main() {
 	pflag.Parse()
 	c.Sharded = c.NumShards != 1
 
+	// create a Sentry config
+	if c.UseSentry {
+		err = sentry.Init(sentry.ClientOptions{
+			Dsn: c.Auth.SentryURL,
+		})
+		if err != nil {
+			sugar.Fatalf("sentry.Init: %s", err)
+		}
+		sugar.Infof("Initialised Sentry")
+		// defer this to flush buffered events
+		defer sentry.Flush(2 * time.Second)
+	}
+	hub := sentry.CurrentHub()
+	if !c.UseSentry {
+		hub = nil
+	}
+
 	// connect to the database
 	d, err := db.Init(c.Auth.DatabaseURL, sugar)
 	if err != nil {
 		sugar.Fatalf("Error connecting to database: %v", err)
 	}
+	d.SetSentry(hub)
 	d.Config = c
 	sugar.Info("Connected to database.")
 
@@ -69,7 +87,7 @@ func main() {
 	r.BlacklistFunc = d.CtxInBlacklist
 
 	// create the bot instance
-	bot := bot.New(sugar, c, r, d)
+	bot := bot.New(sugar, c, r, d, hub)
 	// add search commands
 	bot.Add(search.Init)
 	// add static commands

@@ -41,6 +41,7 @@ func getConfig(sugar *zap.SugaredLogger) (config *structs.BotConfig) {
 	if os.Getenv("TERMBOT_DB_URL") != "" {
 		config.Auth.DatabaseURL = os.Getenv("TERMBOT_DB_URL")
 	}
+	config.UseSentry = config.Auth.SentryURL != ""
 
 	return config
 }
