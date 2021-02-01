@@ -22,6 +22,12 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 		r := recover()
 		if r != nil {
 			bot.Sugar.Errorf("Caught panic in channel ID %v (user %v, guild %v): %v", m.ChannelID, m.Author.ID, m.GuildID, err)
+
+			// if something causes a panic, it's our problem, because *it shouldn't panic*
+			// so skip checking the error and just immediately report it
+			if bot.UseSentry {
+				bot.Sentry.Recover(r)
+			}
 		}
 	}()
 
@@ -52,7 +58,7 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	if bot.Router.MatchPrefix(m.Content) {
 		err = bot.Router.Execute(ctx)
 		if err != nil {
-			if db.IsOurProblem(err) {
+			if db.IsOurProblem(err) && bot.UseSentry {
 				bot.Sentry.CaptureException(err)
 			}
 			bot.Sugar.Error(err)
