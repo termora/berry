@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v2/utils/httputil"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/getsentry/sentry-go"
 	"github.com/google/uuid"
@@ -139,6 +140,12 @@ func IsOurProblem(e error) bool {
 		// this is because the user inputted an invalid number for string conversion
 		// we should handle this in the command itself instead but we're lazy, and this shouldn't come up in normal usage, only with admin commands
 		return false
+	case *httputil.HTTPError:
+		// 404 error, so just return false
+		// usually caused by a message being deleted while we're still doing stuff with it (so if someone selects an option in the search results before the bot is done adding reactions)
+		if e.(*httputil.HTTPError).Code == 404 {
+			return false
+		}
 	}
 
 	return true
