@@ -134,18 +134,14 @@ func (db *Db) SetSentry(hub *sentry.Hub) {
 // IsOurProblem checks if an error is "our problem", as in, should be in the logs and reported to Sentry.
 // Will be expanded eventually once we get more insight into what type of errors we get.
 func IsOurProblem(e error) bool {
-	// first, check types
 	switch e.(type) {
 	case *strconv.NumError:
 		// this is because the user inputted an invalid number for string conversion
 		// we should handle this in the command itself instead but we're lazy, and this shouldn't come up in normal usage, only with admin commands
 		return false
 	case *httputil.HTTPError:
-		// 404 error, so just return false
 		// usually caused by a message being deleted while we're still doing stuff with it (so if someone selects an option in the search results before the bot is done adding reactions)
-		if e.(*httputil.HTTPError).Code == 404 {
-			return false
-		}
+		return false
 	}
 
 	return true
