@@ -34,7 +34,7 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	term, err := c.Db.GetTerm(id)
+	term, err := c.DB.GetTerm(id)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
 			_, err = ctx.Sendf("❌ No term with that ID found.")
@@ -59,7 +59,7 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	_, err = ctx.Session.SendEmbed(channel.ID, *term.TermEmbed(c.conf.Bot.TermBaseURL))
+	_, err = ctx.Session.SendEmbed(channel.ID, *term.TermEmbed(c.Config.Bot.TermBaseURL))
 	if err != nil {
 		return
 	}

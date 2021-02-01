@@ -10,9 +10,9 @@ import (
 )
 
 func (c *commands) explanation(ctx *bcr.Context) (err error) {
-	ex, err := c.Db.GetAllExplanations()
+	ex, err := c.DB.GetAllExplanations()
 	if err != nil {
-		return c.Db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	// just cycle through all of these, it's fine (probably)

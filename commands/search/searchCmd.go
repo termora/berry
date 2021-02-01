@@ -20,7 +20,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	err = fs.Parse(ctx.Args)
 	if err != nil {
-		return c.Db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 	ctx.Args = fs.Args()
 
@@ -30,7 +30,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 
 	// get the category ID
-	category, err := c.Db.CategoryID(ctx.Args[0])
+	category, err := c.DB.CategoryID(ctx.Args[0])
 	if err != nil {
 		_, err = ctx.Sendf("The category you specified (``%v``) was not found.", bcr.EscapeBackticks(ctx.Args[0]))
 		return err
@@ -44,9 +44,9 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		limit = 1
 		search = strings.TrimPrefix(search, "!")
 	}
-	terms, err := c.Db.SearchCat(search, category, limit, showHidden)
+	terms, err := c.DB.SearchCat(search, category, limit, showHidden)
 	if err != nil {
-		return c.Db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	if len(terms) == 0 {
@@ -55,7 +55,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 	// if there's only one term, just show that one
 	if len(terms) == 1 {
-		_, err = ctx.Send("", terms[0].TermEmbed(c.conf.Bot.TermBaseURL))
+		_, err = ctx.Send("", terms[0].TermEmbed(c.Config.Bot.TermBaseURL))
 		return err
 	}
 
@@ -79,6 +79,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	msg, err := ctx.PagedEmbed(embeds, false)
 	if err != nil {
+		c.Report(err)
 		return err
 	}
 
@@ -120,7 +121,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 			if err != nil {
 				c.Sugar.Error("Error deleting message:", err)
 			}
-			_, err = ctx.Send("", termSlice[index].TermEmbed(c.conf.Bot.TermBaseURL))
+			_, err = ctx.Send("", termSlice[index].TermEmbed(c.Config.Bot.TermBaseURL))
 			if err != nil {
 				c.Sugar.Error("Error sending message:", err)
 			}

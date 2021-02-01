@@ -10,9 +10,9 @@ import (
 )
 
 func (c *commands) list(ctx *bcr.Context) (err error) {
-	terms, err := c.Db.GetTerms(db.FlagSearchHidden)
+	terms, err := c.DB.GetTerms(db.FlagSearchHidden)
 	if err != nil {
-		return c.Db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 	s := make([]string, 0)
 	for _, t := range terms {

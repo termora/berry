@@ -5,20 +5,15 @@ import (
 
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/bot"
-	"github.com/starshine-sys/berry/db"
-	"github.com/starshine-sys/berry/structs"
-	"go.uber.org/zap"
 )
 
 type commands struct {
-	Db    *db.Db
-	Sugar *zap.SugaredLogger
-	conf  *structs.BotConfig
+	*bot.Bot
 }
 
 // Init ...
 func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
-	c := commands{Db: bot.DB, conf: bot.Config, Sugar: bot.Sugar}
+	c := commands{Bot: bot}
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "advsearch",

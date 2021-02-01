@@ -9,7 +9,7 @@ import (
 
 func (c *commands) initExplanations(r *bcr.Router) (out []*bcr.Command) {
 	// get explanations *that are marked as being able to be invoked as commands*
-	explanations, err := c.Db.GetCmdExplanations()
+	explanations, err := c.DB.GetCmdExplanations()
 	if err != nil {
 		c.Sugar.Error("Error getting explanations:", err)
 		return
