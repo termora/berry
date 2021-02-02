@@ -85,7 +85,7 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name:  "Terms",
-				Value: "`search`: search the database for a term (alias: `s`)\n`random`: show a random term (alias: `r`)\n`post`: post a single term by ID.",
+				Value: "`search`: search the database for a plurality-related term (alias: `s`)\n`lgbt`: search for an LGBTQ+-related term\n`random`: show a random term (alias: `r`)\n`post`: post a single term by ID.",
 			},
 			{
 				Name:  "Explanations",

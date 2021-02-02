@@ -48,8 +48,8 @@ func (c *Admin) setStatusLoop(s *state.State) {
 			c.sugar.Error("Error setting status:", err)
 		}
 
-		// wait a minute to switch to other status
-		time.Sleep(1 * time.Minute)
+		// wait two minutes to switch to other status
+		time.Sleep(2 * time.Minute)
 
 		// if the guild count is disabled, loop immediately
 		if !c.config.Bot.ShowGuildCount {
@@ -80,8 +80,8 @@ func (c *Admin) setStatusLoop(s *state.State) {
 			c.sugar.Error("Error setting status:", err)
 		}
 
-		// run once every minute
-		time.Sleep(1 * time.Minute)
+		// run once every two minutes
+		time.Sleep(2 * time.Minute)
 	}
 }
 
