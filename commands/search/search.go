@@ -16,12 +16,12 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	c := commands{Bot: bot}
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
-		Name:    "advsearch",
-		Aliases: []string{"as"},
+		Name:    "search",
+		Aliases: []string{"s"},
 
 		Summary:     "Search for a term",
-		Description: "Search for a term in a category. Prefix your search with `!` to show the first result.",
-		Usage:       "<category> <search term>",
+		Description: "Search for a term. Prefix your search with `!` to show the first result.",
+		Usage:       "[--category/-c <category>] [--show-hidden/-h] <search term>",
 
 		Blacklistable: true,
 
@@ -74,9 +74,9 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 	// aliases
 	ps := bot.Router.AddCommand(bot.Router.AliasMust(
-		"search", []string{"s"},
-		[]string{"advsearch"},
-		bcr.DefaultArgTransformer("plurality", ""),
+		"plurality", []string{"p", "plural"},
+		[]string{"search"},
+		bcr.DefaultArgTransformer("-c plurality", ""),
 	))
 	// we need to set these manually, the default description doesn't cut it
 	ps.Summary = "Search for a plurality-related term"
@@ -84,9 +84,9 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	ps.Usage = "<search term>"
 
 	ls := bot.Router.AddCommand(bot.Router.AliasMust(
-		"lgbt", nil,
-		[]string{"advsearch"},
-		bcr.DefaultArgTransformer("lgbtq+", ""),
+		"lgbt", []string{"lgbtq", "l"},
+		[]string{"search"},
+		bcr.DefaultArgTransformer("-c lgbtq+", ""),
 	))
 	// same as above
 	ls.Summary = "Search for a LGBTQ+-related term"

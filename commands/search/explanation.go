@@ -33,7 +33,7 @@ func (c *commands) explanation(ctx *bcr.Context) (err error) {
 
 	var x string
 	for _, e := range ex {
-		x += fmt.Sprintf("- `%v`\n", e.Name)
+		x += fmt.Sprintf("%v: `%v`\n", e.ID, e.Name)
 	}
 	if x == "" {
 		x = "No explanations."

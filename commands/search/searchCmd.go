@@ -14,9 +14,11 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	var (
 		showHidden bool
+		cat        string
 	)
 
 	fs.BoolVarP(&showHidden, "show-hidden", "h", false, "")
+	fs.StringVarP(&cat, "category", "c", "", "")
 
 	err = fs.Parse(ctx.Args)
 	if err != nil {
@@ -24,19 +26,12 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 	ctx.Args = fs.Args()
 
-	if err = ctx.CheckMinArgs(2); err != nil {
-		_, err = ctx.Send("No category or search term provided.", nil)
+	if err = ctx.CheckMinArgs(1); err != nil {
+		_, err = ctx.Send("No search term provided.", nil)
 		return err
 	}
 
-	// get the category ID
-	category, err := c.DB.CategoryID(ctx.Args[0])
-	if err != nil {
-		_, err = ctx.Sendf("The category you specified (``%v``) was not found.", bcr.EscapeBackticks(ctx.Args[0]))
-		return err
-	}
-
-	search := strings.TrimSpace(strings.TrimPrefix(strings.Join(ctx.Args, " "), ctx.Args[0]))
+	search := strings.Join(ctx.Args, " ")
 
 	limit := 0
 	// if the query starts with !, only show the first result
@@ -44,9 +39,28 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		limit = 1
 		search = strings.TrimPrefix(search, "!")
 	}
-	terms, err := c.DB.SearchCat(search, category, limit, showHidden)
-	if err != nil {
-		return c.DB.InternalError(ctx, err)
+
+	var terms []*db.Term
+	if cat == "" {
+		// no category given, so just search *all* terms
+		terms, err = c.DB.Search(search, limit)
+		if err != nil {
+			return c.DB.InternalError(ctx, err)
+		}
+	} else {
+		// category given, so search in category
+
+		// get the category ID
+		category, err := c.DB.CategoryID(cat)
+		if err != nil {
+			_, err = ctx.Sendf("The category you specified (``%v``) was not found.", bcr.EscapeBackticks(cat))
+			return err
+		}
+
+		terms, err = c.DB.SearchCat(search, category, limit, showHidden)
+		if err != nil {
+			return c.DB.InternalError(ctx, err)
+		}
 	}
 
 	if len(terms) == 0 {
