@@ -117,7 +117,7 @@ func (db *Db) RandomTerm() (t *Term, err error) {
 	var terms []*Term
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags
 	from public.terms as t, public.categories as c
-	where t.flags & $1 = 0
+	where t.flags & $1 = 0 and t.category = c.id
 	order by t.id`, FlagRandomHidden)
 	if err != nil {
 		return
