@@ -17,9 +17,10 @@ import (
 const eVersion = 1
 
 type e struct {
-	Version    int        `json:"export_version"`
-	ExportDate time.Time  `json:"export_date"`
-	Terms      []*db.Term `json:"terms"`
+	Version      int               `json:"export_version"`
+	ExportDate   time.Time         `json:"export_date"`
+	Terms        []*db.Term        `json:"terms"`
+	Explanations []*db.Explanation `json:"explanations"`
 }
 
 func (c *Commands) export(ctx *bcr.Context) (err error) {
@@ -41,8 +42,13 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
-
 	export.Terms = terms
+
+	ex, err := c.DB.GetAllExplanations()
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+	export.Explanations = ex
 
 	b, err := json.MarshalIndent(export, "", "  ")
 	if err != nil {
