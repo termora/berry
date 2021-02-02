@@ -74,7 +74,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 	// aliases
 	ps := bot.Router.AddCommand(bot.Router.AliasMust(
-		"plurality", []string{"p", "plural"},
+		"plural", nil,
 		[]string{"search"},
 		bcr.DefaultArgTransformer("-c plurality", ""),
 	))
