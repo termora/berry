@@ -34,7 +34,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Summary: "Show a random term",
 
-		Cooldown:      3 * time.Second,
+		Cooldown:      time.Second,
 		Blacklistable: true,
 
 		Command: c.random,
@@ -47,7 +47,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Summary: "Show a single explanation, or a list of all explanations",
 		Usage:   "[explanation]",
 
-		Cooldown:      1 * time.Second,
+		Cooldown:      time.Second,
 		Blacklistable: false,
 
 		Command: c.explanation,
@@ -57,7 +57,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Name:    "list",
 		Summary: "List all terms",
 
-		Cooldown:      3 * time.Second,
+		Cooldown:      time.Second,
 		Blacklistable: true,
 		Command:       c.list,
 	}))
@@ -67,7 +67,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Summary: "Post a single term",
 		Usage:   "<term ID> [channel]",
 
-		Cooldown:      3 * time.Second,
+		Cooldown:      time.Second,
 		Blacklistable: true,
 		Command:       c.term,
 	}))
