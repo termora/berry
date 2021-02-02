@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
@@ -22,6 +23,8 @@ import (
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		panic(err)
