@@ -25,6 +25,7 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 		if count >= 10 {
 			s = append(s, b.String())
 			b.Reset()
+			count = 0
 		}
 		b.WriteString(fmt.Sprintf("`%v`: %v/%v/%v/%v/%v\n", p.ID, p.Subjective, p.Objective, p.PossDet, p.PossPro, p.Reflexive))
 		count++
