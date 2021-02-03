@@ -94,14 +94,14 @@ func main() {
 	bot := bot.New(sugar, c, r, d, hub)
 	// add search commands
 	bot.Add(search.Init)
+	// add pronoun commands
+	bot.Add(pronouns.Init)
 	// add static commands
 	bot.Add(static.Init)
 	// add server commands
 	bot.Add(server.Init)
 	// add admin commands
 	bot.Add(admin.Init)
-	// add pronoun commands
-	bot.Add(pronouns.Init)
 
 	// open a connection to Discord
 	if err = s.Open(); err != nil {
