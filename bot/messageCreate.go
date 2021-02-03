@@ -46,6 +46,10 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	if m.Author.Bot && !inSlice(bot.Config.Bot.AllowedBots, m.Author.ID) {
 		return
 	}
+	// if the message content is empty (indicating an embed-only bot message), return
+	if m.Content == "" {
+		return
+	}
 
 	// get context
 	ctx, err := bot.Router.NewContext(m.Message)
