@@ -30,6 +30,7 @@ func (c *commands) use(ctx *bcr.Context) (err error) {
 		}
 		if err == db.ErrMoreThanOneRow {
 			_, err = ctx.Sendf("Found more than one pronoun set matching your input! Please be more specific, or use `%vlist-pronouns` to see a list of all pronouns.", ctx.Router.Prefixes[0])
+			return
 		}
 		return c.DB.InternalError(ctx, err)
 	}
