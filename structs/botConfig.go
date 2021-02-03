@@ -18,6 +18,8 @@ type BotConfig struct {
 		Support struct {
 			Invite         string
 			SupportChannel string `json:"support_channel"`
+
+			PronounChannel discord.ChannelID `json:"pronoun_channel"`
 		}
 
 		TermBaseURL string `json:"term_base_url"`

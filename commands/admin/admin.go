@@ -127,6 +127,17 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	})
 
 	a.AddSubcommand(&bcr.Command{
+		Name:    "add-pronouns",
+		Aliases: []string{"addpronouns"},
+		Summary: "Add a pronoun set",
+		Usage:   "<subjective>/<objective>/<poss. determiner>/<poss. pronoun>/<reflexive>",
+
+		CustomPermissions: c,
+
+		Command: c.addPronouns,
+	})
+
+	a.AddSubcommand(&bcr.Command{
 		Name:    "addexplanation",
 		Aliases: []string{"add-explanation"},
 		Summary: "Add an explanation",

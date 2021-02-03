@@ -1,0 +1,9 @@
+**{{.Subjective | title}}** went to the ice rink.
+
+I went with **{{.Objective}}**.
+
+**{{.Subjective | title}}** brought **{{.PossDet}}** hockey stick.
+
+At least, I think it was **{{.PossPro}}**.
+
+**{{.Subjective | title}}** bounced the puck off the boards to **{{.Reflexive}}**.

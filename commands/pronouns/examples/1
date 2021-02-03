@@ -1,0 +1,9 @@
+**{{.Subjective | title}}** went to the park.
+
+I went with **{{.Objective}}**.
+
+**{{.Subjective | title}}** brought **{{.PossDet}}** frisbee.
+
+At least I think it was **{{.PossPro}}**.
+
+**{{.Subjective | title}}** threw the frisbee to  **{{.Reflexive}}**.

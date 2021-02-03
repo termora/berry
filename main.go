@@ -16,6 +16,7 @@ import (
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/bot"
 	"github.com/starshine-sys/berry/commands/admin"
+	"github.com/starshine-sys/berry/commands/pronouns"
 	"github.com/starshine-sys/berry/commands/search"
 	"github.com/starshine-sys/berry/commands/server"
 	"github.com/starshine-sys/berry/commands/static"
@@ -99,6 +100,8 @@ func main() {
 	bot.Add(server.Init)
 	// add admin commands
 	bot.Add(admin.Init)
+	// add pronoun commands
+	bot.Add(pronouns.Init)
 
 	// open a connection to Discord
 	if err = s.Open(); err != nil {
