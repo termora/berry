@@ -67,6 +67,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Summary: "Post a single term",
 		Usage:   "<term ID> [channel]",
 
+		Args:          bcr.MinArgs(1),
 		Cooldown:      time.Second,
 		Blacklistable: true,
 		Command:       c.term,

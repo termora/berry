@@ -12,10 +12,6 @@ import (
 )
 
 func (c *commands) term(ctx *bcr.Context) (err error) {
-	if err = ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Sendf("❌ No term ID provided.")
-		return
-	}
 	channel := ctx.Channel
 	if len(ctx.Args) > 1 {
 		channel, err = ctx.ParseChannel(strings.Join(ctx.Args[1:], " "))
