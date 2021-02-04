@@ -31,8 +31,8 @@ type BotConfig struct {
 
 		TermChangelogPing string `json:"term_changelog_ping"`
 
-		HelpFields   []EmbedField `json:"help_fields"`
-		CreditFields []EmbedField `json:"credit_fields"`
+		HelpFields   []discord.EmbedField `json:"help_fields"`
+		CreditFields []discord.EmbedField `json:"credit_fields"`
 	}
 
 	// Fields used for sharding
@@ -45,10 +45,4 @@ type BotConfig struct {
 
 	// Debug will print more logs
 	Debug bool `json:"-"`
-}
-
-// EmbedField ...
-type EmbedField struct {
-	Name  string
-	Value string
 }

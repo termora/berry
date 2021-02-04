@@ -114,12 +114,7 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 
 	// if custom help fields are defined, add those
 	if len(c.Config.Bot.HelpFields) != 0 {
-		for _, f := range c.Config.Bot.HelpFields {
-			e.Fields = append(e.Fields, discord.EmbedField{
-				Name:  f.Name,
-				Value: f.Value,
-			})
-		}
+		e.Fields = append(e.Fields, c.Config.Bot.HelpFields...)
 	}
 
 	_, err = ctx.Send("", e)

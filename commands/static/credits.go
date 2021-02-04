@@ -14,20 +14,11 @@ func (c *Commands) credits(ctx *bcr.Context) (err error) {
 		return nil
 	}
 
-	fs := make([]discord.EmbedField, 0)
-
-	for _, f := range c.Config.Bot.CreditFields {
-		fs = append(fs, discord.EmbedField{
-			Name:  f.Name,
-			Value: f.Value,
-		})
-	}
-
 	_, err = ctx.Send("", &discord.Embed{
 		Color:       db.EmbedColour,
 		Title:       "Credits",
 		Description: fmt.Sprintf("These are the people who helped create %v!", ctx.Bot.Username),
-		Fields:      fs,
+		Fields:      c.Config.Bot.CreditFields,
 	})
 	return err
 }
