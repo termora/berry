@@ -59,7 +59,7 @@ To delete server information from the database, simply have the bot leave the se
 func (c *Commands) autopost(ctx *bcr.Context) (err error) {
 	_, err = ctx.Send("", &discord.Embed{
 		Title:       "Autopost",
-		Description: "To automatically post terms at a set interval, you can use the following custom command for [YAGPDB.xyz](https://yagpdb.xyz/):\n```{{/* Recommended trigger: Minute/Hourly interval */}}\n\nt!random\n{{deleteResponse 1}}```\nOther bots may have similar functionality; if you need a bot whitelisted for commands, feel free to ask on the support server.",
+		Description: fmt.Sprintf("To automatically post terms at a set interval, you can use the following custom command for [YAGPDB.xyz](https://yagpdb.xyz/):\n```{{/* Recommended trigger: Minute/Hourly interval */}}\n\n%vrandom\n{{deleteResponse 1}}```\nOther bots may have similar functionality; if you need a bot whitelisted for commands, feel free to ask on the support server.", ctx.Router.Prefixes[0]),
 		Color:       db.EmbedColour,
 	})
 	return
