@@ -5,10 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/diamondburned/arikawa/v2/api"
-	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
 )
 
 func (c *commands) submit(ctx *bcr.Context) (err error) {
@@ -32,35 +29,20 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	_, err = ctx.Router.Session.SendMessageComplex(c.Config.Bot.Support.PronounChannel, api.SendMessageData{
-		Content:         fmt.Sprintf("%v#%v (<@%v>, %v) submitted a new pronoun set: **%v**.", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID, ctx.Author.ID, strings.Join(p[:5], "/")),
-		AllowedMentions: &api.AllowedMentions{Parse: nil},
-	})
+	_, err = ctx.NewMessage().Channel(c.Config.Bot.Support.PronounChannel).
+		Content(
+			fmt.Sprintf(
+				"%v#%v (<@%v>, %v) submitted a new pronoun set: **%v**.",
+				ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID,
+				ctx.Author.ID, strings.Join(p[:5], "/"),
+			)).BlockMentions().Send()
 	if err != nil {
-		id := c.Report(err)
-		var e *discord.Embed
-		if id != nil {
-			e = &discord.Embed{
-				Title:       "Error code",
-				Description: "`" + string(*id) + "`",
-				Fields: []discord.EmbedField{{
-					Name:  "Internal error occurred",
-					Value: "To report this error, please join the bot support server and give the bot developer the ID above.",
-				}},
-				Color: db.EmbedColour,
-			}
-		}
-		_, err = ctx.Send("There was an error sending the submission. Please try again, and if this happens again, please submit it in the support server instead.", e)
-		if err != nil {
-			c.Report(err)
-			return err
-		}
+		return c.DB.InternalError(ctx, err)
 	}
 
-	_, err = ctx.Send("", &discord.Embed{
-		Description: fmt.Sprintf("Successfully submitted the pronoun set **%v**.", strings.Join(p[:5], "/")),
-		Color:       db.EmbedColour,
-	})
+	_, err = ctx.NewMessage().Content(
+		fmt.Sprintf("Successfully submitted the pronoun set **%v**.", strings.Join(p[:5], "/")),
+	).BlockMentions().Send()
 	if err != nil {
 		c.Report(err)
 		return err
