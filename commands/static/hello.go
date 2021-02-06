@@ -1,6 +1,7 @@
 package static
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -10,7 +11,10 @@ import (
 
 var pk = pkgo.NewSession(nil)
 
-var greetings = []string{"Hello", "Heyo", "Heya", "Hiya"}
+var greetings = []string{"Hello", "Heya", "Hi", "Hiya"}
+
+// yeah this won't work on any other instance of the bot sadly
+var emotes = []string{"👋", "<:MenheraWave:807587508623507456>", "<a:ameowcomfywave:807587518857216021>"}
 
 func (c *Commands) hello(ctx *bcr.Context) (err error) {
 	// sleep for a second to give PK time to process the message
@@ -35,6 +39,22 @@ func (c *Commands) hello(ctx *bcr.Context) (err error) {
 		name = m.Member.Name
 	}
 
-	_, err = ctx.Sendf("%v, %v!", greetings[rand.Intn(len(greetings))], name)
+	// spaghetti Lite™ to get some more randomness
+	greeting := fmt.Sprintf(
+		"%v, %v!",
+		greetings[rand.Intn(len(greetings))],
+		name,
+	)
+	if r := rand.Intn(3); r == 1 {
+		if len(emotes) != 0 {
+			if r := rand.Intn(2); r == 1 {
+				greeting = fmt.Sprintf("%v %v", greeting, emotes[rand.Intn(len(emotes))])
+			} else {
+				greeting = fmt.Sprintf("%v %v", emotes[rand.Intn(len(emotes))], greeting)
+			}
+		}
+	}
+
+	_, err = ctx.Send(greeting, nil)
 	return err
 }
