@@ -14,13 +14,14 @@ import (
 	"github.com/starshine-sys/berry/db"
 )
 
-const eVersion = 1
+const eVersion = 2
 
 type e struct {
 	Version      int               `json:"export_version"`
 	ExportDate   time.Time         `json:"export_date"`
 	Terms        []*db.Term        `json:"terms"`
 	Explanations []*db.Explanation `json:"explanations"`
+	Pronouns     []*db.PronounSet  `json:"pronouns"`
 }
 
 func (c *Commands) export(ctx *bcr.Context) (err error) {
@@ -38,17 +39,20 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	terms, err := c.DB.GetTerms(0)
+	export.Terms, err = c.DB.GetTerms(0)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
-	export.Terms = terms
 
-	ex, err := c.DB.GetAllExplanations()
+	export.Explanations, err = c.DB.GetAllExplanations()
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
-	export.Explanations = ex
+
+	export.Pronouns, err = c.DB.Pronouns()
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
 
 	b, err := json.MarshalIndent(export, "", "  ")
 	if err != nil {
@@ -80,7 +84,7 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 	}
 
 	_, err = ctx.Session.SendMessageComplex(u.ID, api.SendMessageData{
-		Content:         fmt.Sprintf("> Done! Archive of %v terms, invoked by %v#%v at %v.", len(terms), ctx.Author.Username, ctx.Author.Discriminator, time.Now().Format(time.RFC3339)),
+		Content:         fmt.Sprintf("> Done! Archive of %v terms, %v explanations, and %v pronoun sets, invoked by %v#%v at %v.", len(export.Terms), len(export.Explanations), len(export.Pronouns), ctx.Author.Username, ctx.Author.Discriminator, time.Now().Format(time.RFC3339)),
 		Files:           []sendpart.File{file},
 		AllowedMentions: ctx.Router.DefaultMentions,
 	})
