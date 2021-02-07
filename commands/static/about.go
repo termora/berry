@@ -71,7 +71,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name:   "Source code",
-				Value:  "[GitHub](https://git.termora.org/termora/berry)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)",
+				Value:  fmt.Sprintf("[GitHub](%v)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)", c.Config.Bot.Git),
 				Inline: true,
 			},
 		},

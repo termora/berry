@@ -43,5 +43,9 @@ func getConfig(sugar *zap.SugaredLogger) (config *structs.BotConfig) {
 	}
 	config.UseSentry = config.Auth.SentryURL != ""
 
+	if config.Bot.Git == "" {
+		config.Bot.Git = structs.FallbackGitURL
+	}
+
 	return config
 }

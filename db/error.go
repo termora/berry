@@ -29,6 +29,9 @@ func (db *Db) InternalError(ctx *bcr.Context, e error) error {
 	if db.useSentry {
 		return db.sentryError(ctx, e)
 	}
+	// log to console
+	db.Sugar.Error(e)
+
 	id := uuid.New()
 
 	_, err := db.Pool.Exec(context.Background(), "insert into public.errors (id, command, user_id, channel, error) values ($1, $2, $3, $4, $5)", id, ctx.Command, ctx.Author.ID, ctx.Channel.ID, e.Error())
@@ -62,7 +65,9 @@ func (db *Db) InternalError(ctx *bcr.Context, e error) error {
 }
 
 func (db *Db) sentryError(ctx *bcr.Context, e error) error {
-	// check if it's a problem on our end, to avoid blowing through Sentry's limits, and to clean up error logs
+	db.Sugar.Error(e)
+
+	// check if it's a problem on our end, to avoid blowing through Sentry's limits
 	if !IsOurProblem(e) {
 		s := "An internal error has occurred. However, it's unlikely that it's on our end. Please check the input you gave the command again; if you're reasonably sure the error *is* on our end, please contact the bot developer"
 		if db.Config.Bot.Support.Invite != "" {
@@ -83,7 +88,6 @@ func (db *Db) sentryError(ctx *bcr.Context, e error) error {
 		return err
 	}
 
-	db.Sugar.Error(e)
 	id := db.sentry.CaptureException(e)
 	if id == nil {
 		return nil

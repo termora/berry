@@ -2,6 +2,9 @@ package structs
 
 import "github.com/diamondburned/arikawa/v2/discord"
 
+// FallbackGitURL if there's no git url set in the config file fall back to this
+const FallbackGitURL = "https://github.com/starshine-sys/berry"
+
 // BotConfig ...
 type BotConfig struct {
 	Auth struct {
@@ -24,9 +27,11 @@ type BotConfig struct {
 
 		TermBaseURL string `json:"term_base_url"`
 		Website     string
+		Git         string
 
-		ShowGuildCount bool              `json:"show_guild_count"`
-		AllowedBots    []discord.UserID  `json:"allowed_bots"`
+		ShowGuildCount bool             `json:"show_guild_count"`
+		AllowedBots    []discord.UserID `json:"allowed_bots"`
+
 		JoinLogChannel discord.ChannelID `json:"join_log_channel"`
 
 		TermChangelogPing string `json:"term_changelog_ping"`

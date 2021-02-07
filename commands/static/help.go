@@ -50,7 +50,7 @@ Additionally, there are daily database backups, which only include a list of bla
 
 To delete server information from the database, simply have the bot leave the server, through kicking or banning it. Do note that this does *not* delete server information from database backups, only the live database (and any later backups).
 
-%v is open source, and its source code is available [on GitHub](https://github.com/starshine-sys/berry). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username),
+%v is open source, and its source code is available [on GitHub](%v). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, c.Config.Bot.Git),
 		Color: db.EmbedColour,
 	})
 	return err
