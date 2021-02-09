@@ -32,7 +32,8 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Name:    "random",
 		Aliases: []string{"r"},
 
-		Summary: "Show a random term",
+		Summary: "Show a random term (optionally filtering by category)",
+		Usage:   "[category]",
 
 		Cooldown:      time.Second,
 		Blacklistable: true,

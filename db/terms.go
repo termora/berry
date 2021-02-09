@@ -131,6 +131,26 @@ func (db *Db) RandomTerm() (t *Term, err error) {
 	return terms[n], nil
 }
 
+// RandomTermCategory gets a random term from the database from the specified category
+func (db *Db) RandomTermCategory(id int) (t *Term, err error) {
+	var terms []*Term
+	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags
+	from public.terms as t, public.categories as c
+	where t.flags & $1 = 0 and t.category = c.id
+	and t.category = $2
+	order by t.id`, FlagRandomHidden, id)
+	if err != nil {
+		return
+	}
+
+	if len(terms) == 1 {
+		return terms[0], nil
+	}
+
+	n := rand.Intn(len(terms) - 1)
+	return terms[n], nil
+}
+
 // SetFlags sets the flags for a term
 func (db *Db) SetFlags(id int, flags TermFlag) (err error) {
 	commandTag, err := db.Pool.Exec(context.Background(), "update public.terms set flags = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", flags, id)
