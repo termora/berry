@@ -104,6 +104,9 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 				Value: fmt.Sprintf("You can blacklist most commands, with the exception of `explain`, using the following commands:\n`blacklist`: show the current blacklist\n`blacklist add`: add a channel to the blacklist\n`blacklist remove`: remove a channel from the blacklist\n\nTo stop %v from responding in a channel completely, deny them the \"Read Messages\" permission in that channel.", ctx.Bot.Username),
 			},
 		},
+		Footer: &discord.EmbedFooter{
+			Text: fmt.Sprintf("Use %vhelp <command> for more information on a specific command.", ctx.Router.Prefixes[0]),
+		},
 	}
 	if c.Config.Bot.Support.Invite != "" {
 		e.Fields = append(e.Fields, discord.EmbedField{
