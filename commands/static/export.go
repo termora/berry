@@ -8,8 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/diamondburned/arikawa/v2/api"
-	"github.com/diamondburned/arikawa/v2/utils/sendpart"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/db"
 )
@@ -78,15 +76,12 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 		buf = bytes.NewBuffer(b)
 	}
 
-	file := sendpart.File{
-		Name:   fn,
-		Reader: buf,
-	}
-
-	_, err = ctx.Session.SendMessageComplex(u.ID, api.SendMessageData{
-		Content:         fmt.Sprintf("> Done! Archive of %v terms, %v explanations, and %v pronoun sets, invoked by %v#%v at %v.", len(export.Terms), len(export.Explanations), len(export.Pronouns), ctx.Author.Username, ctx.Author.Discriminator, time.Now().Format(time.RFC3339)),
-		Files:           []sendpart.File{file},
-		AllowedMentions: ctx.Router.DefaultMentions,
-	})
+	_, err = ctx.NewMessage().Channel(u.ID).TogglePermCheck().Content(
+		fmt.Sprintf(
+			"> Done! Archive of %v terms, %v explanations, and %v pronoun sets, invoked by %v#%v at %v.",
+			len(export.Terms), len(export.Explanations), len(export.Pronouns),
+			ctx.Author.Username, ctx.Author.Discriminator, time.Now().Format(time.RFC3339),
+		),
+	).AddFile(fn, buf).Send()
 	return err
 }
