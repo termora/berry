@@ -71,7 +71,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 	// if there's only one term, just show that one
 	if len(terms) == 1 {
-		_, err = ctx.Send("", terms[0].TermEmbed(c.Config.Bot.TermBaseURL))
+		_, err = ctx.Send("", terms[0].TermEmbed(c.Config.TermBaseURL()))
 		return err
 	}
 
@@ -137,7 +137,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 			if err != nil {
 				c.Sugar.Error("Error deleting message:", err)
 			}
-			_, err = ctx.Send("", termSlice[index].TermEmbed(c.Config.Bot.TermBaseURL))
+			_, err = ctx.Send("", termSlice[index].TermEmbed(c.Config.TermBaseURL()))
 			if err != nil {
 				c.Sugar.Error("Error sending message:", err)
 			}

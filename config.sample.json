@@ -19,7 +19,6 @@
         "server_invite": "",
         "website": "https://berry.starshines.xyz/",
         "join_log_channel": 0,
-        "term_base_url": "https://berry.starshines.xyz/term/",
         "allowed_bots": [
             "204255221017214977",
             "235148962103951360"

@@ -55,7 +55,7 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	_, err = ctx.Session.SendEmbed(channel.ID, *term.TermEmbed(c.Config.Bot.TermBaseURL))
+	_, err = ctx.Session.SendEmbed(channel.ID, *term.TermEmbed(c.Config.TermBaseURL()))
 	if err != nil {
 		return
 	}

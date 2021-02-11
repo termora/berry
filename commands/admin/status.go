@@ -27,6 +27,11 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		default:
 		}
 
+		// add term count to status
+		if c.Config.Bot.ShowTermCount {
+			st = fmt.Sprintf("%v | %v terms", st, c.DB.TermCount())
+		}
+
 		// add the website to the status, if it's not empty
 		status := fmt.Sprintf("%v | %v", st, urlParse(c.Config.Bot.Website))
 		if c.Config.Bot.Website == "" {

@@ -20,17 +20,17 @@ type BotConfig struct {
 
 		Support struct {
 			Invite         string
-			SupportChannel string `json:"support_channel"`
-
 			PronounChannel discord.ChannelID `json:"pronoun_channel"`
 		}
 
-		TermBaseURL string `json:"term_base_url"`
-		Website     string
-		Git         string
+		Website string
+		Git     string
 
-		ShowGuildCount bool             `json:"show_guild_count"`
-		AllowedBots    []discord.UserID `json:"allowed_bots"`
+		// Whether to show term and server counts in the status
+		ShowTermCount  bool `json:"show_term_count"`
+		ShowGuildCount bool `json:"show_guild_count"`
+
+		AllowedBots []discord.UserID `json:"allowed_bots"`
 
 		JoinLogChannel discord.ChannelID `json:"join_log_channel"`
 
@@ -50,4 +50,12 @@ type BotConfig struct {
 
 	// Debug will print more logs
 	Debug bool `json:"-"`
+}
+
+// TermBaseURL returns the base URL for terms
+func (c BotConfig) TermBaseURL() string {
+	if c.Bot.Website == "" {
+		return ""
+	}
+	return c.Bot.Website + "term/"
 }
