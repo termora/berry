@@ -10,7 +10,7 @@ import (
 )
 
 func (c *commands) list(ctx *bcr.Context) (err error) {
-	terms, err := c.DB.GetTerms(db.FlagSearchHidden)
+	terms, err := c.termCat(ctx.RawArgs)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
@@ -49,4 +49,14 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 
 	_, err = ctx.PagedEmbed(embeds, false)
 	return err
+}
+
+func (c *commands) termCat(cat string) (t []*db.Term, err error) {
+	if cat != "" {
+		cat, err := c.DB.CategoryID(cat)
+		if err == nil {
+			return c.DB.GetCategoryTerms(cat, db.FlagSearchHidden)
+		}
+	}
+	return c.DB.GetTerms(db.FlagSearchHidden)
 }

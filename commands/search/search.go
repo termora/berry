@@ -56,7 +56,8 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "list",
-		Summary: "List all terms",
+		Summary: "List all terms, optionally filtering by a category",
+		Usage:   "[category]",
 
 		Cooldown:      time.Second,
 		Blacklistable: true,
