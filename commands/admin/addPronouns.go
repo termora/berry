@@ -14,7 +14,7 @@ func (c *Admin) addPronouns(ctx *bcr.Context) (err error) {
 		_, err = ctx.Send("Not enough forms given.", nil)
 	}
 
-	id, err := c.db.AddPronoun(db.PronounSet{
+	id, err := c.DB.AddPronoun(db.PronounSet{
 		Subjective: p[0],
 		Objective:  p[1],
 		PossDet:    p[2],
@@ -27,7 +27,7 @@ func (c *Admin) addPronouns(ctx *bcr.Context) (err error) {
 			_, err = ctx.Send("Not enough forms given, some were empty.", nil)
 			return err
 		}
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Added new pronoun set with ID %v.", id)

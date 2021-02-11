@@ -36,9 +36,9 @@ func (c *Admin) setFlags(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	err = c.db.SetFlags(id, db.TermFlag(flags))
+	err = c.DB.SetFlags(id, db.TermFlag(flags))
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Updated the flags for %v to %v.", id, flags)

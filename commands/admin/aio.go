@@ -33,7 +33,7 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 
 	source := ctx.Args[4]
 
-	category, err := c.db.CategoryID(catName)
+	category, err := c.DB.CategoryID(catName)
 	if err != nil {
 		_, err = ctx.Send("Could not find that category, cancelled.", nil)
 		return
@@ -51,10 +51,10 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 		Source:      source,
 	}
 
-	t, err = c.db.AddTerm(t)
+	t, err = c.DB.AddTerm(t)
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
-	_, err = ctx.Send(fmt.Sprintf("Added term with ID %v.", t.ID), t.TermEmbed(c.config.Bot.TermBaseURL))
+	_, err = ctx.Send(fmt.Sprintf("Added term with ID %v.", t.ID), t.TermEmbed(c.Config.Bot.TermBaseURL))
 	return err
 }

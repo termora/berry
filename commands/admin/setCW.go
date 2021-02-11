@@ -15,12 +15,12 @@ func (c *Admin) setCW(ctx *bcr.Context) (err error) {
 
 	id, err := strconv.Atoi(ctx.Args[0])
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
-	t, err := c.db.GetTerm(id)
+	t, err := c.DB.GetTerm(id)
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	// h
@@ -36,10 +36,10 @@ func (c *Admin) setCW(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	err = c.db.SetCW(t.ID, cw)
+	err = c.DB.SetCW(t.ID, cw)
 	if err != nil {
-		c.sugar.Errorf("Error setting CW for %v: %v", id, err)
-		return c.db.InternalError(ctx, err)
+		c.Sugar.Errorf("Error setting CW for %v: %v", id, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Updated CW for %v.", id)

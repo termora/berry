@@ -37,9 +37,9 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	}
 
 	// get terms since the specified date
-	t, err := c.db.TermsSince(date)
+	t, err := c.DB.TermsSince(date)
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	if len(t) == 0 {
@@ -55,7 +55,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	// check perms in the channel
 	perms, err := ctx.Session.Permissions(ch.ID, ctx.Author.ID)
 	if err != nil {
-		c.sugar.Errorf("Error getting perms for %v in %v: %v", ctx.Author.ID, ch.ID, err)
+		c.Sugar.Errorf("Error getting perms for %v in %v: %v", ctx.Author.ID, ch.ID, err)
 		_, err = ctx.Sendf(
 			"❌ An error occurred while trying to get permissions.\nIf this issue persists, please contact the bot developer.",
 		)
@@ -73,12 +73,12 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	s := fmt.Sprintf(
 		"Since %v, **%v** new terms have been added, for a total of **%v** terms!\n\n**New terms**\nThe following terms have been added: %v",
 		date.Format("January 02"), len(t),
-		c.db.TermCount(), strings.Join(terms, ", "),
+		c.DB.TermCount(), strings.Join(terms, ", "),
 	)
 
 	// if it won't fit in a single embed (which is *very* unlikely), split it into 2000-character-ish chunks
 	if len(s) >= 2000 {
-		s = fmt.Sprintf("Since %v, **%v** new terms have been added, for a total of **%v** terms!", date.Format("January 02"), len(t), c.db.TermCount())
+		s = fmt.Sprintf("Since %v, **%v** new terms have been added, for a total of **%v** terms!", date.Format("January 02"), len(t), c.DB.TermCount())
 
 		buf := "**New terms**\nThe following terms have been added:\n"
 		for _, t := range terms {
@@ -91,7 +91,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 		msgs = append(msgs, buf)
 	}
 
-	_, err = ctx.Session.SendMessage(ch.ID, c.config.Bot.TermChangelogPing, &discord.Embed{
+	_, err = ctx.Session.SendMessage(ch.ID, c.Config.Bot.TermChangelogPing, &discord.Embed{
 		Title:       "Term changelog",
 		Description: s,
 

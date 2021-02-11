@@ -29,7 +29,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 			ctx.Send("Term creation cancelled.", nil)
 			return
 		}
-		cat, err := c.db.CategoryID(m.Content)
+		cat, err := c.DB.CategoryID(m.Content)
 		if err != nil {
 			_, err = ctx.Send("Could not find that category, cancelled.", nil)
 			return
@@ -93,9 +93,9 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 					}
 
 					ctx.AddYesNoHandler(*msg, ctx.Author.ID, func(ctx *bcr.Context) {
-						t, err := c.db.AddTerm(t)
+						t, err := c.DB.AddTerm(t)
 						if err != nil {
-							c.db.InternalError(ctx, err)
+							c.DB.InternalError(ctx, err)
 							return
 						}
 						ctx.Sendf("Added term with ID %v.", t.ID)

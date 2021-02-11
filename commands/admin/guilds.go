@@ -41,11 +41,11 @@ func (c *Admin) cmdGuilds(ctx *bcr.Context) (err error) {
 	zw.Name = fn
 	_, err = zw.Write([]byte(s))
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 	err = zw.Close()
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 	fn += ".gz"
 

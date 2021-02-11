@@ -16,9 +16,9 @@ func (c *Admin) addCategory(ctx *bcr.Context) (err error) {
 	// check if a category with that name exists
 	var e bool
 
-	err = c.db.Pool.QueryRow(context.Background(), "select exists (select from categories where lower(name) = lower($1))", ctx.RawArgs).Scan(&e)
+	err = c.DB.Pool.QueryRow(context.Background(), "select exists (select from categories where lower(name) = lower($1))", ctx.RawArgs).Scan(&e)
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	// if so, return
@@ -30,9 +30,9 @@ func (c *Admin) addCategory(ctx *bcr.Context) (err error) {
 	// add the category
 	var id int
 
-	err = c.db.Pool.QueryRow(context.Background(), "insert into public.categories (name) values ($1) returning id", ctx.RawArgs).Scan(&id)
+	err = c.DB.Pool.QueryRow(context.Background(), "insert into public.categories (name) values ($1) returning id", ctx.RawArgs).Scan(&id)
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Added category `%v` with ID %v.", ctx.RawArgs, id)

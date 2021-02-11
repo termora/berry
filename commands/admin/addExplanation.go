@@ -40,9 +40,9 @@ func (c *Admin) addExplanation(ctx *bcr.Context) (err error) {
 	e.Description = strings.Join(content[1:], "\n")
 
 	// add the explanation
-	e, err = c.db.AddExplanation(e)
+	e, err = c.DB.AddExplanation(e)
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Added explanation with ID %v.\nName: `%v`\nAliases: `%v`\n**:warning: Warning:** to have me respond to this explanation as a base command, please restart the bot.", e.ID, e.Name, strings.Join(e.Aliases, ", "))
@@ -71,7 +71,7 @@ func (c *Admin) toggleExplanationCmd(ctx *bcr.Context) (err error) {
 	}
 
 	// set it in the database
-	err = c.db.SetAsCommand(id, b)
+	err = c.DB.SetAsCommand(id, b)
 	if err != nil {
 		_, err = ctx.Send(fmt.Sprintf("Internal error occurred: %v", bcr.AsCode(bcr.EscapeBackticks(err.Error()))), nil)
 		return err

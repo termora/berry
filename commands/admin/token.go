@@ -9,14 +9,14 @@ import (
 func (c *Admin) token(ctx *bcr.Context) (err error) {
 	u, err := ctx.Session.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		c.sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		c.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?", nil)
 		return
 	}
 
-	token, err := c.db.GetOrCreateToken(ctx.Author.ID.String())
+	token, err := c.DB.GetOrCreateToken(ctx.Author.ID.String())
 	if err != nil {
-		c.sugar.Errorf("Error creating token for %v: %v", ctx.Author.ID, err)
+		c.Sugar.Errorf("Error creating token for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error creating/finding your token.", nil)
 		return err
 	}
@@ -40,14 +40,14 @@ func (c *Admin) token(ctx *bcr.Context) (err error) {
 func (c *Admin) refreshToken(ctx *bcr.Context) (err error) {
 	u, err := ctx.Session.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		c.sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		c.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?", nil)
 		return
 	}
 
-	token, err := c.db.ResetToken(ctx.Author.ID.String())
+	token, err := c.DB.ResetToken(ctx.Author.ID.String())
 	if err != nil {
-		c.sugar.Errorf("Error resetting token for %v: %v", ctx.Author.ID, err)
+		c.Sugar.Errorf("Error resetting token for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error resetting your token.", nil)
 		return err
 	}

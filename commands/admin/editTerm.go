@@ -21,14 +21,14 @@ func (c *Admin) editTerm(ctx *bcr.Context) (err error) {
 		_, err = ctx.Sendf("Could not parse ID:\n```%v```", err)
 		return
 	}
-	t, err := c.db.GetTerm(id)
+	t, err := c.DB.GetTerm(id)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
 			_, err = ctx.Send("No term with that ID found.", nil)
 			return
 		}
 
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	// these should probably be actual subcommands but then we'd have to duplicate the code above 5 times
@@ -56,7 +56,7 @@ func (c *Admin) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
 		return
 	}
 
-	err = c.db.UpdateTitle(t.ID, title)
+	err = c.DB.UpdateTitle(t.ID, title)
 	if err != nil {
 		_, err = ctx.Sendf("Error updating title: ```%v```", err)
 		return
@@ -73,7 +73,7 @@ func (c *Admin) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
 		return
 	}
 
-	err = c.db.UpdateDesc(t.ID, desc)
+	err = c.DB.UpdateDesc(t.ID, desc)
 	if err != nil {
 		_, err = ctx.Sendf("Error updating description: ```%v```", err)
 		return
@@ -90,7 +90,7 @@ func (c *Admin) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 		return
 	}
 
-	err = c.db.UpdateSource(t.ID, source)
+	err = c.DB.UpdateSource(t.ID, source)
 	if err != nil {
 		_, err = ctx.Sendf("Error updating source: ```%v```", err)
 		return
@@ -111,7 +111,7 @@ func (c *Admin) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 		return
 	}
 
-	err = c.db.UpdateAliases(t.ID, aliases)
+	err = c.DB.UpdateAliases(t.ID, aliases)
 	if err != nil {
 		_, err = ctx.Sendf("Error updating aliases: ```%v```", err)
 		return
@@ -127,7 +127,7 @@ func (c *Admin) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
 		img = ""
 	}
 
-	err = c.db.UpdateImage(t.ID, img)
+	err = c.DB.UpdateImage(t.ID, img)
 	if err != nil {
 		_, err = ctx.Sendf("Error updating image: ```%v```", err)
 		return

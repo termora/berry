@@ -7,16 +7,11 @@ import (
 	"github.com/diamondburned/arikawa/v2/gateway"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/berry/bot"
-	"github.com/starshine-sys/berry/db"
-	"github.com/starshine-sys/berry/structs"
-	"go.uber.org/zap"
 )
 
 // Admin ...
 type Admin struct {
-	db     *db.Db
-	config *structs.BotConfig
-	sugar  *zap.SugaredLogger
+	*bot.Bot
 
 	admins []string
 
@@ -31,9 +26,9 @@ func (Admin) String() string {
 
 // Check ...
 func (c *Admin) Check(ctx *bcr.Context) (bool, error) {
-	if c.config.Bot.AdminServers != nil {
+	if c.Config.Bot.AdminServers != nil {
 		var inServer bool
-		for _, s := range c.config.Bot.AdminServers {
+		for _, s := range c.Config.Bot.AdminServers {
 			if ctx.Message.GuildID == s {
 				inServer = true
 				break
@@ -43,16 +38,16 @@ func (c *Admin) Check(ctx *bcr.Context) (bool, error) {
 			return false, nil
 		}
 	}
-	for _, id := range c.config.Bot.BotOwners {
+	for _, id := range c.Config.Bot.BotOwners {
 		if id == ctx.Author.ID {
 			return true, nil
 		}
 	}
 
 	if len(c.admins) == 0 {
-		admins, err := c.db.GetAdmins()
+		admins, err := c.DB.GetAdmins()
 		if err != nil {
-			c.sugar.Error("Error getting admins:", err)
+			c.Sugar.Error("Error getting admins:", err)
 			return false, err
 		}
 		c.admins = admins
@@ -69,7 +64,7 @@ func (c *Admin) Check(ctx *bcr.Context) (bool, error) {
 
 // Init ...
 func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
-	c := &Admin{db: bot.DB, config: bot.Config, sugar: bot.Sugar}
+	c := &Admin{Bot: bot}
 	c.stopStatus = make(chan bool, 1)
 
 	a := bot.Router.AddCommand(&bcr.Command{

@@ -15,12 +15,12 @@ func (c *Admin) setNote(ctx *bcr.Context) (err error) {
 
 	id, err := strconv.Atoi(ctx.Args[0])
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
-	t, err := c.db.GetTerm(id)
+	t, err := c.DB.GetTerm(id)
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	note := strings.TrimSpace(strings.TrimPrefix(ctx.RawArgs, ctx.Args[0]))
@@ -34,9 +34,9 @@ func (c *Admin) setNote(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	err = c.db.SetNote(t.ID, note)
+	err = c.DB.SetNote(t.ID, note)
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Updated note for %v.", id)

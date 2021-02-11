@@ -13,9 +13,9 @@ func (c *Admin) error(ctx *bcr.Context) (err error) {
 		return err
 	}
 
-	e, err := c.db.Error(ctx.RawArgs)
+	e, err := c.DB.Error(ctx.RawArgs)
 	if err != nil {
-		c.sugar.Errorf("Error when retrieving error with ID %v: %v", ctx.RawArgs, err)
+		c.Sugar.Errorf("Error when retrieving error with ID %v: %v", ctx.RawArgs, err)
 		_, err = ctx.Send("Error with that ID not found, or another error occurred.", nil)
 		return err
 	}
