@@ -40,6 +40,7 @@ func (db *Db) GetCategoryTerms(id int, mask TermFlag) (terms []*Term, err error)
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.content_warnings, t.image_url
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0 and t.category = $2
+	and t.category = c.id
 	order by t.name, t.id`, mask, id)
 	return terms, err
 }
