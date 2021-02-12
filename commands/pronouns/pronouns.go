@@ -38,18 +38,6 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	c.submitCooldown.SkipTTLExtensionOnHit(true)
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
-		Name:    "pronouns",
-		Aliases: []string{"pronoun", "neopronoun", "neopronouns"},
-
-		Summary: "Show pronouns (with optional name) used in a sentence",
-		Usage:   "<pronouns> [name]",
-
-		Blacklistable: true,
-		Cooldown:      time.Second,
-		Command:       c.use,
-	}))
-
-	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "list-pronouns",
 		Aliases: []string{"pronoun-list", "listpronouns", "pronounlist"},
 
@@ -70,7 +58,22 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Command:       c.submit,
 	}))
 
-	return "Pronoun commands", list
+	pronouns := bot.Router.AddCommand(&bcr.Command{
+		Name:    "pronouns",
+		Aliases: []string{"pronoun", "neopronoun", "neopronouns"},
+
+		Summary: "Show pronouns (with optional name) used in a sentence",
+		Usage:   "<pronouns> [name]",
+
+		Blacklistable: true,
+		Cooldown:      time.Second,
+		Command:       c.use,
+	})
+
+	pronouns.AddSubcommand(bot.Router.AliasMust("list", nil, []string{"list-pronouns"}, nil))
+	pronouns.AddSubcommand(bot.Router.AliasMust("submit", nil, []string{"submit-pronouns"}, nil))
+
+	return "Pronoun commands", append(list, pronouns)
 }
 
 func funcs() map[string]interface{} {

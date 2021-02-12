@@ -18,6 +18,10 @@ type PronounSet struct {
 	Reflexive  string `json:"reflexive"`
 }
 
+func (p PronounSet) String() string {
+	return p.Subjective + "/" + p.Objective + "/" + p.PossDet + "/" + p.PossPro + "/" + p.Reflexive
+}
+
 // Errors ...
 var (
 	ErrMoreThanOneRow = errors.New("more than one row returned")
@@ -27,49 +31,42 @@ var (
 
 // GetPronoun gets a pronoun from the database
 // gods this function is shit but idc, if it works it works
-func (db *Db) GetPronoun(forms ...string) (set *PronounSet, err error) {
-	var p []*PronounSet
-
+func (db *Db) GetPronoun(forms ...string) (sets []*PronounSet, err error) {
 	switch len(forms) {
 	case 0:
 		return nil, ErrNoForms
 	case 1:
-		err = pgxscan.Select(context.Background(), db.Pool, &p, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 order by id", forms[0])
+		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 order by id", forms[0])
 		if err != nil {
 			return
 		}
 	case 2:
-		err = pgxscan.Select(context.Background(), db.Pool, &p, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 order by id", forms[0], forms[1])
+		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 order by id", forms[0], forms[1])
 		if err != nil {
 			return
 		}
 	case 3:
-		err = pgxscan.Select(context.Background(), db.Pool, &p, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 and poss_det = $3 order by id", forms[0], forms[1], forms[2])
+		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 and poss_det = $3 order by id", forms[0], forms[1], forms[2])
 		if err != nil {
 			return
 		}
 	case 4:
-		err = pgxscan.Select(context.Background(), db.Pool, &p, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 order by id", forms[0], forms[1], forms[2], forms[3])
+		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 order by id", forms[0], forms[1], forms[2], forms[3])
 		if err != nil {
 			return
 		}
 	case 5:
-		err = pgxscan.Select(context.Background(), db.Pool, &p, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 and reflexive = $5 order by id", forms[0], forms[1], forms[2], forms[3], forms[4])
+		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 and reflexive = $5 order by id", forms[0], forms[1], forms[2], forms[3], forms[4])
 		if err != nil {
 			return
 		}
 	default:
 		return nil, ErrTooManyForms
 	}
-
-	if len(p) == 0 {
+	if len(sets) == 0 {
 		return nil, pgx.ErrNoRows
 	}
-
-	if len(p) > 1 {
-		return nil, ErrMoreThanOneRow
-	}
-	return p[0], nil
+	return sets, nil
 }
 
 // AddPronoun adds a pronoun set, returning the ID
