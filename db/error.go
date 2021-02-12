@@ -148,5 +148,14 @@ func IsOurProblem(e error) bool {
 		return false
 	}
 
+	// ignore some specific errors
+	switch e {
+	case bcr.ErrBotMissingPermissions:
+		return false
+	case bcr.ErrorNotEnoughArgs, bcr.ErrorTooManyArgs, bcr.ErrInvalidMention, bcr.ErrChannelNotFound, bcr.ErrMemberNotFound, bcr.ErrUserNotFound, bcr.ErrRoleNotFound:
+		// we're not sure if these are ever returned, but ignore them anyway
+		return false
+	}
+
 	return true
 }
