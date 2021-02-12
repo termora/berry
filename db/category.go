@@ -24,3 +24,11 @@ func (db *Db) GetCategories() (c []*Category, err error) {
 	from public.categories`)
 	return c, err
 }
+
+// CategoryFromID ...
+func (db *Db) CategoryFromID(id int) (c *Category) {
+	c = &Category{}
+	pgxscan.Get(context.Background(), db.Pool, c, `select id, name
+	from public.categories where id = $1`, id)
+	return c
+}

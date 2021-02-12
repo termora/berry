@@ -10,12 +10,16 @@ import (
 )
 
 func (c *commands) list(ctx *bcr.Context) (err error) {
-	terms, err := c.termCat(ctx.RawArgs)
+	cat, terms, err := c.termCat(ctx.RawArgs)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
 	s := make([]string, 0)
 	for _, t := range terms {
+		if len(t.Aliases) > 0 {
+			s = append(s, fmt.Sprintf("`%v`: %v, %v", t.ID, t.Name, strings.Join(t.Aliases, ", ")))
+			continue
+		}
 		s = append(s, fmt.Sprintf("`%v`: %v", t.ID, t.Name))
 	}
 
@@ -35,14 +39,20 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 	// create the embeds and send them
 	embeds := make([]discord.Embed, 0)
 
+	title := fmt.Sprintf("List of terms (%v)", len(terms))
+	footer := ""
+	if cat != nil {
+		title = fmt.Sprintf("List of %v terms (%v)", cat.Name, len(terms))
+		footer = fmt.Sprintf("Category: %v (ID: %v) |", cat.Name, cat.ID)
+	}
 	for i, s := range termSlices {
 		embeds = append(embeds, discord.Embed{
-			Title:       fmt.Sprintf("List of terms (%v)", len(terms)),
+			Title:       title,
 			Description: strings.Join(s, "\n"),
 			Color:       db.EmbedColour,
 
 			Footer: &discord.EmbedFooter{
-				Text: fmt.Sprintf("Page %v/%v", i+1, len(termSlices)),
+				Text: fmt.Sprintf("%v Page %v/%v", footer, i+1, len(termSlices)),
 			},
 		})
 	}
@@ -51,12 +61,14 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 	return err
 }
 
-func (c *commands) termCat(cat string) (t []*db.Term, err error) {
+func (c *commands) termCat(cat string) (s *db.Category, t []*db.Term, err error) {
 	if cat != "" {
-		cat, err := c.DB.CategoryID(cat)
+		id, err := c.DB.CategoryID(cat)
 		if err == nil {
-			return c.DB.GetCategoryTerms(cat, db.FlagSearchHidden)
+			t, err = c.DB.GetCategoryTerms(id, db.FlagSearchHidden)
+			return c.DB.CategoryFromID(id), t, err
 		}
 	}
-	return c.DB.GetTerms(db.FlagSearchHidden)
+	t, err = c.DB.GetTerms(db.FlagSearchHidden)
+	return nil, t, err
 }
