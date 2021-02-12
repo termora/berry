@@ -63,7 +63,7 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 		err = bot.Router.Execute(ctx)
 		if err != nil {
 			if db.IsOurProblem(err) && bot.UseSentry {
-				bot.Sentry.CaptureException(err)
+				bot.DB.CaptureError(ctx, err)
 			}
 			bot.Sugar.Error(err)
 		}

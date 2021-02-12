@@ -64,6 +64,32 @@ func (db *Db) InternalError(ctx *bcr.Context, e error) error {
 	return err
 }
 
+// CaptureError captures an error with additional context
+func (db *Db) CaptureError(ctx *bcr.Context, e error) *sentry.EventID {
+	// clone the hub
+	hub := db.sentry.Clone()
+
+	// add the user's ID
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetUser(sentry.User{ID: ctx.Author.ID.String()})
+	})
+
+	// add some more info
+	hub.AddBreadcrumb(&sentry.Breadcrumb{
+		Category: "cmd",
+		Data: map[string]interface{}{
+			"user":    ctx.Author.ID,
+			"channel": ctx.Channel.ID,
+			"guild":   ctx.Message.GuildID,
+			"command": ctx.Command,
+		},
+		Level:     sentry.LevelError,
+		Timestamp: time.Now().UTC(),
+	}, nil)
+
+	return hub.CaptureException(e)
+}
+
 func (db *Db) sentryError(ctx *bcr.Context, e error) error {
 	db.Sugar.Error(e)
 
@@ -88,10 +114,7 @@ func (db *Db) sentryError(ctx *bcr.Context, e error) error {
 		return err
 	}
 
-	id := db.sentry.CaptureException(e)
-	if id == nil {
-		return nil
-	}
+	id := db.CaptureError(ctx, e)
 
 	s := "An internal error has occurred. If this issue persists, please contact the bot developer with the error code above."
 	if db.Config != nil {
