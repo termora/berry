@@ -21,7 +21,7 @@
         <h3>Tags</h3>
         <ul>
             {{range .Tags}}
-            <li><a href="/tag/{{. | lower | urlEncode}}">{{. | title}}</a></li>
+            <li><a href="/tag/{{. | urlEncode}}">{{. | title}}</a></li>
             {{end}}
             <li><a href="/tag/untagged">Untagged terms</a></li>
         </ul>
