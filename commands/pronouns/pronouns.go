@@ -11,12 +11,12 @@ import (
 	"github.com/starshine-sys/berry/bot"
 )
 
-var templates = template.Must(template.New("").Funcs(funcs()).ParseGlob("commands/pronouns/examples/*"))
+var templates = template.Must(template.New("").Funcs(funcs()).ParseGlob("pronoun-examples/*"))
 var tmplCount int
 
 // initialise number of templates
 func init() {
-	files, err := ioutil.ReadDir("commands/pronouns/examples")
+	files, err := ioutil.ReadDir("pronoun-examples")
 	if err != nil {
 		panic(err)
 	}

@@ -2,13 +2,10 @@
 *.code-workspace
 
 # config files
-config.yaml
 config.json
-api/config.yaml
-site/config.yaml
+config.yaml
 
 # binaries
-termbot
-api/api
-site/site
-berry
+cmd/api/api
+cmd/site/site
+cmd/bot/bot
