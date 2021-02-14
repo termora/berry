@@ -12,8 +12,13 @@ import (
 )
 
 func (a *api) list(c echo.Context) (err error) {
-	// get all terms except the ones listed as "hidden"
-	terms, err := a.db.GetTerms(db.FlagListHidden)
+	flags := db.FlagListHidden
+	if c.QueryParam("flags") != "" {
+		f, _ := strconv.Atoi(c.QueryParam("flags"))
+		flags = db.TermFlag(f)
+	}
+
+	terms, err := a.db.GetTerms(flags)
 	if err != nil {
 		// if no rows were returned, return no content
 		if errors.Cause(err) == pgx.ErrNoRows {
