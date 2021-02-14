@@ -68,9 +68,9 @@ func (bot *Bot) Add(f func(*Bot) (string, []*bcr.Command)) {
 }
 
 // Report reports an exception to Sentry if that's used, and the error is "our problem"
-func (bot *Bot) Report(err error) *sentry.EventID {
+func (bot *Bot) Report(ctx *bcr.Context, err error) *sentry.EventID {
 	if db.IsOurProblem(err) && bot.UseSentry {
-		return bot.Sentry.CaptureException(err)
+		return bot.DB.CaptureError(ctx, err)
 	}
 	return nil
 }

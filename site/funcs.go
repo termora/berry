@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/microcosm-cc/bluemonday"
@@ -37,5 +38,6 @@ func funcMap() template.FuncMap {
 		"resultsNum": func(s []*db.Term) int {
 			return len(s)
 		},
+		"title": strings.Title,
 	}
 }

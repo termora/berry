@@ -9,11 +9,6 @@ import (
 	"github.com/starshine-sys/berry/db"
 )
 
-type termPageData struct {
-	Conf conf
-	Term *db.Term
-}
-
 func (s *site) term(c echo.Context) (err error) {
 	var t *db.Term
 
@@ -42,5 +37,10 @@ func (s *site) term(c echo.Context) (err error) {
 	t.Note = strings.ReplaceAll(t.Note, "(##", "(/term/")
 	t.ContentWarnings = strings.ReplaceAll(t.ContentWarnings, "(##", "(/term/")
 
-	return c.Render(http.StatusOK, "term.html", termPageData{Conf: s.conf, Term: t})
+	data := struct {
+		Conf conf
+		Term *db.Term
+	}{s.conf, t}
+
+	return c.Render(http.StatusOK, "term.html", data)
 }

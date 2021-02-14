@@ -12,7 +12,7 @@ import (
 
 func (c *Admin) editTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(3); err != nil {
-		_, err = ctx.Send("Not enough arguments. Valid subcommands are: `title`, `desc`, `source`, `aliases`, `image`.", nil)
+		_, err = ctx.Send("Not enough arguments. Valid subcommands are: `title`, `desc`, `source`, `aliases`, `image`, `tags`.", nil)
 		return
 	}
 
@@ -31,7 +31,7 @@ func (c *Admin) editTerm(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	// these should probably be actual subcommands but then we'd have to duplicate the code above 5 times
+	// these should probably be actual subcommands but then we'd have to duplicate the code above 6 times
 	switch ctx.Args[0] {
 	case "name", "title":
 		return c.editTermTitle(ctx, t)
@@ -41,6 +41,8 @@ func (c *Admin) editTerm(ctx *bcr.Context) (err error) {
 		return c.editTermSource(ctx, t)
 	case "image":
 		return c.editTermImage(ctx, t)
+	case "tags":
+		return c.editTermTags(ctx, t)
 	case "aliases":
 		return c.editTermAliases(ctx, t)
 	}
@@ -134,5 +136,21 @@ func (c *Admin) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	_, err = ctx.Send("Image updated!", nil)
+	return
+}
+
+func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
+	var tags []string
+	if ctx.Args[2] != "clear" {
+		tags = strings.Split(strings.Join(ctx.Args[2:], " "), "\n")
+	}
+
+	err = c.DB.UpdateTags(t.ID, tags)
+	if err != nil {
+		_, err = ctx.Sendf("Error updating tags: ```%v```", err)
+		return
+	}
+
+	_, err = ctx.Send("Tags updated!", nil)
 	return
 }

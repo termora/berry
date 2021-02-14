@@ -11,19 +11,12 @@
 
 <body>
     <h1><a href="/">{{.Conf.SiteName}}</a></h1>
-    <div class="search">
-        <form action="/search">
-            <input type="text" class="searchBox" id="searchBox" name="q" placeholder="Search">
-            <input type="submit" class="searchButton" value="🔍">
-        </form>
-    </div>
     <div class="terms">
-        <h3>Tags</h3>
+        <h3>List of {{.Category.Name}} terms</h3>
         <ul>
-            {{range .Tags}}
-            <li><a href="/tag/{{. | lower | urlEncode}}">{{. | title}}</a></li>
+            {{range .Terms}}
+            <li><a href="/term/{{.Name | lower | urlEncode}}">{{.Name}}</a> ({{if .Aliases}}{{.Aliases | join ", "}}{{else}}no aliases{{end}})</li>
             {{end}}
-            <li><a href="/tag/untagged">Untagged terms</a></li>
         </ul>
     </div>
     <div class="info">

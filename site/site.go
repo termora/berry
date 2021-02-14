@@ -80,6 +80,7 @@ func main() {
 
 	e.GET("/", s.index)
 	e.GET("/term/:term", s.term)
+	e.GET("/tag/:tag", s.tag)
 	e.GET("/search", s.search)
 
 	// get port

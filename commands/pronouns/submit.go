@@ -44,7 +44,7 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 		fmt.Sprintf("Successfully submitted the pronoun set **%v**.", strings.Join(p[:5], "/")),
 	).BlockMentions().Send()
 	if err != nil {
-		c.Report(err)
+		c.Report(ctx, err)
 		return err
 	}
 

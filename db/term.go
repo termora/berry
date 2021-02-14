@@ -32,6 +32,7 @@ type Term struct {
 	Source          string    `json:"source"`
 	Created         time.Time `json:"created"`
 	LastModified    time.Time `json:"last_modified"`
+	Tags            []string  `json:"tags,omitempty"`
 	ContentWarnings string    `json:"content_warnings,omitempty"`
 	ImageURL        string    `json:"image_url,omitempty"`
 

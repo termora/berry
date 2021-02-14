@@ -27,7 +27,7 @@ func (db *Db) TermCount() (count int) {
 // GetTerms gets all terms not blocked by the given mask
 func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.content_warnings, t.image_url
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0 and t.category = c.id
 	order by t.name, t.id`, mask)
@@ -37,7 +37,7 @@ func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 // GetCategoryTerms gets terms by category
 func (db *Db) GetCategoryTerms(id int, mask TermFlag) (terms []*Term, err error) {
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.content_warnings, t.image_url
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0 and t.category = $2
 	and t.category = c.id
@@ -51,7 +51,7 @@ func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 		limit = 50
 	}
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.content_warnings, t.image_url,
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url,
 	ts_rank_cd(t.searchtext, websearch_to_tsquery('english', $1), 8) as rank,
 	ts_headline(t.description, websearch_to_tsquery('english', $1), 'StartSel=**, StopSel=**') as headline
 	from public.terms as t, public.categories as c
@@ -73,7 +73,7 @@ func (db *Db) SearchCat(input string, cat, limit int, showHidden bool) (terms []
 	}
 
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.content_warnings, t.image_url,
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url,
 	ts_rank_cd(t.searchtext, websearch_to_tsquery('english', $1), 8) as rank,
 	ts_headline(t.description, websearch_to_tsquery('english', $1), 'StartSel=**, StopSel=**') as headline
 	from public.terms as t, public.categories as c
@@ -109,14 +109,14 @@ func (db *Db) RemoveTerm(id int) (err error) {
 func (db *Db) GetTerm(id int) (t *Term, err error) {
 	t = &Term{}
 	err = pgxscan.Get(context.Background(), db.Pool, t, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.image_url from public.terms as t, public.categories as c where t.id = $1 and t.category = c.id`, id)
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags, t.image_url from public.terms as t, public.categories as c where t.id = $1 and t.category = c.id`, id)
 	return t, err
 }
 
 // RandomTerm gets a random term from the database
 func (db *Db) RandomTerm() (t *Term, err error) {
 	var terms []*Term
-	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags
+	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0 and t.category = c.id
 	order by t.id`, FlagRandomHidden)
@@ -135,7 +135,7 @@ func (db *Db) RandomTerm() (t *Term, err error) {
 // RandomTermCategory gets a random term from the database from the specified category
 func (db *Db) RandomTermCategory(id int) (t *Term, err error) {
 	var terms []*Term
-	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags
+	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0 and t.category = c.id
 	and t.category = $2
@@ -257,5 +257,11 @@ func (db *Db) SetNote(id int, note string) (err error) {
 	if commandTag.RowsAffected() != 1 {
 		return ErrorNoRowsAffected
 	}
+	return
+}
+
+// UpdateTags updates the tags for a term
+func (db *Db) UpdateTags(id int, tags []string) (err error) {
+	_, err = db.Pool.Exec(context.Background(), "update public.terms set tags = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", tags, id)
 	return
 }

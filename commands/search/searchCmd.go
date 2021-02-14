@@ -95,7 +95,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	msg, err := ctx.PagedEmbed(embeds, false)
 	if err != nil {
-		c.Report(err)
+		c.Report(ctx, err)
 		return err
 	}
 

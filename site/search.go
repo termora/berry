@@ -26,11 +26,11 @@ func (s *site) search(c echo.Context) (err error) {
 		return c.Render(http.StatusNotFound, "noQuery.html", searchData{Conf: s.conf, Query: q})
 	}
 
-	return c.Render(http.StatusOK, "results.html",
-		searchData{
-			Conf:  s.conf,
-			Terms: terms,
-			Query: q,
-		},
-	)
+	data := struct {
+		Conf  conf
+		Terms []*db.Term
+		Query template.HTML
+	}{s.conf, terms, q}
+
+	return c.Render(http.StatusOK, "results.html", data)
 }

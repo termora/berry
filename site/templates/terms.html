@@ -18,28 +18,15 @@
         </form>
     </div>
     <div class="terms">
-        <h3>Tags</h3>
+        {{if (eq .Tag "untagged")}}
+        <h3>List of untagged terms</h3>
+        {{else}}
+        <h3>List of terms tagged "{{.Tag | sanitize}}"</h3>
+        {{end}}
         <ul>
-            {{range .Tags}}
-            <li><a href="/tag/{{. | lower | urlEncode}}">{{. | title}}</a></li>
+            {{range .Terms}}
+            <li><a href="/term/{{.Name | lower | urlEncode}}">{{.Name}}</a> ({{if .Aliases}}{{.Aliases | join ", "}}{{else}}no aliases{{end}})</li>
             {{end}}
-            <li><a href="/tag/untagged">Untagged terms</a></li>
-        </ul>
-    </div>
-    <div class="info">
-        <h3>Info</h3>
-        <ul>
-            <li><a href="{{.Conf.Invite}}">Invite the bot</a></li>
-            <li><a href="{{.Conf.Git}}">Source code</a></li>
-        </ul>
-        <h4>Feedback</h4>
-        <ul>
-            <li><a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSdsa4SmmJomil0cx8o7UHyNkR0tUtKTrkh_oCqAJ6nIHcry0Q/viewform?usp=sf_link">Term
-                    submissions</a></li>
-            <li><a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLScgRC2-fjZAnF3CSb_Mr2rtUPJFnCPXMcCsjxXXTioW_uve_g/viewform?usp=sf_link">Feedback
-                    and term edit/removal requests</a></li>
         </ul>
     </div>
     <div class="footer">
