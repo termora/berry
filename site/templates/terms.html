@@ -24,8 +24,12 @@
         <h3>List of terms tagged "{{.Tag | sanitize}}"</h3>
         {{end}}
         <ul>
+            {{if .Terms}}
             {{range .Terms}}
             <li><a href="/term/{{.Name | lower | urlEncode}}">{{.Name}}</a> ({{if .Aliases}}{{.Aliases | join ", "}}{{else}}no aliases{{end}})</li>
+            {{end}}
+            {{else}}
+            No terms found.
             {{end}}
         </ul>
     </div>
