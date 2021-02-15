@@ -9,22 +9,23 @@ import (
 	"time"
 
 	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/berry/commands/static/export"
 	"github.com/starshine-sys/berry/db"
 )
 
-const eVersion = 2
+const eVersion = 3
 
 type e struct {
 	Version      int               `json:"export_version"`
 	ExportDate   time.Time         `json:"export_date"`
+	Categories   []*db.Category    `json:"categories"`
 	Terms        []*db.Term        `json:"terms"`
-	Explanations []*db.Explanation `json:"explanations"`
-	Pronouns     []*db.PronounSet  `json:"pronouns"`
+	Tags         []string          `json:"tags"`
+	Explanations []*db.Explanation `json:"explanations,omitempty"`
+	Pronouns     []*db.PronounSet  `json:"pronouns,omitempty"`
 }
 
 func (c *Commands) export(ctx *bcr.Context) (err error) {
-	export := e{ExportDate: time.Now().UTC(), Version: eVersion}
-
 	var gz bool
 	if strings.Contains(ctx.RawArgs, "-gz") || strings.Contains(ctx.RawArgs, "-gzip") {
 		gz = true
@@ -37,17 +38,7 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	export.Terms, err = c.DB.GetTerms(0)
-	if err != nil {
-		return c.DB.InternalError(ctx, err)
-	}
-
-	export.Explanations, err = c.DB.GetAllExplanations()
-	if err != nil {
-		return c.DB.InternalError(ctx, err)
-	}
-
-	export.Pronouns, err = c.DB.Pronouns()
+	export, err := export.New(c.DB)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}

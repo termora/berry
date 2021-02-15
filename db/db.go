@@ -95,7 +95,9 @@ func initDBIfNotInitialised(s *zap.SugaredLogger, db *pgxpool.Pool) error {
 	if err != nil {
 		return err
 	}
-	s.Infof("Successfully initialised the database.")
+	if s != nil {
+		s.Infof("Successfully initialised the database.")
+	}
 	return nil
 }
 
@@ -112,9 +114,11 @@ func updateDB(s *zap.SugaredLogger, db *pgxpool.Pool) (err error) {
 			return err
 		}
 		dbVersion++
-		s.Infof("Updated database to version %v", dbVersion)
+		if s != nil {
+			s.Infof("Updated database to version %v", dbVersion)
+		}
 	}
-	if initialDBVersion < DBVersion {
+	if initialDBVersion < DBVersion && s != nil {
 		s.Infof("Successfully updated database to target version %v", DBVersion)
 	}
 	return nil
