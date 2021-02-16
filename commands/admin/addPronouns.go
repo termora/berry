@@ -9,27 +9,26 @@ import (
 )
 
 func (c *Admin) addPronouns(ctx *bcr.Context) (err error) {
-	p := strings.Split(ctx.RawArgs, "/")
-	if len(p) < 5 {
-		_, err = ctx.Send("Not enough forms given.", nil)
-	}
-
-	id, err := c.DB.AddPronoun(db.PronounSet{
-		Subjective: p[0],
-		Objective:  p[1],
-		PossDet:    p[2],
-		PossPro:    p[3],
-		Reflexive:  p[4],
-	})
-
-	if err != nil {
-		if err == db.ErrNoForms {
-			_, err = ctx.Send("Not enough forms given, some were empty.", nil)
-			return err
+	i := 0
+	for _, arg := range strings.Split(ctx.RawArgs, "\n") {
+		p := strings.Split(arg, "/")
+		if len(p) < 5 {
+			_, err = ctx.Sendf("Not enough forms given (argument %v)", arg)
+			break
 		}
-		return c.DB.InternalError(ctx, err)
-	}
 
-	_, err = ctx.Sendf("Added new pronoun set with ID %v.", id)
+		_, err = c.DB.AddPronoun(db.PronounSet{
+			Subjective: p[0],
+			Objective:  p[1],
+			PossDet:    p[2],
+			PossPro:    p[3],
+			Reflexive:  p[4],
+		})
+		if err != nil {
+			return c.DB.InternalError(ctx, err)
+		}
+		i++
+	}
+	_, err = ctx.Sendf("Added %v new pronoun set(s).", i)
 	return
 }
