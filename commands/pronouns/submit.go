@@ -15,7 +15,7 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 	}
 
 	if _, err = c.submitCooldown.Get(ctx.Author.ID.String()); err == nil {
-		_, err = ctx.Send("You can only submit a pronoun set every five minutes, please try again later.\nIf you're submitting a lot of pronouns at once, feel free to join the bot support server and ask there!", nil)
+		_, err = ctx.Send("You can only submit a pronoun set every ten seconds.", nil)
 		return
 	}
 
@@ -48,6 +48,6 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 		return err
 	}
 
-	c.submitCooldown.SetWithTTL(ctx.Author.ID.String(), true, 5*time.Minute)
+	c.submitCooldown.SetWithTTL(ctx.Author.ID.String(), true, 10*time.Second)
 	return
 }
