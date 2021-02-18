@@ -77,7 +77,9 @@ var DBVersions []string = []string{
         objective   text    not null default '',
         poss_det    text    not null default '',
         poss_pro    text    not null default '',
-        reflexive   text    not null default ''
+        reflexive   text    not null default '',
+
+        unique (subjective, objective, poss_det, poss_pro, reflexive)
     );
     
     update public.info set schema_version = 13;`,

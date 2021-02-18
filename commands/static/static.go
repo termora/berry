@@ -110,7 +110,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.commandList,
+		Command:       bot.CommandList,
 	})
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{

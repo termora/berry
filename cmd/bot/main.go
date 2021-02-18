@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -11,9 +10,9 @@ import (
 	"github.com/getsentry/sentry-go"
 	"go.uber.org/zap"
 
-	"github.com/diamondburned/arikawa/v2/state"
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
+	bcrbot "github.com/starshine-sys/bcr/bot"
 	"github.com/starshine-sys/berry/bot"
 	"github.com/starshine-sys/berry/commands/admin"
 	"github.com/starshine-sys/berry/commands/pronouns"
@@ -69,29 +68,24 @@ func main() {
 	sugar.Info("Connected to database.")
 
 	// create a new state
-	s, err := state.NewWithIntents("Bot "+c.Auth.Token, bcr.RequiredIntents)
+	r, err := bcr.NewWithState(c.Auth.Token, c.Bot.BotOwners, c.Bot.Prefixes)
 	if err != nil {
-		log.Fatalln("Error creating state:", err)
+		sugar.Fatalf("Error creating router: %v", err)
 	}
 
 	// if the bot is sharded, set the number and count
 	if c.Sharded {
-		s.Gateway.Identifier.SetShard(c.Shard, c.NumShards)
+		r.Session.Gateway.Identifier.SetShard(c.Shard, c.NumShards)
 	}
 
-	// create a new router and set the default embed colour
-	owners := make([]string, 0)
-	for _, u := range c.Bot.BotOwners {
-		owners = append(owners, u.String())
-	}
-	r := bcr.NewRouter(s, owners, c.Bot.Prefixes)
+	// set the default embed colour and blacklist function
 	r.EmbedColor = db.EmbedColour
-
-	// set blacklist function
 	r.BlacklistFunc = d.CtxInBlacklist
 
 	// create the bot instance
-	bot := bot.New(sugar, c, r, d, hub)
+	bot := bot.New(
+		bcrbot.NewWithRouter(r),
+		sugar, c, d, hub)
 	// add search commands
 	bot.Add(search.Init)
 	// add pronoun commands
@@ -104,13 +98,13 @@ func main() {
 	bot.Add(admin.Init)
 
 	// open a connection to Discord
-	if err = s.Open(); err != nil {
+	if err = r.Session.Open(); err != nil {
 		sugar.Fatal("Failed to connect:", err)
 	}
 
 	// Defer this to make sure that things are always cleanly shutdown even in the event of a crash
 	defer func() {
-		s.Close()
+		r.Session.Close()
 		sugar.Infof("Disconnected from Discord.")
 		d.Pool.Close()
 		sugar.Infof("Closed database connection.")
@@ -118,7 +112,7 @@ func main() {
 
 	sugar.Info("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
 
-	botUser, _ := s.Me()
+	botUser, _ := r.Session.Me()
 	sugar.Infof("User: %v#%v (%v)", botUser.Username, botUser.Discriminator, botUser.ID)
 
 	sc := make(chan os.Signal, 1)

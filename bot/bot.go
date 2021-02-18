@@ -7,6 +7,7 @@ import (
 	"github.com/diamondburned/arikawa/v2/utils/handler"
 	"github.com/getsentry/sentry-go"
 	"github.com/starshine-sys/bcr"
+	bcrbot "github.com/starshine-sys/bcr/bot"
 	"github.com/starshine-sys/berry/db"
 	"github.com/starshine-sys/berry/structs"
 	"go.uber.org/zap"
@@ -14,12 +15,11 @@ import (
 
 // Bot is the main bot struct
 type Bot struct {
+	*bcrbot.Bot
+
 	Sugar  *zap.SugaredLogger
 	Config *structs.BotConfig
-	Router *bcr.Router
 	DB     *db.Db
-
-	Modules []Module
 
 	Sentry    *sentry.Hub
 	UseSentry bool
@@ -32,11 +32,15 @@ type Module interface {
 }
 
 // New creates a new instance of Bot
-func New(s *zap.SugaredLogger, config *structs.BotConfig, r *bcr.Router, db *db.Db, hub *sentry.Hub) *Bot {
+func New(
+	bot *bcrbot.Bot,
+	s *zap.SugaredLogger,
+	config *structs.BotConfig,
+	db *db.Db, hub *sentry.Hub) *Bot {
 	b := &Bot{
+		Bot:       bot,
 		Sugar:     s,
 		Config:    config,
-		Router:    r,
 		DB:        db,
 		Sentry:    hub,
 		UseSentry: hub != nil,
