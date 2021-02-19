@@ -14,8 +14,7 @@ import (
 
 func (c *commands) use(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("You didn't give a pronoun set to use.", nil)
-		return
+		return c.list(ctx)
 	}
 
 	sets, err := c.DB.GetPronoun(strings.Split(ctx.Args[0], "/")...)

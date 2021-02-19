@@ -20,7 +20,7 @@ func (bot *Bot) GuildCreate(g *gateway.GuildCreateEvent) {
 		return
 	}
 
-	bot.Sugar.Infof("Joined guild %v (%v, owned by %v).", g.Name, g.ID, g.OwnerID)
+	bot.Sugar.Infof("Joined server %v (%v).", g.Name, g.ID)
 
 	// if there's no channel to log joins/leaves to, return
 	if bot.Config.Bot.JoinLogChannel == 0 {
@@ -28,7 +28,7 @@ func (bot *Bot) GuildCreate(g *gateway.GuildCreateEvent) {
 	}
 
 	_, err = bot.Router.Session.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
-		Content:         fmt.Sprintf("<a:ablobjoin:803960435983515648> Joined guild **%v** (%v, owned by <@%v>/%v)", g.Name, g.ID, g.OwnerID, g.OwnerID),
+		Content:         fmt.Sprintf("Joined new server **%v** (%v)", g.Name, g.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
 	if err != nil {
@@ -58,7 +58,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 	}
 
 	// otherwise, use the cached guild
-	bot.Sugar.Infof("Left guild %v (%v, owned by %v).", guild.Name, guild.ID, guild.OwnerID)
+	bot.Sugar.Infof("Left server %v (%v)", guild.Name, guild.ID)
 
 	// if there's no channel to log joins/leaves to, return
 	if bot.Config.Bot.JoinLogChannel == 0 {
@@ -66,7 +66,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 	}
 
 	_, err = bot.Router.Session.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
-		Content:         fmt.Sprintf("<a:ablobleave:803960446251171901> Left guild **%v** (%v, owned by <@%v>/%v)", guild.Name, guild.ID, guild.OwnerID, guild.OwnerID),
+		Content:         fmt.Sprintf("Left server **%v** (%v) :(", guild.Name, guild.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
 	if err != nil {
@@ -78,7 +78,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 // this is run if the left guild isn't found in the state
 // which gives us almost no info, only the ID
 func (bot *Bot) guildDeleteNoState(g *gateway.GuildDeleteEvent) {
-	bot.Sugar.Infof("Left guild %v.", g.ID)
+	bot.Sugar.Infof("Left server %v.", g.ID)
 
 	// if there's no channel to log joins/leaves to, return
 	if bot.Config.Bot.JoinLogChannel == 0 {
@@ -86,7 +86,7 @@ func (bot *Bot) guildDeleteNoState(g *gateway.GuildDeleteEvent) {
 	}
 
 	_, err := bot.Router.Session.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
-		Content:         fmt.Sprintf("<a:ablobleave:803960446251171901> Left guild **%v**", g.ID),
+		Content:         fmt.Sprintf("Left server **%v** :(", g.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
 	if err != nil {

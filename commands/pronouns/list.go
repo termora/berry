@@ -22,7 +22,7 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 	)
 
 	for _, p := range p {
-		if count >= 10 {
+		if count >= 15 {
 			s = append(s, b.String())
 			b.Reset()
 			count = 0
