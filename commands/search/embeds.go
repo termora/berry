@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/diamondburned/arikawa/v2/discord"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 var emoji = []string{"1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"}

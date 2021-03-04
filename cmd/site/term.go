@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 func (s *site) term(c echo.Context) (err error) {

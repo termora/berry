@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/starshine-sys/berry/structs"
+	"github.com/termora/berry/structs"
 	"go.uber.org/zap"
 )
 

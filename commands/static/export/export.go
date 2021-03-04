@@ -3,7 +3,7 @@ package export
 import (
 	"time"
 
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 // ExportVersion is the current version

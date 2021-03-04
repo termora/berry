@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 type searchData struct {

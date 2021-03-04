@@ -6,7 +6,7 @@ import (
 	"github.com/diamondburned/arikawa/v2/discord"
 	flag "github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 func (c *commands) search(ctx *bcr.Context) (err error) {

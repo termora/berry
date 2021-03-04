@@ -270,8 +270,6 @@ github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnIn
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
 github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/spf13/viper v1.3.2/go.mod h1:ZiWeW+zYFKm7srdB9IoDzzZXaJaI5eL9QjNiN/DMA2s=
-github.com/starshine-sys/bcr v0.10.0 h1:UY1YThW5MM1w7P2ddDYAhpAJtT+tO1wKu1j6XQNVFMw=
-github.com/starshine-sys/bcr v0.10.0/go.mod h1:SHnB28f2d4X9qUNAO4O33TH/YO0Mht4R+fxOQDp2NGk=
 github.com/starshine-sys/bcr v0.10.1-0.20210219213708-76488a1a893b h1:qxIRymRtPvtFIj7xNb5QkA+04QAEC6v4hIyKQCScbOg=
 github.com/starshine-sys/bcr v0.10.1-0.20210219213708-76488a1a893b/go.mod h1:SHnB28f2d4X9qUNAO4O33TH/YO0Mht4R+fxOQDp2NGk=
 github.com/starshine-sys/pkgo v0.2.1 h1:v4SPsAVK+ZObmYlDogDjC7zkXcco76WD5Mqd0ui71QY=

@@ -8,7 +8,7 @@ import (
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday/v2"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 func funcMap() template.FuncMap {

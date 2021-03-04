@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/commands/static/export"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/commands/static/export"
+	"github.com/termora/berry/db"
 )
 
 const eVersion = 3

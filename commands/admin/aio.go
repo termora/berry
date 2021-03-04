@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 func (c *Admin) aio(ctx *bcr.Context) (err error) {

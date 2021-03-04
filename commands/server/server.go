@@ -3,8 +3,8 @@ package server
 import (
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/bot"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/bot"
+	"github.com/termora/berry/db"
 )
 
 type commands struct {

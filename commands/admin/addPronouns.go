@@ -3,7 +3,7 @@ package admin
 import (
 	"strings"
 
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 
 	"github.com/starshine-sys/bcr"
 )

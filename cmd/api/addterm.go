@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 
 	"github.com/labstack/echo/v4"
 )

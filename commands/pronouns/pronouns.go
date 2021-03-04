@@ -8,7 +8,7 @@ import (
 
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/bot"
+	"github.com/termora/berry/bot"
 )
 
 var templates = template.Must(template.New("").Funcs(funcs()).ParseGlob("pronoun-examples/*"))

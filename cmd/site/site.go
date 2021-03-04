@@ -13,7 +13,7 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )

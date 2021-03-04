@@ -3,7 +3,7 @@ package structs
 import "github.com/diamondburned/arikawa/v2/discord"
 
 // FallbackGitURL if there's no git url set in the config file fall back to this
-const FallbackGitURL = "https://github.com/starshine-sys/berry"
+const FallbackGitURL = "https://github.com/termora/berry"
 
 // BotConfig ...
 type BotConfig struct {

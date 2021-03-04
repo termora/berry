@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 func (c *commands) use(ctx *bcr.Context) (err error) {

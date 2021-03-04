@@ -9,3 +9,7 @@ config.yaml
 cmd/api/api
 cmd/site/site
 cmd/bot/bot
+cmd/export/export
+
+# misc untracked files
+VERIFICATION.md

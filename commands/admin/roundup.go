@@ -7,7 +7,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 func (c *Admin) changelog(ctx *bcr.Context) (err error) {

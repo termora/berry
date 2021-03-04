@@ -9,7 +9,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 // uh this isn't semver, this is just. increment the number when we feel like it i guess

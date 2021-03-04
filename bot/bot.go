@@ -8,8 +8,8 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/starshine-sys/bcr"
 	bcrbot "github.com/starshine-sys/bcr/bot"
-	"github.com/starshine-sys/berry/db"
-	"github.com/starshine-sys/berry/structs"
+	"github.com/termora/berry/db"
+	"github.com/termora/berry/structs"
 	"go.uber.org/zap"
 )
 

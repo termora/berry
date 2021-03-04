@@ -3,5 +3,5 @@ port: "1300"
 
 site_name: Termora
 invite_url: https://termora.org/invite
-git: https://github.com/starshine-sys/berry
+git: https://github.com/termora/berry
 contact: true

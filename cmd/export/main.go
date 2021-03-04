@@ -6,8 +6,8 @@ import (
 	"os"
 
 	flag "github.com/spf13/pflag"
-	"github.com/starshine-sys/berry/commands/static/export"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/commands/static/export"
+	"github.com/termora/berry/db"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/starshine-sys/berry
+module github.com/termora/berry
 
 go 1.15
 

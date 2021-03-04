@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/bot"
+	"github.com/termora/berry/bot"
 )
 
 // Commands ...

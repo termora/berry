@@ -5,7 +5,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 // MessageCreate is run when a message is created and handles commands

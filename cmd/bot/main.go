@@ -13,13 +13,13 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	bcrbot "github.com/starshine-sys/bcr/bot"
-	"github.com/starshine-sys/berry/bot"
-	"github.com/starshine-sys/berry/commands/admin"
-	"github.com/starshine-sys/berry/commands/pronouns"
-	"github.com/starshine-sys/berry/commands/search"
-	"github.com/starshine-sys/berry/commands/server"
-	"github.com/starshine-sys/berry/commands/static"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/bot"
+	"github.com/termora/berry/commands/admin"
+	"github.com/termora/berry/commands/pronouns"
+	"github.com/termora/berry/commands/search"
+	"github.com/termora/berry/commands/server"
+	"github.com/termora/berry/commands/static"
+	"github.com/termora/berry/db"
 )
 
 func main() {

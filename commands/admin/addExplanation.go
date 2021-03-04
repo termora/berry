@@ -7,7 +7,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v2/bot/extras/shellwords"
 	"github.com/starshine-sys/bcr"
-	"github.com/starshine-sys/berry/db"
+	"github.com/termora/berry/db"
 )
 
 func (c *Admin) addExplanation(ctx *bcr.Context) (err error) {
