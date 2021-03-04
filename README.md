@@ -5,7 +5,7 @@ Berry is a searchable glossary bot for Discord.
 ## Requirements
 
 - PostgreSQL (only 12.5 tested)
-- Go (only 1.15 tested)
+- Go (only 1.16 tested)
 - For the site and API: a reverse proxy (such as Caddy or nginx)
 
 ## Running
@@ -14,7 +14,7 @@ This is still very much a WIP. Although we've done our best to not hardcode name
 
 ### Bot
 
-1. `go build` in the root directory
+1. `go build` in the cmd/bot directory
 2. Copy `config.sample.json` to `config.json` and fill it in
 3. Run the executable
 
@@ -22,19 +22,19 @@ This is still very much a WIP. Although we've done our best to not hardcode name
 
 ### API
 
-1. `go build` in the api/ directory
-2. Copy `config.sample.yaml` to `confi.yaml` and fill it in
+1. `go build` in the cmd/bot directory
+2. Copy `config.sample.yaml` to `config.yaml` and fill it in
 3. Run the executable
 
 ### Site
 
-1. `go build` in the site/ directory
-2. Copy `config.sample.yaml` to `confi.yaml` and fill it in
+1. `go build` in the cmd/bot directory
+2. Copy `config.sample.yaml` to `config.yaml` and fill it in
 3. Run the executable
 
 ## License
 
-Copyright (C) 2020, Starshine System
+Copyright (C) 2021, Starshine System
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
