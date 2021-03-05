@@ -30,12 +30,17 @@ func (c *Commands) privacy(ctx *bcr.Context) (err error) {
 		Title: "Privacy",
 		Description: fmt.Sprintf(`We're not lawyers, we don't want to write a document that no one will (or even can) read.
 
+By continuing to use %v's commands, you consent to us processing the data listed below in a manner compliant with the GDPR.
+
 This is the data %v collects:
 
 - A list of blacklisted channels per server
+
+This is the data %v collects, and which is deleted after 30 days:
+
 - Information about internal errors: command, user ID, and channel ID
 
-This is the data %v stores in memory, and which is wiped on a bot restart:
+This is the data %v stores in memory for as long as it's needed (up to 15 minutes), and which is always wiped on a bot restart:
 
 - Message metadata *for its own messages*
 - Message metadata for messages that trigger commands
@@ -48,9 +53,9 @@ This is the data %v does *not* collect:
 
 Additionally, there are daily database backups, which only include a list of blacklisted channels (as well as all terms/explanations).
 
-To delete server information from the database, simply have the bot leave the server, through kicking or banning it. Do note that this does *not* delete server information from database backups, only the live database (and any later backups).
+To delete server information from the database, simply have the bot leave the server, through kicking or banning it. Do note that this does *not* delete server information from database backups, only the live database (and any later backups). Contact us (on the support server, or [here](%vcontact)) if you want that deleted too, or have any other requests regarding your data. We'll comply with these within 30 days.
 
-%v is open source, and its source code is available [on GitHub](%v). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, c.Config.Bot.Git),
+%v is open source, and its source code is available [on GitHub](%v). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, ctx.Bot.Username, c.Config.Bot.Website, ctx.Bot.Username, c.Config.Bot.Git),
 		Color: db.EmbedColour,
 	})
 	return err
