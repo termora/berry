@@ -22,7 +22,8 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	err = fs.Parse(ctx.Args)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		_, err = ctx.Sendf("You didn't give a valid input for this command. Usage:\n> ``%v%v %v``", ctx.Router.Prefixes[0], ctx.Command, ctx.Cmd.Usage)
+		return
 	}
 	ctx.Args = fs.Args()
 
