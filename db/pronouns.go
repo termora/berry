@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"math/rand"
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4"
@@ -67,6 +68,22 @@ func (db *Db) GetPronoun(forms ...string) (sets []*PronounSet, err error) {
 		return nil, pgx.ErrNoRows
 	}
 	return sets, nil
+}
+
+// RandomPronouns gets a random pronoun set from the database
+func (db *Db) RandomPronouns() (p *PronounSet, err error) {
+	var pronouns []*PronounSet
+	err = pgxscan.Select(context.Background(), db.Pool, &pronouns, `select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns order by id`)
+	if err != nil {
+		return
+	}
+
+	if len(pronouns) == 1 {
+		return pronouns[0], nil
+	}
+
+	n := rand.Intn(len(pronouns) - 1)
+	return pronouns[n], nil
 }
 
 // AddPronoun adds a pronoun set, returning the ID

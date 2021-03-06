@@ -58,6 +58,15 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Command:       c.submit,
 	}))
 
+	list = append(list, bot.Router.AddCommand(&bcr.Command{
+		Name:    "random-pronouns",
+		Summary: "Show a random pronoun set",
+
+		Blacklistable: true,
+		Cooldown:      time.Second,
+		Command:       c.random,
+	}))
+
 	pronouns := bot.Router.AddCommand(&bcr.Command{
 		Name:    "pronouns",
 		Aliases: []string{"pronoun", "neopronoun", "neopronouns"},
@@ -72,6 +81,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 	pronouns.AddSubcommand(bot.Router.AliasMust("list", nil, []string{"list-pronouns"}, nil))
 	pronouns.AddSubcommand(bot.Router.AliasMust("submit", nil, []string{"submit-pronouns"}, nil))
+	pronouns.AddSubcommand(bot.Router.AliasMust("random", []string{"r"}, []string{"random-pronouns"}, nil))
 
 	return "Pronoun commands", append(list, pronouns)
 }
