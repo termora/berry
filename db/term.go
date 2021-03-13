@@ -110,6 +110,25 @@ func (t *Term) TermEmbed(baseURL string) *discord.Embed {
 		Value: t.Source,
 	})
 
+	if len(t.Tags) > 0 {
+		var b strings.Builder
+		for i, tag := range t.Tags {
+			if b.Len() >= 500 {
+				b.WriteString(fmt.Sprintf("\nToo many to list (showing %v/%v)", i, len(t.Tags)))
+				break
+			}
+			b.WriteString(tag)
+			if i != len(t.Tags)-1 {
+				b.WriteString(", ")
+			}
+		}
+
+		fields = append(fields, discord.EmbedField{
+			Name:  "Tag(s)",
+			Value: b.String(),
+		})
+	}
+
 	var u string
 	if baseURL != "" {
 		u = baseURL + url.PathEscape(strings.ToLower(t.Name))

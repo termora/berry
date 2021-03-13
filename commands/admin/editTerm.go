@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -142,8 +143,9 @@ func (c *Admin) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
 func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 	var tags []string
 	if ctx.Args[2] != "clear" {
-		tags = strings.Split(strings.Join(ctx.Args[2:], " "), "\n")
+		tags = ctx.Args[2:]
 	}
+	fmt.Println(tags)
 
 	err = c.DB.UpdateTags(t.ID, tags)
 	if err != nil {

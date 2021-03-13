@@ -12,9 +12,9 @@ import (
 func (c *commands) blacklist(ctx *bcr.Context) (err error) {
 	b, err := c.db.GetBlacklist(ctx.Message.GuildID.String())
 	if err != nil {
-		_, err = ctx.Sendf(":x: Internal error occurred: %v", err)
-		return err
+		return c.db.InternalError(ctx, err)
 	}
+
 	var x string
 	// append all channel IDs (as mentions) to x
 	for _, c := range b {
