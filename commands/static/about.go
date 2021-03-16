@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/dustin/go-humanize"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -28,6 +29,9 @@ func init() {
 }
 
 func (c *Commands) about(ctx *bcr.Context) (err error) {
+	stats := runtime.MemStats{}
+	runtime.ReadMemStats(&stats)
+
 	embed := &discord.Embed{
 		Title: "About",
 		Color: db.EmbedColour,
@@ -57,12 +61,21 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			{
 				Name: "Uptime",
 				Value: fmt.Sprintf(
-					"%v\n(Since %v)\n\n**Terms:** %v\n",
+					"%v\n(Since %v)",
 					prettyDurationString(time.Since(c.start)),
 					c.start.Format("Jan _2 2006, 15:04:05 MST"),
-					c.DB.TermCount(),
 				),
 				Inline: false,
+			},
+			{
+				Name:   "Memory used",
+				Value:  fmt.Sprintf("%v / %v (%v garbage collected)", humanize.Bytes(stats.Alloc), humanize.Bytes(stats.Sys), humanize.Bytes(stats.TotalAlloc)),
+				Inline: false,
+			},
+			{
+				Name:   "Terms",
+				Value:  fmt.Sprint(c.DB.TermCount()),
+				Inline: true,
 			},
 			{
 				Name:   "Credits",

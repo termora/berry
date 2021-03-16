@@ -8,6 +8,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
 	github.com/diamondburned/arikawa/v2 v2.0.0
+	github.com/dustin/go-humanize v1.0.0
 	github.com/georgysavva/scany v0.2.7
 	github.com/getsentry/sentry-go v0.9.0
 	github.com/google/uuid v1.1.5
