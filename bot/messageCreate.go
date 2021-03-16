@@ -5,6 +5,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
+	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
 
@@ -53,7 +54,7 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 
 	// get context
 	ctx, err := bot.Router.NewContext(m)
-	if err != nil {
+	if err != nil && err != bcr.ErrEmptyMessage {
 		bot.Sugar.Error("Error creating context:", err)
 		return
 	}
