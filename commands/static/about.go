@@ -69,7 +69,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name:   "Memory used",
-				Value:  fmt.Sprintf("%v / %v (%v garbage collected)", humanize.Bytes(stats.Alloc), humanize.Bytes(stats.Sys), humanize.Bytes(stats.TotalAlloc)),
+				Value:  fmt.Sprintf("%v / %v (%v garbage collected)\n%v goroutines", humanize.Bytes(stats.Alloc), humanize.Bytes(stats.Sys), humanize.Bytes(stats.TotalAlloc), runtime.NumGoroutine()),
 				Inline: false,
 			},
 			{
