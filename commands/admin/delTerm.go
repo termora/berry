@@ -28,21 +28,21 @@ func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 	}
 
 	// confirm deleting the term
-	ctx.AddYesNoHandler(*m, ctx.Author.ID, func(ctx *bcr.Context) {
-		err = c.DB.RemoveTerm(id)
-		if err != nil {
-			c.Sugar.Error("Error removing term:", err)
-			c.DB.InternalError(ctx, err)
-			return
-		}
-		_, err = ctx.Send("✅ Term deleted.", nil)
-		if err != nil {
-			c.Sugar.Error("Error sending message:", err)
-		}
-	}, func(ctx *bcr.Context) {
+	if yes, timeout := ctx.YesNoHandler(*m, ctx.Author.ID); !yes || timeout {
 		ctx.Send("Cancelled.", nil)
 		return
-	})
+	}
+
+	err = c.DB.RemoveTerm(id)
+	if err != nil {
+		c.Sugar.Error("Error removing term:", err)
+		c.DB.InternalError(ctx, err)
+		return
+	}
+	_, err = ctx.Send("✅ Term deleted.", nil)
+	if err != nil {
+		c.Sugar.Error("Error sending message:", err)
+	}
 
 	return nil
 }

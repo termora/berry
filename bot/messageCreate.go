@@ -52,14 +52,14 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	}
 
 	// get context
-	ctx, err := bot.Router.NewContext(m.Message)
+	ctx, err := bot.Router.NewContext(m)
 	if err != nil {
 		bot.Sugar.Error("Error creating context:", err)
 		return
 	}
 
 	// check if the message might be a command
-	if bot.Router.MatchPrefix(m.Content) {
+	if bot.Router.MatchPrefix(m.Message) {
 		err = bot.Router.Execute(ctx)
 		if err != nil {
 			if db.IsOurProblem(err) && bot.UseSentry {

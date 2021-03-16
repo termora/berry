@@ -92,16 +92,15 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 						return
 					}
 
-					ctx.AddYesNoHandler(*msg, ctx.Author.ID, func(ctx *bcr.Context) {
-						t, err := c.DB.AddTerm(t)
-						if err != nil {
-							c.DB.InternalError(ctx, err)
-							return
-						}
-						ctx.Sendf("Added term with ID %v.", t.ID)
-					}, func(ctx *bcr.Context) {
+					if yes, timeout := ctx.YesNoHandler(*msg, ctx.Author.ID); !yes || timeout {
 						ctx.Send("Cancelled.", nil)
-					})
+						return
+					}
+					t, err = c.DB.AddTerm(t)
+					if err != nil {
+						c.DB.InternalError(ctx, err)
+						return
+					}
 				})
 			})
 		})

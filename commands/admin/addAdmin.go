@@ -23,38 +23,23 @@ func (c *Admin) addAdmin(ctx *bcr.Context) (err error) {
 	msg, err := ctx.Sendf("Are you sure you want to add %v as a bot admin?", u.Mention())
 
 	// add a yes/no reaction handler
-	ctx.AddYesNoHandler(*msg, ctx.Author.ID, func(ctx *bcr.Context) {
-		// add the admin
-		err := c.DB.AddAdmin(u.ID.String())
-
-		if err != nil {
-			c.Sugar.Errorf("Error adding admin %v: %v", u.ID.String(), err)
-			_, err = ctx.Send("Error adding admin.", nil)
-			if err != nil {
-				c.Sugar.Errorf("Error sending message: %v", err)
-			}
-			return
-		}
-
-		_, err = ctx.Sendf("Added %v as a bot admin.", u.Mention())
-		if err != nil {
-			c.Sugar.Error("Error sending message:", err)
-			return
-		}
-
-		// refresh the list of admins
-		c.admins, err = c.DB.GetAdmins()
-		if err != nil {
-			c.Sugar.Error("Error refreshing list of admins:", err)
-		}
-		return
-	}, func(ctx *bcr.Context) {
-		// otherwise cancel
+	if yes, timeout := ctx.YesNoHandler(*msg, ctx.Author.ID); !yes || timeout {
 		_, err = ctx.Send("Cancelled.", nil)
-		if err != nil {
-			c.Sugar.Errorf("Error sending message: %v", err)
-		}
 		return
-	})
-	return err
+	}
+
+	err = c.DB.AddAdmin(u.ID.String())
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+
+	_, err = ctx.Sendf("Added %v as a bot admin.", u.Mention())
+
+	// refresh the list of admins
+	c.admins, err = c.DB.GetAdmins()
+	if err != nil {
+		c.Sugar.Error("Error refreshing list of admins:", err)
+	}
+	return
+
 }

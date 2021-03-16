@@ -5,7 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/db"
 )
 
 func (c *commands) submit(ctx *bcr.Context) (err error) {
@@ -30,12 +32,20 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 	}
 
 	_, err = ctx.NewMessage().Channel(c.Config.Bot.Support.PronounChannel).
-		Content(
-			fmt.Sprintf(
-				"%v#%v (<@%v>, %v) submitted a new pronoun set: **%v**.",
-				ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID,
-				ctx.Author.ID, strings.Join(p[:5], "/"),
-			)).BlockMentions().Send()
+		Embed(&discord.Embed{
+			Author: &discord.EmbedAuthor{
+				Name: fmt.Sprintf("%v#%v (%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
+				Icon: ctx.Author.AvatarURL(),
+			},
+			Color:       db.EmbedColour,
+			Title:       "Pronoun submission",
+			Description: strings.Join(p[:5], "/"),
+			Fields: []discord.EmbedField{{
+				Name:  "Submitted by",
+				Value: ctx.Author.Mention(),
+			}},
+			Timestamp: discord.NowTimestamp(),
+		}).Send()
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}

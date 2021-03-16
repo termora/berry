@@ -9,7 +9,7 @@ import (
 func (bot *Bot) UpdateStatus(name string, s gateway.Status) (err error) {
 	return bot.Router.Session.Gateway.UpdateStatus(gateway.UpdateStatusData{
 		Status: s,
-		Activities: &[]discord.Activity{{
+		Activities: []discord.Activity{{
 			Name: name,
 		}},
 	})
