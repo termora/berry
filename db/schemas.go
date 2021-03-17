@@ -1,7 +1,7 @@
 package db
 
 // DBVersion is the current database version
-const DBVersion = 14
+const DBVersion = 15
 
 // DBVersions is a slice of schemas for every database version
 var DBVersions []string = []string{
@@ -87,6 +87,14 @@ var DBVersions []string = []string{
 	`alter table public.terms add column tags text[] not null default array[]::text[];
     
     update public.info set schema_version = 14;`,
+
+	`create index subjective_idx on public.pronouns (lower(subjective));
+    create index objective_idx on public.pronouns (lower(subjective), lower(objective));
+    create index poss_det_idx on public.pronouns (lower(subjective), lower(objective), lower(poss_det));
+    create index poss_pro_idx on public.pronouns (lower(subjective), lower(objective), lower(poss_det), lower(poss_pro));
+    create index reflexive_idx on public.pronouns (lower(subjective), lower(objective), lower(poss_det), lower(poss_pro), lower(reflexive));
+    
+    update public.info set schema_version = 15;`,
 }
 
 // initDBSql is the initial SQL database schema

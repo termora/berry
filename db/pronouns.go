@@ -37,27 +37,27 @@ func (db *Db) GetPronoun(forms ...string) (sets []*PronounSet, err error) {
 	case 0:
 		return nil, ErrNoForms
 	case 1:
-		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 order by id", forms[0])
+		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) order by id", forms[0])
 		if err != nil {
 			return
 		}
 	case 2:
-		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 order by id", forms[0], forms[1])
+		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) order by id", forms[0], forms[1])
 		if err != nil {
 			return
 		}
 	case 3:
-		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 and poss_det = $3 order by id", forms[0], forms[1], forms[2])
+		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) and lower(poss_det) = lower($3) order by id", forms[0], forms[1], forms[2])
 		if err != nil {
 			return
 		}
 	case 4:
-		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 order by id", forms[0], forms[1], forms[2], forms[3])
+		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) and lower(poss_det) = lower($3) and lower(poss_pro) = lower($4) order by id", forms[0], forms[1], forms[2], forms[3])
 		if err != nil {
 			return
 		}
 	case 5:
-		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 and reflexive = $5 order by id", forms[0], forms[1], forms[2], forms[3], forms[4])
+		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) and lower(poss_det) = lower($3) and lower(poss_pro) = lower($4) and lower(reflexive) = lower($5) order by id", forms[0], forms[1], forms[2], forms[3], forms[4])
 		if err != nil {
 			return
 		}
