@@ -2,7 +2,6 @@ package bot
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/diamondburned/arikawa/v2/discord"
@@ -11,7 +10,6 @@ import (
 // Prefixer ...
 func (bot *Bot) Prefixer(m discord.Message) (n int) {
 	prefixes := append(bot.Router.Prefixes, bot.PrefixesFor(m.GuildID)...)
-	fmt.Println(prefixes)
 	for _, p := range prefixes {
 		if strings.HasPrefix(strings.ToLower(m.Content), p) {
 			return len(p)
