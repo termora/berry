@@ -14,7 +14,7 @@ import (
 )
 
 // uh this isn't semver, this is just. increment the number when we feel like it i guess
-const botVersion = "v5"
+const botVersion = "v6"
 
 var gitVer string
 
