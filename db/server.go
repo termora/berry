@@ -9,7 +9,7 @@ func (db *Db) CreateServerIfNotExists(guildID string) (exists bool, err error) {
 		return exists, err
 	}
 	if !exists {
-		commandTag, err := db.Pool.Exec(context.Background(), "insert into public.servers (id) values ($1)", guildID)
+		commandTag, err := db.Pool.Exec(context.Background(), "insert into public.servers (id, prefixes) values ($1, $2)", guildID, db.Config.Bot.Prefixes)
 		if err != nil {
 			return exists, err
 		}
