@@ -79,7 +79,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name:   "Credits",
-				Value:  fmt.Sprintf("Check `%vcredits`!", ctx.Router.Prefixes[0]),
+				Value:  fmt.Sprintf("Check `%vcredits`!", ctx.Prefix),
 				Inline: true,
 			},
 			{

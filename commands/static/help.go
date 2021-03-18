@@ -19,7 +19,7 @@ func (c *Commands) perms(ctx *bcr.Context) (err error) {
 - **Embed Links**: to send responses for most commands
 - **Attach Files**: to send a glossary export
 - **Add Reactions**: for menus to work
-- **Use External Emojis**: to use custom emotes in a couple of commands`, ctx.Bot.Username, ctx.Router.Prefixes[0]),
+- **Use External Emojis**: to use custom emotes in a couple of commands`, ctx.Bot.Username, c.Config.Bot.Prefixes[0]),
 		Color: db.EmbedColour,
 	})
 	return
@@ -64,7 +64,7 @@ To delete server information from the database, simply have the bot leave the se
 func (c *Commands) autopost(ctx *bcr.Context) (err error) {
 	_, err = ctx.Send("", &discord.Embed{
 		Title:       "Autopost",
-		Description: fmt.Sprintf("To automatically post terms at a set interval, you can use the following custom command for [YAGPDB.xyz](https://yagpdb.xyz/):\n```{{/* Recommended trigger: Minute/Hourly interval */}}\n\n%vrandom\n{{deleteResponse 1}}```\nOther bots may have similar functionality; if you need a bot whitelisted for commands, feel free to ask on the support server.", ctx.Router.Prefixes[0]),
+		Description: fmt.Sprintf("To automatically post terms at a set interval, you can use the following custom command for [YAGPDB.xyz](https://yagpdb.xyz/):\n```{{/* Recommended trigger: Minute/Hourly interval */}}\n\n%vrandom\n{{deleteResponse 1}}```\nOther bots may have similar functionality; if you need a bot whitelisted for commands, feel free to ask on the support server.", ctx.Prefix),
 		Color:       db.EmbedColour,
 	})
 	return
@@ -110,7 +110,7 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 			},
 		},
 		Footer: &discord.EmbedFooter{
-			Text: fmt.Sprintf("Use %vhelp <command> for more information on a specific command.", ctx.Router.Prefixes[0]),
+			Text: "Use `help <command>` for more information on a specific command.",
 		},
 	}
 	if c.Config.Bot.Support.Invite != "" {
@@ -130,6 +130,6 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 }
 
 func (c *Commands) cmdInvite(ctx *bcr.Context) (err error) {
-	_, err = ctx.Sendf("Use this link to invite me to your server: <%v>\n\nYou can use the `%vhelp permissions` command to get a detailed explanation of all permissions required.", invite(ctx), ctx.Router.Prefixes[0])
+	_, err = ctx.Sendf("Use this link to invite me to your server: <%v>\n\nYou can use the `%vhelp permissions` command to get a detailed explanation of all permissions required.", invite(ctx), ctx.Prefix)
 	return
 }

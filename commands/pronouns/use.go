@@ -20,7 +20,7 @@ func (c *commands) use(ctx *bcr.Context) (err error) {
 	sets, err := c.DB.GetPronoun(strings.Split(ctx.Args[0], "/")...)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
-			_, err = ctx.Sendf("Couldn't find any pronoun sets from your input. Try `%vlist-pronouns` for a list of all pronouns; if it's not on there, feel free to submit it with `%vsubmit-pronouns`!", ctx.Router.Prefixes[0], ctx.Router.Prefixes[0])
+			_, err = ctx.Sendf("Couldn't find any pronoun sets from your input. Try `%vlist-pronouns` for a list of all pronouns; if it's not on there, feel free to submit it with `%vsubmit-pronouns`!", ctx.Prefix, ctx.Prefix)
 			return
 		}
 		if err == db.ErrTooManyForms {
