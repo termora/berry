@@ -11,7 +11,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/spf13/pflag"
-	"github.com/starshine-sys/bcr"
 	bcrbot "github.com/starshine-sys/bcr/bot"
 	"github.com/termora/berry/bot"
 	"github.com/termora/berry/commands/admin"
@@ -68,24 +67,24 @@ func main() {
 	sugar.Info("Connected to database.")
 
 	// create a new state
-	r, err := bcr.NewWithState(c.Auth.Token, c.Bot.BotOwners, c.Bot.Prefixes)
+	b, err := bcrbot.New(c.Auth.Token)
 	if err != nil {
-		sugar.Fatalf("Error creating router: %v", err)
+		sugar.Fatalf("Error creating bot: %v", err)
 	}
+	b.Owner(c.Bot.BotOwners...)
 
 	// if the bot is sharded, set the number and count
 	if c.Sharded {
-		r.Session.Gateway.Identifier.SetShard(c.Shard, c.NumShards)
+		b.Router.Session.Gateway.Identifier.SetShard(c.Shard, c.NumShards)
 	}
 
 	// set the default embed colour and blacklist function
-	r.EmbedColor = db.EmbedColour
-	r.BlacklistFunc = d.CtxInBlacklist
+	b.Router.EmbedColor = db.EmbedColour
+	b.Router.BlacklistFunc = d.CtxInBlacklist
 
 	// create the bot instance
 	bot := bot.New(
-		bcrbot.NewWithRouter(r),
-		sugar, c, d, hub)
+		b, sugar, c, d, hub)
 	// add search commands
 	bot.Add(search.Init)
 	// add pronoun commands
@@ -98,13 +97,13 @@ func main() {
 	bot.Add(admin.Init)
 
 	// open a connection to Discord
-	if err = r.Session.Open(); err != nil {
+	if err = bot.Router.Session.Open(); err != nil {
 		sugar.Fatal("Failed to connect:", err)
 	}
 
 	// Defer this to make sure that things are always cleanly shutdown even in the event of a crash
 	defer func() {
-		r.Session.Close()
+		bot.Router.Session.Close()
 		sugar.Infof("Disconnected from Discord.")
 		d.Pool.Close()
 		sugar.Infof("Closed database connection.")
@@ -112,7 +111,7 @@ func main() {
 
 	sugar.Info("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
 
-	botUser, _ := r.Session.Me()
+	botUser, _ := bot.Router.Session.Me()
 	sugar.Infof("User: %v#%v (%v)", botUser.Username, botUser.Discriminator, botUser.ID)
 
 	sc := make(chan os.Signal, 1)

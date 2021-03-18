@@ -4,16 +4,15 @@ import (
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
-	"github.com/termora/berry/db"
 )
 
 type commands struct {
-	db *db.Db
+	*bot.Bot
 }
 
 // Init ...
 func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
-	c := &commands{db: bot.DB}
+	c := &commands{Bot: bot}
 
 	g := bot.Router.AddCommand(&bcr.Command{
 		Name:    "blacklist",
@@ -42,6 +41,35 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 
 		Permissions: discord.PermissionManageGuild,
 		Command:     c.blacklistRemove,
+	})
+
+	prefixes := bot.Router.AddCommand(&bcr.Command{
+		Name:    "prefixes",
+		Aliases: []string{"prefix"},
+		Summary: "Show this server's prefixes",
+
+		Blacklistable: true,
+		Command:       c.prefixes,
+	})
+
+	prefixes.AddSubcommand(&bcr.Command{
+		Name:    "add",
+		Summary: "Add the given prefix",
+		Usage:   "<prefix>",
+		Args:    bcr.MinArgs(1),
+
+		Permissions: discord.PermissionManageGuild,
+		Command:     c.addPrefix,
+	})
+
+	prefixes.AddSubcommand(&bcr.Command{
+		Name:    "remove",
+		Summary: "Remove the given prefix",
+		Usage:   "<prefix>",
+		Args:    bcr.MinArgs(1),
+
+		Permissions: discord.PermissionManageGuild,
+		Command:     c.removePrefix,
 	})
 
 	return "Server management commands", append(out, g)
