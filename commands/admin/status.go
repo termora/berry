@@ -27,13 +27,14 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		default:
 		}
 
+		status := st
 		// add term count to status
 		if c.Config.Bot.ShowTermCount {
-			st = fmt.Sprintf("%v | %v terms", st, c.DB.TermCount())
+			status = fmt.Sprintf("%v | %v terms", st, c.DB.TermCount())
 		}
 
 		// add the website to the status, if it's not empty
-		status := fmt.Sprintf("%v | %v", st, urlParse(c.Config.Bot.Website))
+		status = fmt.Sprintf("%v | %v", status, urlParse(c.Config.Bot.Website))
 		if c.Config.Bot.Website == "" {
 			status = st
 		}
@@ -64,7 +65,13 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		default:
 		}
 
-		status = fmt.Sprintf("%v | in %v servers", st, guilds)
+		status = st
+		// add term count to status
+		if c.Config.Bot.ShowTermCount {
+			status = fmt.Sprintf("%v | %v terms", st, c.DB.TermCount())
+		}
+
+		status = fmt.Sprintf("%v | in %v servers", status, guilds)
 		if c.Config.Sharded {
 			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID(), s.Gateway.Identifier.Shard.NumShards())
 		}
