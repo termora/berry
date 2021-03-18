@@ -30,14 +30,14 @@ func (c *commands) blacklistAdd(ctx *bcr.Context) (err error) {
 		ch = append(ch, c.ID.String())
 	}
 
-	err = c.db.AddToBlacklist(ctx.Message.GuildID.String(), ch)
+	err = c.DB.AddToBlacklist(ctx.Message.GuildID.String(), ch)
 	if err != nil {
 		if err == db.ErrorAlreadyBlacklisted {
 			_, err = ctx.Send("One or more channels is already blacklisted.", nil)
 			return err
 		}
 
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Added %v to the blacklist.", strings.Join(mapString(ch, func(s string) string { return "<#" + s + ">" }), ", "))
@@ -57,21 +57,21 @@ func (c *commands) blacklistRemove(ctx *bcr.Context) (err error) {
 			return err
 		}
 
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 	if ch.GuildID != ctx.Message.GuildID {
 		_, err = ctx.Sendf("The given channel (%v) isn't in this server.", ch.Mention())
 		return err
 	}
 
-	err = c.db.RemoveFromBlacklist(ctx.Message.GuildID.String(), ch.ID.String())
+	err = c.DB.RemoveFromBlacklist(ctx.Message.GuildID.String(), ch.ID.String())
 	if err != nil {
 		if err == db.ErrorNotBlacklisted {
 			_, err = ctx.Send("That channel isn't blacklisted.", nil)
 			return err
 		}
 
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Removed %v from the blacklist.", ch.Mention())

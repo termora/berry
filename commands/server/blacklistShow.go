@@ -10,9 +10,9 @@ import (
 )
 
 func (c *commands) blacklist(ctx *bcr.Context) (err error) {
-	b, err := c.db.GetBlacklist(ctx.Message.GuildID.String())
+	b, err := c.DB.GetBlacklist(ctx.Message.GuildID.String())
 	if err != nil {
-		return c.db.InternalError(ctx, err)
+		return c.DB.InternalError(ctx, err)
 	}
 
 	var x string

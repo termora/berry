@@ -50,6 +50,9 @@ func New(
 	b.Router.Session.PreHandler = handler.New()
 	b.Router.Session.PreHandler.Synchronous = true
 
+	// set the router's prefixer
+	b.Router.Prefixer = b.Prefixer
+
 	// add the required handlers
 	b.Router.Session.AddHandler(b.MessageCreate)
 	b.Router.Session.AddHandler(b.GuildCreate)
