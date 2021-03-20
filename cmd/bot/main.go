@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -114,9 +115,12 @@ func main() {
 	botUser, _ := bot.Router.Session.Me()
 	sugar.Infof("User: %v#%v (%v)", botUser.Username, botUser.Discriminator, botUser.ID)
 
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	defer stop()
+
+	select {
+	case <-ctx.Done():
+	}
 
 	sugar.Infof("Interrupt signal received. Shutting down...")
 }

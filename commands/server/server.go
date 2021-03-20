@@ -72,5 +72,5 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Command:     c.removePrefix,
 	})
 
-	return "Server management commands", append(out, g)
+	return "Server configuration commands", append(out, g, prefixes)
 }

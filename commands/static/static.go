@@ -1,10 +1,12 @@
 package static
 
 import (
+	"os"
 	"time"
 
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
+	"github.com/termora/berry/bot/cc"
 )
 
 // Commands ...
@@ -134,5 +136,25 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 	}))
 
 	o = append(o, help)
-	return "Static commands", o
+
+	// thing
+	if _, err := os.Stat("custom_commands.json"); err != nil {
+		return "Static commands", o
+	}
+
+	bytes, err := os.ReadFile("custom_commands.json")
+	if err != nil {
+		bot.Sugar.Fatalf("Error reading custom commands file: %v", err)
+	}
+
+	cmds, err := cc.ParseBytes(bytes)
+	if err != nil {
+		bot.Sugar.Fatalf("Error parsing custom commands file: %v", err)
+	}
+
+	for _, c := range cmds {
+		o = append(o, bot.Router.AddCommand(c))
+	}
+
+	return "Bot info commands", o
 }
