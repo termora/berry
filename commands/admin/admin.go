@@ -263,6 +263,16 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Command:           c.refreshToken,
 	})
 
+	a.AddSubcommand(&bcr.Command{
+		Name:    "import",
+		Summary: "Add a term from a correctly formatted message.",
+		Usage:   "<message link|ID>",
+		Args:    bcr.MinArgs(1),
+
+		CustomPermissions: c,
+		Command:           c.importFromMessage,
+	})
+
 	// set status
 	// this is in admin because of the `guild` owner command
 	var o sync.Once
