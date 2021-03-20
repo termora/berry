@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
@@ -134,5 +135,16 @@ done:
 		return c.DB.InternalError(ctx, err)
 	}
 	_, err = ctx.Sendf("Added term with ID %v.", t.ID)
+	if err != nil {
+		return err
+	}
+
+	// if we don't have perms return
+	if p, _ := ctx.Session.Permissions(msg.ChannelID, ctx.Bot.ID); !p.Has(discord.PermissionAddReactions | discord.PermissionReadMessageHistory) {
+		return
+	}
+
+	// react with a checkmark to the original message
+	err = ctx.Session.React(msg.ChannelID, msg.ID, "yes:822929172669136966")
 	return err
 }
