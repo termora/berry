@@ -46,8 +46,13 @@ func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 				t.Aliases = aliases
 			case "Description":
 				t.Description = f.Value
-			case "Coiner/source":
+			case "Source":
 				t.Source = f.Value
+			case "What category does your term fall under? Pick the most relevant one.":
+				if cat, err := c.DB.CategoryID(f.Value); err == nil {
+					t.Category = cat
+					t.CategoryName = f.Value
+				}
 			}
 		}
 
