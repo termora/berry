@@ -40,6 +40,9 @@ type BotConfig struct {
 		CreditFields []discord.EmbedField `json:"credit_fields"`
 	}
 
+	// QuickNotes is a map of notes that can quickly be set with `t;admin setnote`
+	QuickNotes map[string]string `json:"quick_notes"`
+
 	// Fields used for sharding
 	Sharded   bool `json:"-"`
 	Shard     int  `json:"-"`
