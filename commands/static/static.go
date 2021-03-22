@@ -127,8 +127,8 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name:    "export",
-		Summary: "Export all terms",
-		Usage:   "[-gz] [-channel <ChannelID/Mention>]",
+		Summary: "Export all terms in a DM",
+		Usage:   "[--compress|-x]",
 
 		Cooldown: time.Minute,
 

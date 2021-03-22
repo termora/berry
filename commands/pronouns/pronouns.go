@@ -80,6 +80,15 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Command:       c.use,
 	})
 
+	pronouns.AddSubcommand(&bcr.Command{
+		Name:          "custom",
+		Summary:       "Show custom pronouns that aren't in the bot",
+		Usage:         "<pronoun set, space or slash separated>",
+		Blacklistable: true,
+		Cooldown:      time.Second,
+		Command:       c.custom,
+	})
+
 	pronouns.AddSubcommand(bot.Router.AliasMust("list", []string{"l"}, []string{"list-pronouns"}, nil))
 	pronouns.AddSubcommand(bot.Router.AliasMust("submit", nil, []string{"submit-pronouns"}, nil))
 	pronouns.AddSubcommand(bot.Router.AliasMust("random", []string{"r"}, []string{"random-pronouns"}, nil))

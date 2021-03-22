@@ -5,9 +5,9 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
+	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/commands/static/export"
 	"github.com/termora/berry/db"
@@ -26,10 +26,9 @@ type e struct {
 }
 
 func (c *Commands) export(ctx *bcr.Context) (err error) {
+	fs := pflag.NewFlagSet("", pflag.ContinueOnError)
 	var gz bool
-	if strings.Contains(ctx.RawArgs, "-gz") || strings.Contains(ctx.RawArgs, "-gzip") {
-		gz = true
-	}
+	fs.BoolVarP(&gz, "compress", "x", false, "Compress the output with gzip")
 
 	u, err := ctx.Session.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
@@ -69,10 +68,14 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 
 	_, err = ctx.NewMessage().Channel(u.ID).TogglePermCheck().Content(
 		fmt.Sprintf(
-			"> Done! Archive of %v terms, %v explanations, and %v pronoun sets, invoked by %v#%v at %v.",
+			"> Done! Archive of %v terms, %v explanations, and %v pronoun sets.",
 			len(export.Terms), len(export.Explanations), len(export.Pronouns),
-			ctx.Author.Username, ctx.Author.Discriminator, time.Now().Format(time.RFC3339),
 		),
 	).AddFile(fn, buf).Send()
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+
+	_, err = ctx.Send("✅ Check your DMs!", nil)
 	return err
 }

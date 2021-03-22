@@ -8,9 +8,15 @@ Berry is a searchable glossary bot for Discord.
 - Go (only 1.16 tested)
 - For the site and API: a reverse proxy (such as Caddy or nginx)
 
+## Configuration
+
+Each executable has its own configuration file, located next to the executable.
+
 ## Running
 
 This is still very much a WIP. Although we've done our best to not hardcode names and links into the source code, they still show up in some places (notably the site), so we recommend going through the source and fixing all those references before you run it.
+
+All of these executables are standalone and can be run independently from each other.
 
 ### Bot
 
@@ -18,7 +24,18 @@ This is still very much a WIP. Although we've done our best to not hardcode name
 2. Copy `config.sample.json` to `config.json` and fill it in
 3. Run the executable
 
-**Note:** The database is managed by the bot executable, you'll have to run that at least once even if you don't plan on running a bot.
+#### Required configuration keys
+
+```
+- auth:
+  - token (string): Discord bot token
+  - database_url (string): dsn for the Postgres database
+- bot:
+  - prefixes: ([]string): default prefixes used
+  - bot_owners: ([]int): bot owner IDs, these users can use all commands including admin commands
+```
+
+All other prefixes are optional but strongly recommended.
 
 ### API
 
