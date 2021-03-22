@@ -32,6 +32,64 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 	stats := runtime.MemStats{}
 	runtime.ReadMemStats(&stats)
 
+	fields := []discord.EmbedField{
+		{
+			Name:   "Bot version",
+			Value:  fmt.Sprintf("%v-%v (bcr v%v)", botVersion, gitVer, bcr.Version()),
+			Inline: true,
+		},
+		{
+			Name:   "Go version",
+			Value:  runtime.Version(),
+			Inline: true,
+		},
+		{
+			Name:   "Invite",
+			Value:  fmt.Sprintf("[Invite link](%v)", invite(ctx)),
+			Inline: true,
+		},
+	}
+
+	if c.Config.Sharded {
+		fields = append(fields, discord.EmbedField{
+			Name:   "Shard",
+			Value:  fmt.Sprintf("#%v (%v total)", c.Router.Session.Gateway.Identifier.Shard.ShardID(), c.Router.Session.Gateway.Identifier.Shard.NumShards()),
+			Inline: true,
+		})
+	}
+
+	fields = append(fields, []discord.EmbedField{
+		{
+			Name: "Uptime",
+			Value: fmt.Sprintf(
+				"%v\n(Since %v)",
+				prettyDurationString(time.Since(c.start)),
+				c.start.Format("Jan _2 2006, 15:04:05 MST"),
+			),
+			Inline: true,
+		},
+		{
+			Name:   "Memory used",
+			Value:  fmt.Sprintf("%v / %v (%v garbage collected)\n%v goroutines", humanize.Bytes(stats.Alloc), humanize.Bytes(stats.Sys), humanize.Bytes(stats.TotalAlloc), runtime.NumGoroutine()),
+			Inline: false,
+		},
+		{
+			Name:   "Terms",
+			Value:  fmt.Sprint(c.DB.TermCount()),
+			Inline: true,
+		},
+		{
+			Name:   "Credits",
+			Value:  fmt.Sprintf("Check `%vcredits`!", ctx.Prefix),
+			Inline: true,
+		},
+		{
+			Name:   "Source code",
+			Value:  fmt.Sprintf("[GitHub](%v)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)", c.Config.Bot.Git),
+			Inline: true,
+		},
+	}...)
+
 	embed := &discord.Embed{
 		Title: "About",
 		Color: db.EmbedColour,
@@ -42,52 +100,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			URL: ctx.Bot.AvatarURL(),
 		},
 		Timestamp: discord.NewTimestamp(time.Now()),
-		Fields: []discord.EmbedField{
-			{
-				Name:   "Bot version",
-				Value:  fmt.Sprintf("%v-%v (bcr v%v)", botVersion, gitVer, bcr.Version()),
-				Inline: true,
-			},
-			{
-				Name:   "Go version",
-				Value:  runtime.Version(),
-				Inline: true,
-			},
-			{
-				Name:   "Invite",
-				Value:  fmt.Sprintf("[Invite link](%v)", invite(ctx)),
-				Inline: true,
-			},
-			{
-				Name: "Uptime",
-				Value: fmt.Sprintf(
-					"%v\n(Since %v)",
-					prettyDurationString(time.Since(c.start)),
-					c.start.Format("Jan _2 2006, 15:04:05 MST"),
-				),
-				Inline: false,
-			},
-			{
-				Name:   "Memory used",
-				Value:  fmt.Sprintf("%v / %v (%v garbage collected)\n%v goroutines", humanize.Bytes(stats.Alloc), humanize.Bytes(stats.Sys), humanize.Bytes(stats.TotalAlloc), runtime.NumGoroutine()),
-				Inline: false,
-			},
-			{
-				Name:   "Terms",
-				Value:  fmt.Sprint(c.DB.TermCount()),
-				Inline: true,
-			},
-			{
-				Name:   "Credits",
-				Value:  fmt.Sprintf("Check `%vcredits`!", ctx.Prefix),
-				Inline: true,
-			},
-			{
-				Name:   "Source code",
-				Value:  fmt.Sprintf("[GitHub](%v)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)", c.Config.Bot.Git),
-				Inline: true,
-			},
-		},
+		Fields:    fields,
 	}
 
 	_, err = ctx.Send("", embed)

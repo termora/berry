@@ -37,9 +37,8 @@ func main() {
 	// command-line flags, mostly sharding
 	pflag.BoolVarP(&c.Debug, "debug", "d", false, "Debug logging")
 	pflag.IntVarP(&c.Shard, "shard", "s", 0, "Shard number")
-	pflag.IntVarP(&c.NumShards, "shard-count", "c", 1, "Number of shards")
 	pflag.Parse()
-	c.Sharded = c.NumShards != 1
+	c.Sharded = c.NumShards > 1
 
 	// create a Sentry config
 	if c.UseSentry {

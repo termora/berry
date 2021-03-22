@@ -7,6 +7,12 @@ const FallbackGitURL = "https://github.com/termora/berry"
 
 // BotConfig ...
 type BotConfig struct {
+	// Fields used for sharding
+	NumShards int `json:"num_shards"`
+	// These are not filled in the config file
+	Sharded bool `json:"-"`
+	Shard   int  `json:"-"`
+
 	Auth struct {
 		Token       string
 		DatabaseURL string `json:"database_url"`
@@ -29,6 +35,8 @@ type BotConfig struct {
 		// Whether to show term and server counts in the status
 		ShowTermCount  bool `json:"show_term_count"`
 		ShowGuildCount bool `json:"show_guild_count"`
+		// Whether to show shard number in the status
+		ShowShard bool `json:"show_shard"`
 
 		AllowedBots []discord.UserID `json:"allowed_bots"`
 
@@ -42,11 +50,6 @@ type BotConfig struct {
 
 	// QuickNotes is a map of notes that can quickly be set with `t;admin setnote`
 	QuickNotes map[string]string `json:"quick_notes"`
-
-	// Fields used for sharding
-	Sharded   bool `json:"-"`
-	Shard     int  `json:"-"`
-	NumShards int  `json:"-"`
 
 	// UseSentry: when false, don't use Sentry for logging errors
 	UseSentry bool `json:"-"`

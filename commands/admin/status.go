@@ -39,7 +39,7 @@ func (c *Admin) setStatusLoop(s *state.State) {
 			status = st
 		}
 		// if the bot is sharded, also add the shard number to the status
-		if c.Config.Sharded {
+		if c.Config.Sharded && c.Config.Bot.ShowShard {
 			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID(), s.Gateway.Identifier.Shard.NumShards())
 		}
 
@@ -72,8 +72,8 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		}
 
 		status = fmt.Sprintf("%v | in %v servers", status, guilds)
-		if c.Config.Sharded {
-			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID(), s.Gateway.Identifier.Shard.NumShards())
+		if c.Config.Sharded && c.Config.Bot.ShowShard {
+			status = fmt.Sprintf("%v | shard %v", status, s.Gateway.Identifier.Shard.ShardID())
 		}
 
 		if err := c.UpdateStatus(status, "online"); err != nil {
