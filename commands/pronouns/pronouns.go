@@ -84,6 +84,8 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	pronouns.AddSubcommand(bot.Router.AliasMust("submit", nil, []string{"submit-pronouns"}, nil))
 	pronouns.AddSubcommand(bot.Router.AliasMust("random", []string{"r"}, []string{"random-pronouns"}, nil))
 
+	bot.Router.Session.AddHandler(c.reactionAdd)
+
 	return "Pronoun commands", append(list, pronouns)
 }
 
