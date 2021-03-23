@@ -16,7 +16,6 @@ func (c *Commands) perms(ctx *bcr.Context) (err error) {
 - **Read Messages** & **Send Messages**: to respond to commands
 - **Read Message History**: for the %vsearch command to work
 - **Manage Messages**: to delete reactions on menus
-- **Embed Links**: to send responses for most commands
 - **Attach Files**: to send a glossary export
 - **Add Reactions**: for menus to work
 - **Use External Emojis**: to use custom emotes in a couple of commands`, ctx.Bot.Username, c.Config.Bot.Prefixes[0]),
@@ -94,7 +93,7 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name:  "Pronouns",
-				Value: fmt.Sprintf("`pronouns`: see how pronouns are used in a sentence (optionally with your name)\n`list-pronouns`: list all pronouns known to %v\n`submit-pronouns`: submit a pronoun set to be added.", ctx.Bot.Username),
+				Value: fmt.Sprintf("`pronouns`: see how pronouns are used in a sentence (optionally with your name)\n`pronouns list`: list all pronouns known to %v\n`pronouns submit`: submit a pronoun set to be added.", ctx.Bot.Username),
 			},
 			{
 				Name:  "Explanations",
@@ -102,7 +101,7 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name:  "Autoposting",
-				Value: fmt.Sprintf("%v can't automatically post terms yet, sorry! However, a couple of bots are whitelisted and can trigger commands, which can be used to emulate an autopost function. See `help autopost` for more info.", ctx.Bot.Username),
+				Value: fmt.Sprintf("%v can't automatically post terms, sorry! However, a couple of bots are whitelisted and can trigger commands, which can be used to emulate an autopost function. See `help autopost` for more info.", ctx.Bot.Username),
 			},
 			{
 				Name:  "For staff",
@@ -130,6 +129,6 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 }
 
 func (c *Commands) cmdInvite(ctx *bcr.Context) (err error) {
-	_, err = ctx.Sendf("Use this link to invite me to your server: <%v>\n\nYou can use the `%vhelp permissions` command to get a detailed explanation of all permissions required.", invite(ctx), ctx.Prefix)
+	_, err = ctx.Sendf("Use this link to invite me to your server: <%v>\n\nYou can use the `help permissions` command to get a detailed explanation of all permissions required.", invite(ctx))
 	return
 }
