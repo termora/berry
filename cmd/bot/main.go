@@ -35,7 +35,6 @@ func main() {
 	c := getConfig(sugar)
 
 	// command-line flags, mostly sharding
-	pflag.BoolVarP(&c.Debug, "debug", "d", false, "Debug logging")
 	pflag.IntVarP(&c.Shard, "shard", "s", 0, "Shard number")
 	pflag.Parse()
 	c.Sharded = c.NumShards > 1

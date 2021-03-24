@@ -3,6 +3,7 @@ package admin
 import (
 	"sync"
 
+	"github.com/diamondburned/arikawa/v2/api/webhook"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
 	"github.com/starshine-sys/bcr"
@@ -18,6 +19,8 @@ type Admin struct {
 	guilds []discord.Guild
 
 	stopStatus chan bool
+
+	WebhookClient *webhook.Client
 }
 
 func (Admin) String() string {
@@ -66,6 +69,10 @@ func (c *Admin) Check(ctx *bcr.Context) (bool, error) {
 func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	c := &Admin{Bot: bot}
 	c.stopStatus = make(chan bool, 1)
+
+	if c.Config.Bot.TermLog.ID.IsValid() {
+		c.WebhookClient = webhook.New(c.Config.Bot.TermLog.ID, c.Config.Bot.TermLog.Token)
+	}
 
 	a := bot.Router.AddCommand(&bcr.Command{
 		Name:    "admin",

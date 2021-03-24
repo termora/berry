@@ -13,11 +13,6 @@ import (
 func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	var err error
 
-	// debug logging, mostly for testing sharding *please don't use this in production i Beg*
-	if bot.Config.Debug {
-		bot.Sugar.Debugf("Message received from %v#%v (%v): %v", m.Author.Username, m.Author.Discriminator, m.Author.ID, m.Content)
-	}
-
 	// defer panic handling
 	defer func() {
 		r := recover()

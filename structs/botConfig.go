@@ -32,6 +32,11 @@ type BotConfig struct {
 			StaffRoles []discord.RoleID `json:"staff_roles"`
 		}
 
+		TermLog struct {
+			ID    discord.WebhookID
+			Token string
+		} `json:"term_log"`
+
 		Website string
 		Git     string
 
@@ -56,9 +61,6 @@ type BotConfig struct {
 
 	// UseSentry: when false, don't use Sentry for logging errors
 	UseSentry bool `json:"-"`
-
-	// Debug will print more logs
-	Debug bool `json:"-"`
 }
 
 // TermBaseURL returns the base URL for terms

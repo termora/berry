@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/diamondburned/arikawa/v2/api/webhook"
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 	"github.com/starshine-sys/bcr"
@@ -66,6 +68,36 @@ func (c *Admin) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	_, err = ctx.Send("Title updated!", nil)
+	if err != nil {
+		c.Report(ctx, err)
+	}
+
+	if c.WebhookClient != nil {
+		e := t.TermEmbed(c.Config.TermBaseURL())
+
+		e.Author = &discord.EmbedAuthor{
+			Name: "Previous version",
+		}
+
+		c.WebhookClient.Execute(webhook.ExecuteData{
+			Username:  ctx.Bot.Username,
+			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Embeds: []discord.Embed{
+				{
+					Author: &discord.EmbedAuthor{
+						Icon: ctx.Author.AvatarURL(),
+						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
+					},
+					Title:       "Title updated",
+					Description: title,
+					Color:       db.EmbedColour,
+					Timestamp:   discord.NowTimestamp(),
+				},
+				*e,
+			},
+		})
+	}
 	return
 }
 
@@ -83,6 +115,36 @@ func (c *Admin) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	_, err = ctx.Send("Description updated!", nil)
+	if err != nil {
+		c.Report(ctx, err)
+	}
+
+	if c.WebhookClient != nil {
+		e := t.TermEmbed(c.Config.TermBaseURL())
+
+		e.Author = &discord.EmbedAuthor{
+			Name: "Previous version",
+		}
+
+		c.WebhookClient.Execute(webhook.ExecuteData{
+			Username:  ctx.Bot.Username,
+			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Embeds: []discord.Embed{
+				{
+					Author: &discord.EmbedAuthor{
+						Icon: ctx.Author.AvatarURL(),
+						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
+					},
+					Title:       "Description updated",
+					Description: desc,
+					Color:       db.EmbedColour,
+					Timestamp:   discord.NowTimestamp(),
+				},
+				*e,
+			},
+		})
+	}
 	return
 }
 
@@ -100,6 +162,36 @@ func (c *Admin) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	_, err = ctx.Send("Source updated!", nil)
+	if err != nil {
+		c.Report(ctx, err)
+	}
+
+	if c.WebhookClient != nil {
+		e := t.TermEmbed(c.Config.TermBaseURL())
+
+		e.Author = &discord.EmbedAuthor{
+			Name: "Previous version",
+		}
+
+		c.WebhookClient.Execute(webhook.ExecuteData{
+			Username:  ctx.Bot.Username,
+			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Embeds: []discord.Embed{
+				{
+					Author: &discord.EmbedAuthor{
+						Icon: ctx.Author.AvatarURL(),
+						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
+					},
+					Title:       "Source updated",
+					Description: source,
+					Color:       db.EmbedColour,
+					Timestamp:   discord.NowTimestamp(),
+				},
+				*e,
+			},
+		})
+	}
 	return
 }
 
@@ -121,6 +213,36 @@ func (c *Admin) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	_, err = ctx.Send("Aliases updated!", nil)
+	if err != nil {
+		c.Report(ctx, err)
+	}
+
+	if c.WebhookClient != nil {
+		e := t.TermEmbed(c.Config.TermBaseURL())
+
+		e.Author = &discord.EmbedAuthor{
+			Name: "Previous version",
+		}
+
+		c.WebhookClient.Execute(webhook.ExecuteData{
+			Username:  ctx.Bot.Username,
+			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Embeds: []discord.Embed{
+				{
+					Author: &discord.EmbedAuthor{
+						Icon: ctx.Author.AvatarURL(),
+						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
+					},
+					Title:       "Aliases updated",
+					Description: strings.Join(aliases, ", "),
+					Color:       db.EmbedColour,
+					Timestamp:   discord.NowTimestamp(),
+				},
+				*e,
+			},
+		})
+	}
 	return
 }
 
@@ -137,6 +259,38 @@ func (c *Admin) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	_, err = ctx.Send("Image updated!", nil)
+	if err != nil {
+		c.Report(ctx, err)
+	}
+
+	if c.WebhookClient != nil {
+		e := t.TermEmbed(c.Config.TermBaseURL())
+
+		e.Author = &discord.EmbedAuthor{
+			Name: "Previous version",
+		}
+
+		c.WebhookClient.Execute(webhook.ExecuteData{
+			Username:  ctx.Bot.Username,
+			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Embeds: []discord.Embed{
+				{
+					Author: &discord.EmbedAuthor{
+						Icon: ctx.Author.AvatarURL(),
+						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
+					},
+					Title: "Image updated",
+					Image: &discord.EmbedImage{
+						URL: img,
+					},
+					Color:     db.EmbedColour,
+					Timestamp: discord.NowTimestamp(),
+				},
+				*e,
+			},
+		})
+	}
 	return
 }
 
@@ -154,5 +308,35 @@ func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	_, err = ctx.Send("Tags updated!", nil)
+	if err != nil {
+		c.Report(ctx, err)
+	}
+
+	if c.WebhookClient != nil {
+		e := t.TermEmbed(c.Config.TermBaseURL())
+
+		e.Author = &discord.EmbedAuthor{
+			Name: "Previous version",
+		}
+
+		c.WebhookClient.Execute(webhook.ExecuteData{
+			Username:  ctx.Bot.Username,
+			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Embeds: []discord.Embed{
+				{
+					Author: &discord.EmbedAuthor{
+						Icon: ctx.Author.AvatarURL(),
+						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
+					},
+					Title:       "Tags updated",
+					Description: strings.Join(tags, ", "),
+					Color:       db.EmbedColour,
+					Timestamp:   discord.NowTimestamp(),
+				},
+				*e,
+			},
+		})
+	}
 	return
 }
