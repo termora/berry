@@ -1,9 +1,11 @@
 package admin
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
+	"github.com/diamondburned/arikawa/v2/api/webhook"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
@@ -145,6 +147,29 @@ done:
 	}
 
 	// react with a checkmark to the original message
-	err = ctx.Session.React(msg.ChannelID, msg.ID, "yes:822929172669136966")
+	ctx.Session.React(msg.ChannelID, msg.ID, "yes:822929172669136966")
+
+	// if logging terms is enabled, log this
+	if c.WebhookClient != nil {
+		e := t.TermEmbed(c.Config.TermBaseURL())
+
+		c.WebhookClient.Execute(webhook.ExecuteData{
+			Username:  ctx.Bot.Username,
+			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Embeds: []discord.Embed{
+				{
+					Author: &discord.EmbedAuthor{
+						Icon: ctx.Author.AvatarURL(),
+						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
+					},
+					Description: fmt.Sprintf("Term imported from\n%v", ctx.Args[0]),
+					Color:       db.EmbedColour,
+					Timestamp:   discord.NowTimestamp(),
+				},
+				*e,
+			},
+		})
+	}
 	return err
 }
