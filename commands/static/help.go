@@ -16,7 +16,7 @@ func (c *Commands) perms(ctx *bcr.Context) (err error) {
 - **Read Messages** & **Send Messages**: to respond to commands
 - **Read Message History**: for the %vsearch command to work
 - **Manage Messages**: to delete reactions on menus
-- **Attach Files**: to send a glossary export
+- **Embed Links**: to send responses for most commands
 - **Add Reactions**: for menus to work
 - **Use External Emojis**: to use custom emotes in a couple of commands`, ctx.Bot.Username, c.Config.Bot.Prefixes[0]),
 		Color: db.EmbedColour,
