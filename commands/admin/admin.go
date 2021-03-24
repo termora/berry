@@ -74,6 +74,8 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		c.WebhookClient = webhook.New(c.Config.Bot.TermLog.ID, c.Config.Bot.TermLog.Token)
 	}
 
+	directorCheck := &directors{admin: c}
+
 	a := bot.Router.AddCommand(&bcr.Command{
 		Name:    "admin",
 		Summary: "Admin commands",
@@ -92,7 +94,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Aliases: []string{"add-term"},
 		Summary: "Add a term",
 
-		CustomPermissions: c,
+		CustomPermissions: directorCheck,
 
 		Command: c.addTerm,
 	}).AddSubcommand(&bcr.Command{
@@ -197,7 +199,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Edit a term",
 		Usage:   "<part to edit> <id> <text>",
 
-		CustomPermissions: c,
+		CustomPermissions: directorCheck,
 
 		Command: c.editTerm,
 	})
@@ -276,7 +278,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<message link|ID>",
 		Args:    bcr.MinArgs(1),
 
-		CustomPermissions: c,
+		CustomPermissions: directorCheck,
 		Command:           c.importFromMessage,
 	})
 
