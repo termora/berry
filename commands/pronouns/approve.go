@@ -20,6 +20,11 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 		return
 	}
 
+	// if the user is a bot return
+	if m.Member.User.Bot {
+		return
+	}
+
 	var exists bool
 	err := bot.DB.Pool.QueryRow(context.Background(), "select exists (select * from pronoun_msgs where message_id = $1)", m.MessageID).Scan(&exists)
 	if err != nil {
