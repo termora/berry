@@ -2,7 +2,6 @@ package static
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
@@ -80,32 +79,24 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 		Title: "Help",
 		Fields: []discord.EmbedField{
 			{
-				Name:  "Prefixes",
-				Value: fmt.Sprintf("%v uses the prefixes %v, and %v.", ctx.Bot.Username, strings.Join(ctx.Router.Prefixes[:len(ctx.Router.Prefixes)-2], ", "), ctx.Bot.Mention()),
-			},
-			{
 				Name:  "Bot info",
-				Value: "`help`: show a list of commands, and some info about the bot (alias: `h`)\n`help privacy`: show the bot's privacy policy\n`about`: show more in-depth info about the bot.\n`credits`: a list of people who helped create the bot\n`ping`: check the bot's latency\n`hello`: say hi to the bot!\n`invite`: get an invite link for the bot",
+				Value: "`help`: show a list of commands, and some info about the bot (alias: `h`)\n`help privacy`: show the bot's privacy policy\n`help commands`: show a full list of commands\n`invite`: get an invite link for the bot",
 			},
 			{
 				Name:  "Terms",
-				Value: "`search`: search the database for a term (alias: `s`)\n`plural`: search for a plurality-related term\n`lgbt`: search for an LGBTQ+-related term\n`random`: show a random term (alias: `r`)\n`post`: post a single term by ID.",
+				Value: "`search`: search the database for a term (alias: `s`)\n`random`: show a random term (alias: `r`)\n`post`: post a single term by ID.",
 			},
 			{
 				Name:  "Pronouns",
-				Value: fmt.Sprintf("`pronouns`: see how pronouns are used in a sentence (optionally with your name)\n`pronouns list`: list all pronouns known to %v\n`pronouns submit`: submit a pronoun set to be added.", ctx.Bot.Username),
+				Value: fmt.Sprintf("`pronouns`: see how pronouns are used in a sentence (optionally with your name)\n`pronouns list`: list all pronouns known to %v\n`pronouns submit`: submit a pronoun set to be added", ctx.Bot.Username),
 			},
 			{
 				Name:  "Explanations",
 				Value: "`explain`: get a list of all registered explanations (aliases: `e`, `ex`)\n`explain <topic>`: explain the given topic",
 			},
 			{
-				Name:  "Autoposting",
-				Value: fmt.Sprintf("%v can't automatically post terms, sorry! However, a couple of bots are whitelisted and can trigger commands, which can be used to emulate an autopost function. See `help autopost` for more info.", ctx.Bot.Username),
-			},
-			{
 				Name:  "For staff",
-				Value: fmt.Sprintf("You can blacklist most commands, with the exception of `explain`, using the following commands:\n`blacklist`: show the current blacklist\n`blacklist add`: add a channel to the blacklist\n`blacklist remove`: remove a channel from the blacklist\n\nTo stop %v from responding in a channel completely, deny them the \"Read Messages\" permission in that channel.", ctx.Bot.Username),
+				Value: "You can blacklist most commands, with the exception of `explain`, using the `blacklist` command.\nYou can also change the prefixes the bot uses with the `prefix` command.",
 			},
 		},
 		Footer: &discord.EmbedFooter{
