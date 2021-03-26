@@ -83,6 +83,8 @@ func (c *Admin) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
 			Username:  ctx.Bot.Username,
 			AvatarURL: ctx.Bot.AvatarURL(),
 
+			Content: "​",
+
 			Embeds: []discord.Embed{
 				{
 					Author: &discord.EmbedAuthor{
@@ -130,6 +132,8 @@ func (c *Admin) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
 			Username:  ctx.Bot.Username,
 			AvatarURL: ctx.Bot.AvatarURL(),
 
+			Content: "​",
+
 			Embeds: []discord.Embed{
 				{
 					Author: &discord.EmbedAuthor{
@@ -176,6 +180,8 @@ func (c *Admin) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 		c.WebhookClient.Execute(webhook.ExecuteData{
 			Username:  ctx.Bot.Username,
 			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Content: "​",
 
 			Embeds: []discord.Embed{
 				{
@@ -228,6 +234,8 @@ func (c *Admin) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 			Username:  ctx.Bot.Username,
 			AvatarURL: ctx.Bot.AvatarURL(),
 
+			Content: "​",
+
 			Embeds: []discord.Embed{
 				{
 					Author: &discord.EmbedAuthor{
@@ -273,6 +281,8 @@ func (c *Admin) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
 		c.WebhookClient.Execute(webhook.ExecuteData{
 			Username:  ctx.Bot.Username,
 			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Content: "​",
 
 			Embeds: []discord.Embed{
 				{
@@ -322,6 +332,8 @@ func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 		c.WebhookClient.Execute(webhook.ExecuteData{
 			Username:  ctx.Bot.Username,
 			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Content: "​",
 
 			Embeds: []discord.Embed{
 				{

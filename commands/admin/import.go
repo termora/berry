@@ -135,8 +135,12 @@ done:
 			_, err = ctx.Sendf("That category (``%v``) could not be found.", bcr.EscapeBackticks(flag))
 		}
 		t.Category = cat
-		t.CategoryName = flag
 	}
+
+	// add the category to the tags
+	cat := c.DB.CategoryFromID(t.Category)
+	t.CategoryName = cat.Name
+	t.Tags = append(t.Tags, cat.Name)
 
 	termMsg, err := ctx.Send("Do you want to add this term?", t.TermEmbed(c.Config.TermBaseURL()))
 	if err != nil {
@@ -177,6 +181,8 @@ done:
 		c.WebhookClient.Execute(webhook.ExecuteData{
 			Username:  ctx.Bot.Username,
 			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Content: "​",
 
 			Embeds: []discord.Embed{
 				{

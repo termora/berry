@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/diamondburned/arikawa/v2/api/webhook"
+	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -49,6 +51,7 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 		Description: description,
 		Aliases:     aliases,
 		Source:      source,
+		Tags:        []string{c.DB.CategoryFromID(category).Name},
 	}
 
 	t, err = c.DB.AddTerm(t)
@@ -56,5 +59,33 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 	_, err = ctx.Send(fmt.Sprintf("Added term with ID %v.", t.ID), t.TermEmbed(c.Config.TermBaseURL()))
+	if err != nil {
+		c.Report(ctx, err)
+	}
+
+	// if logging terms is enabled, log this
+	if c.WebhookClient != nil {
+		e := t.TermEmbed(c.Config.TermBaseURL())
+
+		c.WebhookClient.Execute(webhook.ExecuteData{
+			Username:  ctx.Bot.Username,
+			AvatarURL: ctx.Bot.AvatarURL(),
+
+			Content: "​",
+
+			Embeds: []discord.Embed{
+				{
+					Author: &discord.EmbedAuthor{
+						Icon: ctx.Author.AvatarURL(),
+						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
+					},
+					Title:     "Term added",
+					Color:     db.EmbedColour,
+					Timestamp: discord.NowTimestamp(),
+				},
+				*e,
+			},
+		})
+	}
 	return err
 }
