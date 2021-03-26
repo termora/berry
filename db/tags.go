@@ -16,7 +16,7 @@ func (db *Db) Tags() (s []string, err error) {
 func (db *Db) TagTerms(tag string) (t []*Term, err error) {
 	err = pgxscan.Select(context.Background(), db.Pool, &t, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.image_url from public.terms as t, public.categories as c
-	where $1 = any(t.tags) and t.category = c.id order by t.name, t.id`, tag)
+	where $1 ilike any(t.tags) and t.category = c.id order by t.name, t.id`, tag)
 	return
 }
 

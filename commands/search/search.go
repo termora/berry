@@ -75,6 +75,17 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Command:       c.term,
 	}))
 
+	list = append(list, bot.Router.AddCommand(&bcr.Command{
+		Name:    "tag",
+		Aliases: []string{"tags"},
+		Summary: "Show all terms with the given tag (case-insensitive)",
+		Usage:   "[tag]",
+
+		Cooldown:      time.Second,
+		Blacklistable: true,
+		Command:       c.tags,
+	}))
+
 	// aliases
 	ps := bot.Router.AddCommand(bot.Router.AliasMust(
 		"plural", nil,
