@@ -14,11 +14,15 @@ import (
 
 var msgRegex = regexp.MustCompile(`\*\*Name:\*\* (.*)\n\*\*Category:\*\* (.*)\n\*\*Description:\*\* ([\s\S]*)\n\*\*Coined by:\*\* (.*)`)
 
+var tagsRegex = regexp.MustCompile(`\*\*Tags:\*\* (.*)`)
+
 func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 	var flag string
+	var rawSource bool
 
 	fs := pflag.NewFlagSet("", pflag.ContinueOnError)
 	fs.StringVarP(&flag, "category", "c", "", "Category")
+	fs.BoolVarP(&rawSource, "raw-source", "r", false, "Use the provided source as-is")
 	fs.Parse(ctx.Args)
 	ctx.Args = fs.Args()
 
@@ -47,6 +51,12 @@ func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 					aliases[i] = strings.TrimSpace(aliases[i])
 				}
 				t.Aliases = aliases
+			case "Tags":
+				tags := strings.Split(f.Value, ",")
+				for i := range tags {
+					tags[i] = strings.TrimSpace(tags[i])
+				}
+				t.Tags = tags
 			case "Description":
 				t.Description = f.Value
 			case "Source":
@@ -91,6 +101,14 @@ func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 
 		t.Description = groups[3]
 		t.Source = groups[4]
+
+		if g := tagsRegex.FindStringSubmatch(msg.Content); len(g) > 1 {
+			tags := strings.Split(g[1], ",")
+			for i := range tags {
+				tags[i] = strings.TrimSpace(tags[i])
+			}
+			t.Tags = tags
+		}
 	}
 
 done:
@@ -101,6 +119,9 @@ done:
 	}
 	if t.Aliases == nil {
 		t.Aliases = []string{}
+	}
+	if !rawSource && !bcr.HasAnyPrefix(t.Source, "Coined by", "Unknown", "unknown") {
+		t.Source = fmt.Sprintf("Coined by %v", t.Source)
 	}
 
 	if t.Category == 0 {

@@ -88,8 +88,11 @@ func (db *Db) AddTerm(t *Term) (*Term, error) {
 	if t.Aliases == nil {
 		t.Aliases = []string{}
 	}
+	if t.Tags == nil {
+		t.Tags = []string{}
+	}
 
-	err := db.Pool.QueryRow(context.Background(), "insert into public.terms (name, category, aliases, description, source, aliases_string) values ($1, $2, $3, $4, $5, $6) returning id, created", t.Name, t.Category, t.Aliases, t.Description, t.Source, strings.Join(t.Aliases, ", ")).Scan(&t.ID, &t.Created)
+	err := db.Pool.QueryRow(context.Background(), "insert into public.terms (name, category, aliases, description, source, aliases_string, tags) values ($1, $2, $3, $4, $5, $6, $7) returning id, created", t.Name, t.Category, t.Aliases, t.Description, t.Source, strings.Join(t.Aliases, ", "), t.Tags).Scan(&t.ID, &t.Created)
 	return t, err
 }
 
