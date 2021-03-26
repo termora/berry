@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/diamondburned/arikawa/v2/api"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
@@ -91,7 +92,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 		msgs = append(msgs, buf)
 	}
 
-	_, err = ctx.State.SendMessage(ch.ID, c.Config.Bot.TermChangelogPing, &discord.Embed{
+	m, err := ctx.State.SendMessage(ch.ID, c.Config.Bot.TermChangelogPing, &discord.Embed{
 		Title:       "Term changelog",
 		Description: s,
 
@@ -101,16 +102,26 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 		return err
 	}
 
+	// if the channel is an announcement channel, also publish the post
+	if ch.Type == discord.GuildNews {
+		ctx.State.FastRequest("POST", api.EndpointChannels+m.ChannelID.String()+"/messages/"+m.ID.String()+"/crosspost")
+	}
+
 	// if it didn't fit in one message, send all the others
 	if len(msgs) > 0 {
 		for _, m := range msgs {
 			time.Sleep(500 * time.Millisecond)
-			_, err = ctx.State.SendMessage(ch.ID, "", &discord.Embed{
+			msg, err := ctx.State.SendMessage(ch.ID, "", &discord.Embed{
 				Description: m,
 				Color:       db.EmbedColour,
 			})
 			if err != nil {
 				return err
+			}
+
+			// if the channel is an announcement channel, also publish the post
+			if ch.Type == discord.GuildNews {
+				ctx.State.FastRequest("POST", api.EndpointChannels+msg.ChannelID.String()+"/messages/"+msg.ID.String()+"/crosspost")
 			}
 		}
 	}
