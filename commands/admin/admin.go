@@ -285,9 +285,9 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	// set status
 	// this is in admin because of the `guild` owner command
 	var o sync.Once
-	bot.Router.Session.AddHandler(func(d *gateway.ReadyEvent) {
+	bot.Router.State.AddHandler(func(d *gateway.ReadyEvent) {
 		o.Do(func() {
-			c.setStatusLoop(bot.Router.Session)
+			c.setStatusLoop(bot.Router.State)
 		})
 	})
 

@@ -53,8 +53,8 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	// if the member isn't staff, return
 	if !isStaff {
 		// also remove their reaction if possible
-		if p, _ := bot.Router.Session.Permissions(m.ChannelID, bot.Router.Bot.ID); p.Has(discord.PermissionManageMessages) && m.Emoji.Name == "✅" {
-			bot.Router.Session.DeleteUserReaction(m.ChannelID, m.MessageID, m.UserID, "✅")
+		if p, _ := bot.Router.State.Permissions(m.ChannelID, bot.Router.Bot.ID); p.Has(discord.PermissionManageMessages) && m.Emoji.Name == "✅" {
+			bot.Router.State.DeleteUserReaction(m.ChannelID, m.MessageID, m.UserID, "✅")
 		}
 
 		return
@@ -73,11 +73,11 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	if err != nil {
 		bot.Sugar.Errorf("Error adding pronoun set: %v", err)
 		// this is the only one we DM the person who approved it for
-		ch, chErr := bot.Router.Session.CreatePrivateChannel(m.Member.User.ID)
+		ch, chErr := bot.Router.State.CreatePrivateChannel(m.Member.User.ID)
 		if chErr != nil {
 			return
 		}
-		bot.Router.Session.SendMessage(ch.ID, fmt.Sprintf("There was an error adding the pronoun set:\n```%v```", err), nil)
+		bot.Router.State.SendMessage(ch.ID, fmt.Sprintf("There was an error adding the pronoun set:\n```%v```", err), nil)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	}
 
 	// get the message
-	msg, err := bot.Router.Session.Message(m.ChannelID, m.MessageID)
+	msg, err := bot.Router.State.Message(m.ChannelID, m.MessageID)
 	if err != nil {
 		bot.Sugar.Errorf("Error getting message: %v", err)
 		return
@@ -110,7 +110,7 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	}
 	e.Timestamp = discord.NowTimestamp()
 
-	_, err = bot.Router.Session.EditEmbed(msg.ChannelID, msg.ID, e)
+	_, err = bot.Router.State.EditEmbed(msg.ChannelID, msg.ID, e)
 	if err != nil {
 		bot.Sugar.Errorf("Error editing message: %v", err)
 		return

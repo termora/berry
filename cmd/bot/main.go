@@ -74,7 +74,7 @@ func main() {
 
 	// if the bot is sharded, set the number and count
 	if c.Sharded {
-		b.Router.Session.Gateway.Identifier.SetShard(c.Shard, c.NumShards)
+		b.Router.State.Gateway.Identifier.SetShard(c.Shard, c.NumShards)
 	}
 
 	// set the default embed colour and blacklist function
@@ -96,13 +96,13 @@ func main() {
 	bot.Add(admin.Init)
 
 	// open a connection to Discord
-	if err = bot.Router.Session.Open(); err != nil {
+	if err = bot.Router.State.Open(); err != nil {
 		sugar.Fatal("Failed to connect:", err)
 	}
 
 	// Defer this to make sure that things are always cleanly shutdown even in the event of a crash
 	defer func() {
-		bot.Router.Session.Close()
+		bot.Router.State.Close()
 		sugar.Infof("Disconnected from Discord.")
 		d.Pool.Close()
 		sugar.Infof("Closed database connection.")
@@ -110,7 +110,7 @@ func main() {
 
 	sugar.Info("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
 
-	botUser, _ := bot.Router.Session.Me()
+	botUser, _ := bot.Router.State.Me()
 	sugar.Infof("User: %v#%v (%v)", botUser.Username, botUser.Discriminator, botUser.ID)
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)

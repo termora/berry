@@ -14,7 +14,7 @@ import (
 )
 
 // uh this isn't semver, this is just. increment the number when we feel like it i guess
-const botVersion = "v6"
+const botVersion = "v7"
 
 var gitVer string
 
@@ -35,7 +35,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 	fields := []discord.EmbedField{
 		{
 			Name:   "Bot version",
-			Value:  fmt.Sprintf("%v-%v (bcr v%v)", botVersion, gitVer, bcr.Version()),
+			Value:  fmt.Sprintf("%v-%v ([bcr](https://github.com/starshine-sys/bcr) v%v)", botVersion, gitVer, bcr.Version()),
 			Inline: true,
 		},
 		{
@@ -53,7 +53,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 	if c.Config.Sharded {
 		fields = append(fields, discord.EmbedField{
 			Name:   "Shard",
-			Value:  fmt.Sprintf("#%v (%v total)", c.Router.Session.Gateway.Identifier.Shard.ShardID(), c.Router.Session.Gateway.Identifier.Shard.NumShards()),
+			Value:  fmt.Sprintf("#%v (%v total)", c.Router.State.Gateway.Identifier.Shard.ShardID(), c.Router.State.Gateway.Identifier.Shard.NumShards()),
 			Inline: true,
 		})
 	}

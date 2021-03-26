@@ -59,7 +59,7 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 	if err == nil {
 		// if the error's non-nil, the message was still sent
 		// so don't just return immediately
-		ctx.Session.React(msg.ChannelID, msg.ID, "✅")
+		ctx.State.React(msg.ChannelID, msg.ID, "✅")
 	} else {
 		c.Sugar.Errorf("Error adding submission message %v to database: %v", msg.ID, err)
 	}

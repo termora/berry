@@ -80,7 +80,7 @@ func (c *Admin) restart(ctx *bcr.Context) (err error) {
 	}
 	c.Sugar.Infof("Restart command received from %v#%v (%v), shutting down...", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID)
 
-	ctx.Router.Session.Close()
+	ctx.Router.State.Close()
 	c.Sugar.Infof("Disconnected from Discord.")
 	c.DB.Pool.Close()
 	c.Sugar.Infof("Closed database connection.")

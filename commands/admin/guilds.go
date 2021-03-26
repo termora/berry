@@ -54,7 +54,7 @@ func (c *Admin) cmdGuilds(ctx *bcr.Context) (err error) {
 		Reader: buf,
 	}
 
-	_, err = ctx.Session.SendMessageComplex(ctx.Channel.ID, api.SendMessageData{
+	_, err = ctx.State.SendMessageComplex(ctx.Channel.ID, api.SendMessageData{
 		Content:         "Here you go!",
 		Files:           []sendpart.File{file},
 		AllowedMentions: ctx.Router.DefaultMentions,

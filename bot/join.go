@@ -27,7 +27,7 @@ func (bot *Bot) GuildCreate(g *gateway.GuildCreateEvent) {
 		return
 	}
 
-	_, err = bot.Router.Session.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
+	_, err = bot.Router.State.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
 		Content:         fmt.Sprintf("Joined new server **%v** (%v)", g.Name, g.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
@@ -50,7 +50,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 		bot.Sugar.Errorf("Error deleting database entry for %v: %v", g.ID, err)
 	}
 
-	guild, err := bot.Router.Session.Guild(g.ID)
+	guild, err := bot.Router.State.Guild(g.ID)
 	if err != nil {
 		// didn't find the guild, so just run this normally
 		bot.guildDeleteNoState(g)
@@ -65,7 +65,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 		return
 	}
 
-	_, err = bot.Router.Session.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
+	_, err = bot.Router.State.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
 		Content:         fmt.Sprintf("Left server **%v** (%v) :(", guild.Name, guild.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
@@ -85,7 +85,7 @@ func (bot *Bot) guildDeleteNoState(g *gateway.GuildDeleteEvent) {
 		return
 	}
 
-	_, err := bot.Router.Session.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
+	_, err := bot.Router.State.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
 		Content:         fmt.Sprintf("Left server **%v** :(", g.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})

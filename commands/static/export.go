@@ -30,7 +30,7 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 	var gz bool
 	fs.BoolVarP(&gz, "compress", "x", false, "Compress the output with gzip")
 
-	u, err := ctx.Session.CreatePrivateChannel(ctx.Author.ID)
+	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
 		c.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?", nil)

@@ -42,7 +42,7 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 	}
 
 	// get permissions
-	perms, err := ctx.Session.Permissions(channel.ID, ctx.Author.ID)
+	perms, err := ctx.State.Permissions(channel.ID, ctx.Author.ID)
 	if err != nil {
 		c.Sugar.Errorf("Error getting perms for %v in %v: %v", ctx.Author.ID, channel.ID, err)
 		_, err = ctx.Sendf("❌ An error occurred while trying to get permissions.\nIf this issue persists, please contact the bot developer.")
@@ -55,7 +55,7 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	_, err = ctx.Session.SendEmbed(channel.ID, *term.TermEmbed(c.Config.TermBaseURL()))
+	_, err = ctx.State.SendEmbed(channel.ID, *term.TermEmbed(c.Config.TermBaseURL()))
 	if err != nil {
 		return
 	}

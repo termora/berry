@@ -108,7 +108,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		}
 
 		emoji := e
-		if err := ctx.Session.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(emoji)); err != nil {
+		if err := ctx.State.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(emoji)); err != nil {
 			c.Sugar.Error("Error adding reaction:", err)
 			return err
 		}
@@ -124,17 +124,17 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 				return
 			}
 			if len(termSlices) < page {
-				ctx.Session.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
+				ctx.State.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
 				return
 			}
 
 			termSlice := termSlices[page]
 			if index >= len(termSlice) {
-				ctx.Session.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
+				ctx.State.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
 				return
 			}
 
-			err := ctx.Session.DeleteMessage(ctx.Channel.ID, msg.ID)
+			err := ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID)
 			if err != nil {
 				c.Sugar.Error("Error deleting message:", err)
 			}

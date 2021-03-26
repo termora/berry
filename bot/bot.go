@@ -47,16 +47,16 @@ func New(
 	}
 
 	// create a pre-handler
-	b.Router.Session.PreHandler = handler.New()
-	b.Router.Session.PreHandler.Synchronous = true
+	b.Router.State.PreHandler = handler.New()
+	b.Router.State.PreHandler.Synchronous = true
 
 	// set the router's prefixer
 	b.Router.Prefixer = b.Prefixer
 
 	// add the required handlers
-	b.Router.Session.AddHandler(b.MessageCreate)
-	b.Router.Session.AddHandler(b.GuildCreate)
-	b.Router.Session.PreHandler.AddHandler(b.GuildDelete)
+	b.Router.State.AddHandler(b.MessageCreate)
+	b.Router.State.AddHandler(b.GuildCreate)
+	b.Router.State.PreHandler.AddHandler(b.GuildDelete)
 	return b
 }
 

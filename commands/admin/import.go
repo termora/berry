@@ -163,12 +163,12 @@ done:
 	}
 
 	// if we don't have perms return
-	if p, _ := ctx.Session.Permissions(msg.ChannelID, ctx.Bot.ID); !p.Has(discord.PermissionAddReactions | discord.PermissionReadMessageHistory) {
+	if p, _ := ctx.State.Permissions(msg.ChannelID, ctx.Bot.ID); !p.Has(discord.PermissionAddReactions | discord.PermissionReadMessageHistory) {
 		return
 	}
 
 	// react with a checkmark to the original message
-	ctx.Session.React(msg.ChannelID, msg.ID, "yes:822929172669136966")
+	ctx.State.React(msg.ChannelID, msg.ID, "yes:822929172669136966")
 
 	// if logging terms is enabled, log this
 	if c.WebhookClient != nil {

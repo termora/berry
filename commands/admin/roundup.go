@@ -53,7 +53,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	}
 
 	// check perms in the channel
-	perms, err := ctx.Session.Permissions(ch.ID, ctx.Author.ID)
+	perms, err := ctx.State.Permissions(ch.ID, ctx.Author.ID)
 	if err != nil {
 		c.Sugar.Errorf("Error getting perms for %v in %v: %v", ctx.Author.ID, ch.ID, err)
 		_, err = ctx.Sendf(
@@ -91,7 +91,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 		msgs = append(msgs, buf)
 	}
 
-	_, err = ctx.Session.SendMessage(ch.ID, c.Config.Bot.TermChangelogPing, &discord.Embed{
+	_, err = ctx.State.SendMessage(ch.ID, c.Config.Bot.TermChangelogPing, &discord.Embed{
 		Title:       "Term changelog",
 		Description: s,
 
@@ -105,7 +105,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	if len(msgs) > 0 {
 		for _, m := range msgs {
 			time.Sleep(500 * time.Millisecond)
-			_, err = ctx.Session.SendMessage(ch.ID, "", &discord.Embed{
+			_, err = ctx.State.SendMessage(ch.ID, "", &discord.Embed{
 				Description: m,
 				Color:       db.EmbedColour,
 			})
