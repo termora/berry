@@ -13,7 +13,9 @@
     <div class="term">
         <h1><a href="/">{{.Conf.SiteName}}</a></h1>
         <h3>{{.Term.Name}}</h3>
-        <h4>Aliases: {{if .Term.Aliases}}{{.Term.Aliases | join "," }}{{else}}none{{end}}</h4>
+        {{if .Term.Aliases}}
+            <h4>Aliases: {{.Term.Aliases | join ", " }}</h4>
+        {{end}}
         {{if .Term.ContentWarnings}}
         <p><strong>Content Warning</strong></p>
         <blockquote>
@@ -34,6 +36,13 @@
         <blockquote>
             {{.Term.Note | markdownParse}}
         </blockquote>
+        {{end}}
+        {{if .Term.Tags}}
+        <p>
+            <strong>Tags</strong>
+            <br />
+            {{.Term.Tags | join ", "}}
+        </p>
         {{end}}
         </p>
         <p>ID: {{.Term.ID}}, category: {{.Term.CategoryName}} (ID: {{.Term.Category}})</p>

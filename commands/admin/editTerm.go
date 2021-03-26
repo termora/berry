@@ -309,7 +309,6 @@ func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 	if ctx.Args[2] != "clear" {
 		tags = ctx.Args[2:]
 	}
-	fmt.Println(tags)
 
 	err = c.DB.UpdateTags(t.ID, tags)
 	if err != nil {

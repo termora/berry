@@ -30,7 +30,7 @@ func (c *Admin) update(ctx *bcr.Context) (err error) {
 
 	t := time.Now()
 	update := exec.Command("/usr/local/go/bin/go", "build", "-v")
-	updateOutput, err := update.Output()
+	updateOutput, err := update.CombinedOutput()
 	if err != nil {
 		_, err = ctx.Send(fmt.Sprintf("Error building:\n```%v```", err), nil)
 		return err

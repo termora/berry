@@ -2,17 +2,23 @@ package main
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/labstack/echo/v4"
 	"github.com/termora/berry/db"
 )
 
 func (s *site) tag(c echo.Context) (err error) {
+	tag, err := url.PathUnescape(c.Param("tag"))
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
 	var terms []*db.Term
-	if c.Param("tag") == "untagged" || c.Param("tag") == "" {
+	if tag == "untagged" || tag == "" {
 		terms, err = s.db.UntaggedTerms()
 	} else {
-		terms, err = s.db.TagTerms(c.Param("tag"))
+		terms, err = s.db.TagTerms(tag)
 	}
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
@@ -22,7 +28,7 @@ func (s *site) tag(c echo.Context) (err error) {
 		Conf  conf
 		Tag   string
 		Terms []*db.Term
-	}{s.conf, c.Param("tag"), terms}
+	}{s.conf, tag, terms}
 
 	return c.Render(http.StatusOK, "terms.html", data)
 }
