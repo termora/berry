@@ -31,6 +31,11 @@ func (c *commands) tags(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
+	if len(terms) == 0 {
+		_, err = ctx.Send("I couldn't find any terms with that tag.", nil)
+		return
+	}
+
 	var s []string
 	for _, t := range terms {
 		s = append(s, t.Name)
