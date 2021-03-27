@@ -56,7 +56,6 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Name:    "add",
 		Summary: "Add the given prefix",
 		Usage:   "<prefix>",
-		Args:    bcr.MinArgs(1),
 
 		Permissions: discord.PermissionManageGuild,
 		Command:     c.addPrefix,
@@ -66,7 +65,6 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Name:    "remove",
 		Summary: "Remove the given prefix",
 		Usage:   "<prefix>",
-		Args:    bcr.MinArgs(1),
 
 		Permissions: discord.PermissionManageGuild,
 		Command:     c.removePrefix,

@@ -13,8 +13,13 @@ func (c *commands) addPrefix(ctx *bcr.Context) (err error) {
 	prefix := strings.ToLower(ctx.RawArgs)
 	current := c.PrefixesFor(ctx.Message.GuildID)
 
+	if ctx.RawArgs == "" {
+		_, err = ctx.Send("You didn't give a prefix to add.", nil)
+		return
+	}
+
 	if strings.Contains(prefix, c.Router.Bot.ID.String()) {
-		_, err = ctx.Send(":x: Can't add mentioning the bot as a prefix!", nil)
+		_, err = ctx.Send("Can't add mentioning the bot as a prefix.", nil)
 		return
 	}
 
@@ -46,8 +51,13 @@ func (c *commands) removePrefix(ctx *bcr.Context) (err error) {
 	prefix := strings.ToLower(ctx.RawArgs)
 	current := c.PrefixesFor(ctx.Message.GuildID)
 
+	if ctx.RawArgs == "" {
+		_, err = ctx.Send("You didn't give a prefix to remove.", nil)
+		return
+	}
+
 	if strings.Contains(prefix, c.Router.Bot.ID.String()) {
-		_, err = ctx.Send(":x: Can't remove mentioning the bot as a prefix!", nil)
+		_, err = ctx.Send("Can't remove mentioning the bot as a prefix.", nil)
 		return
 	}
 
