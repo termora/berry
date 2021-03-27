@@ -66,10 +66,10 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "post",
+		Aliases: []string{"term"},
 		Summary: "Post a single term",
-		Usage:   "<term ID> [channel]",
+		Usage:   "<term ID/name>",
 
-		Args:          bcr.MinArgs(1),
 		Cooldown:      time.Second,
 		Blacklistable: true,
 		Command:       c.term,
