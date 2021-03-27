@@ -1,9 +1,13 @@
 package search
 
 import (
+	"context"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v2/gateway"
 	flag "github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
@@ -100,50 +104,104 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		return err
 	}
 
-	ctx.AdditionalParams["termSlices"] = termSlices
+	con, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
 
-	for i, e := range emoji {
-		if i >= len(terms) {
-			return
+	go func() {
+		for i, e := range emoji {
+			if i >= len(terms) {
+				return
+			}
+
+			emoji := e
+			ctx.State.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(emoji))
+
+			index := i
+			ctx.AddReactionHandler(msg.ID, ctx.Author.ID, e, false, false, func(ctx *bcr.Context) {
+				page, ok := ctx.AdditionalParams["page"].(int)
+				if ok == false {
+					return
+				}
+				if len(termSlices) < page {
+					ctx.State.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
+					return
+				}
+
+				termSlice := termSlices[page]
+				if index >= len(termSlice) {
+					ctx.State.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
+					return
+				}
+
+				err := ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID)
+				if err != nil {
+					c.Sugar.Error("Error deleting message:", err)
+				}
+				_, err = ctx.Send("", termSlice[index].TermEmbed(c.Config.TermBaseURL()))
+				if err != nil {
+					c.Sugar.Error("Error sending message:", err)
+				}
+				cancel()
+			})
+		}
+	}()
+
+	// wait for a message, so people can also type in the item number
+	v := ctx.State.WaitFor(con, func(v interface{}) bool {
+		ev, ok := v.(*gateway.MessageCreateEvent)
+		if !ok {
+			return false
 		}
 
-		emoji := e
-		if err := ctx.State.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(emoji)); err != nil {
-			c.Sugar.Error("Error adding reaction:", err)
-			return err
+		if ev.Author.ID != ctx.Author.ID || ev.ChannelID != ctx.Message.ChannelID {
+			return false
 		}
 
-		index := i
-		ctx.AddReactionHandler(msg.ID, ctx.Author.ID, e, false, false, func(ctx *bcr.Context) {
-			page, ok := ctx.AdditionalParams["page"].(int)
-			if ok == false {
-				return
-			}
-			termSlices, ok := ctx.AdditionalParams["termSlices"].([][]*db.Term)
-			if ok == false {
-				return
-			}
-			if len(termSlices) < page {
-				ctx.State.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
-				return
-			}
+		page, ok := ctx.AdditionalParams["page"].(int)
+		if !ok {
+			return false
+		}
 
-			termSlice := termSlices[page]
-			if index >= len(termSlice) {
-				ctx.State.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
-				return
-			}
+		if len(termSlices) < page {
+			return false
+		}
 
-			err := ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID)
-			if err != nil {
-				c.Sugar.Error("Error deleting message:", err)
-			}
-			_, err = ctx.Send("", termSlice[index].TermEmbed(c.Config.TermBaseURL()))
-			if err != nil {
-				c.Sugar.Error("Error sending message:", err)
-			}
-		})
+		termSlice := termSlices[page]
+
+		i, err := strconv.Atoi(ev.Content)
+		if err != nil {
+			return false
+		}
+
+		if i-1 >= len(termSlice) {
+			return false
+		}
+
+		return true
+	})
+
+	// if it timed out, return
+	if v == nil {
+		return
 	}
 
+	m, ok := v.(*gateway.MessageCreateEvent)
+	if !ok {
+		return
+	}
+
+	i, err := strconv.Atoi(m.Content)
+	if err != nil {
+		return
+	}
+
+	page, ok := ctx.AdditionalParams["page"].(int)
+	if !ok {
+		return
+	}
+
+	// delete the original message, then send the definition
+	ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID)
+	_, err = ctx.Send("", termSlices[page][i-1].TermEmbed(c.Config.TermBaseURL()))
 	return
 }

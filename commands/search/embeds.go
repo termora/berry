@@ -33,7 +33,7 @@ func searchResultEmbed(search string, page, total, totalTerms int, s []*db.Term)
 	// only show this if there's more than one page
 	v := []discord.EmbedField{{
 		Name:  "Usage",
-		Value: "Use ⬅️ ➡️ to navigate between pages and the numbers to choose a term.",
+		Value: "Use ⬅️ ➡️ to navigate between pages and the numbers to choose a term.\nYou can also type out the number in chat to choose a term.",
 	}}
 	if totalTerms <= 5 {
 		v = nil
