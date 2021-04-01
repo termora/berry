@@ -80,7 +80,11 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		return err
 	}
 
-	termSlices := make([][]*db.Term, 0)
+	// split the slice of terms into 5-long slices each
+	var (
+		termSlices [][]*db.Term
+		embeds     []discord.Embed
+	)
 
 	for i := 0; i < len(terms); i += 5 {
 		end := i + 5
@@ -92,106 +96,106 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		termSlices = append(termSlices, terms[i:end])
 	}
 
-	embeds := make([]discord.Embed, 0)
-
+	// turn those slices into embeds
 	for i, t := range termSlices {
 		embeds = append(embeds, searchResultEmbed(search, i+1, len(termSlices), len(terms), t))
 	}
 
+	// actually send the search results
 	msg, err := ctx.PagedEmbed(embeds, false)
 	if err != nil {
 		c.Report(ctx, err)
 		return err
 	}
 
-	con, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
-	defer cancel()
-
+	// add the reactions, this is spun off into its own goroutine to immediately add the handler below
 	go func() {
 		for i, e := range emoji {
 			if i >= len(terms) {
 				return
 			}
 
-			emoji := e
-			ctx.State.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(emoji))
-
-			index := i
-			ctx.AddReactionHandler(msg.ID, ctx.Author.ID, e, false, false, func(ctx *bcr.Context) {
-				page, ok := ctx.AdditionalParams["page"].(int)
-				if ok == false {
-					return
-				}
-				if len(termSlices) < page {
-					ctx.State.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
-					return
-				}
-
-				termSlice := termSlices[page]
-				if index >= len(termSlice) {
-					ctx.State.DeleteUserReaction(ctx.Channel.ID, msg.ID, ctx.Author.ID, discord.APIEmoji(emoji))
-					return
-				}
-
-				err := ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID)
-				if err != nil {
-					c.Sugar.Error("Error deleting message:", err)
-				}
-				_, err = ctx.Send("", termSlice[index].TermEmbed(c.Config.TermBaseURL()))
-				if err != nil {
-					c.Sugar.Error("Error sending message:", err)
-				}
-				cancel()
-			})
+			err = ctx.State.React(ctx.Channel.ID, msg.ID, discord.APIEmoji(e))
+			// if the error was non-nil we can assume the message was deleted, so return
+			if err != nil {
+				break
+			}
 		}
 	}()
 
-	// wait for a message, so people can also type in the item number
+	// time out the request below after 15 minutes
+	// deferring the cancel func is just good practice
+	con, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	// wait for either a message or a reaction
+	// store the number in a variable so we don't have to parse it all over again
+	var n int
 	v := ctx.State.WaitFor(con, func(v interface{}) bool {
-		ev, ok := v.(*gateway.MessageCreateEvent)
-		if !ok {
+		if ev, ok := v.(*gateway.MessageCreateEvent); ok {
+			// if the channel/author aren't correct, return
+			if ev.Author.ID != ctx.Author.ID || ev.ChannelID != ctx.Message.ChannelID {
+				return false
+			}
+
+			// parse the number
+			n, err = strconv.Atoi(ev.Content)
+			if err != nil {
+				return false
+			}
+		} else if ev, ok := v.(*gateway.MessageReactionAddEvent); ok {
+			// else, check for a message reaction
+			if ev.UserID != ctx.Author.ID ||
+				ev.ChannelID != ctx.Message.ChannelID ||
+				ev.MessageID != msg.ID {
+				return false
+			}
+
+			// get the emoji number
+			var isNum bool
+			for i, e := range emoji {
+				if ev.Emoji.Name == e {
+					n = i + 1
+					isNum = true
+					break
+				}
+			}
+
+			// if it wasn't a number emoji, return
+			if !isNum {
+				return false
+			}
+		} else {
 			return false
 		}
 
-		if ev.Author.ID != ctx.Author.ID || ev.ChannelID != ctx.Message.ChannelID {
-			return false
-		}
-
+		// get the page number
+		// this conversion *shouldn't* fail, but if it does and we don't check for that, the function will panic
 		page, ok := ctx.AdditionalParams["page"].(int)
 		if !ok {
 			return false
 		}
 
+		// this should never happen but check just in case
 		if len(termSlices) < page {
 			return false
 		}
 
-		termSlice := termSlices[page]
-
-		i, err := strconv.Atoi(ev.Content)
-		if err != nil {
+		// if the reaction/number is out of bounds, return
+		if n > len(termSlices[page]) {
 			return false
 		}
 
-		if i-1 >= len(termSlice) {
-			return false
-		}
-
+		// everything's fine so we can accept this event!
 		return true
 	})
 
 	// if it timed out, return
+	// and try to clean up reactions too
 	if v == nil {
-		return
-	}
-
-	m, ok := v.(*gateway.MessageCreateEvent)
-	if !ok {
-		return
-	}
-
-	i, err := strconv.Atoi(m.Content)
-	if err != nil {
+		if p, _ := ctx.State.Permissions(ctx.Channel.ID, ctx.Bot.ID); p.Has(discord.PermissionManageMessages) {
+			ctx.State.DeleteAllReactions(msg.ChannelID, msg.ID)
+		}
 		return
 	}
 
@@ -202,6 +206,6 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	// delete the original message, then send the definition
 	ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID)
-	_, err = ctx.Send("", termSlices[page][i-1].TermEmbed(c.Config.TermBaseURL()))
+	_, err = ctx.Send("", termSlices[page][n-1].TermEmbed(c.Config.TermBaseURL()))
 	return
 }
