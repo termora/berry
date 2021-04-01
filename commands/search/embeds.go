@@ -11,7 +11,15 @@ import (
 var emoji = []string{"1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"}
 
 func searchResultEmbed(search string, page, total, totalTerms int, s []*db.Term) discord.Embed {
-	var desc string
+	var (
+		desc   string
+		fields []discord.EmbedField
+	)
+
+	// only show this if there's more than one page
+	if totalTerms > 5 {
+		desc = "Use ⬅️ ➡️ to navigate between pages and the numbers to choose a term.\nYou can also type out the number in chat to choose a term."
+	}
 
 	// add ellipses to headlines if they're needed
 	// this isn't 100% accurate but it's close enough
@@ -27,22 +35,18 @@ func searchResultEmbed(search string, page, total, totalTerms int, s []*db.Term)
 		if len(t.Aliases) > 0 {
 			name += fmt.Sprintf(" (%v)", strings.Join(t.Aliases, ", "))
 		}
-		desc += fmt.Sprintf("%v **%v**\n%v\n\n", emoji[i], name, h)
+
+		fields = append(fields, discord.EmbedField{
+			Name:  "​",
+			Value: fmt.Sprintf("%v **%v**\n%v\n\n", emoji[i], name, h),
+		})
 	}
 
-	// only show this if there's more than one page
-	v := []discord.EmbedField{{
-		Name:  "Usage",
-		Value: "Use ⬅️ ➡️ to navigate between pages and the numbers to choose a term.\nYou can also type out the number in chat to choose a term.",
-	}}
-	if totalTerms <= 5 {
-		v = nil
-	}
 	return discord.Embed{
 		Title:       fmt.Sprintf("Search results for \"%v\"", search),
-		Description: desc,
 		Color:       db.EmbedColour,
-		Fields:      v,
+		Description: desc,
+		Fields:      fields,
 		Footer: &discord.EmbedFooter{
 			Text: fmt.Sprintf("Results: %v | Page %v/%v", totalTerms, page, total),
 		},

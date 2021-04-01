@@ -277,6 +277,8 @@ github.com/starshine-sys/bcr v0.14.0 h1:mE/f6uOJbuEAp4O3KSnfpkcFkGXs4Or9p8/LzMMV
 github.com/starshine-sys/bcr v0.14.0/go.mod h1:RbJjgxThrGFChrapaxajZJiUO8oNN65I4mGN+3g2R0I=
 github.com/starshine-sys/bcr v0.14.1 h1:ZeJQUFGVWzS0M46/CDbPDAfwPJBpK7r3+MC6f4+gawg=
 github.com/starshine-sys/bcr v0.14.1/go.mod h1:RbJjgxThrGFChrapaxajZJiUO8oNN65I4mGN+3g2R0I=
+github.com/starshine-sys/bcr v0.14.3-0.20210401205810-b0dbbd646a77 h1:FeyPswvf1r7zZZSYtIh2QVh6oMC+IsH3hABlfM1LGOU=
+github.com/starshine-sys/bcr v0.14.3-0.20210401205810-b0dbbd646a77/go.mod h1:RbJjgxThrGFChrapaxajZJiUO8oNN65I4mGN+3g2R0I=
 github.com/starshine-sys/pkgo v0.2.1 h1:v4SPsAVK+ZObmYlDogDjC7zkXcco76WD5Mqd0ui71QY=
 github.com/starshine-sys/pkgo v0.2.1/go.mod h1:/MObIv0vRt273UyDtuPdMNgADYhOh+h7VPccO6Zh9V8=
 github.com/starshine-sys/snowflake/v2 v2.0.0 h1:rVDUw1tXe1nDcGTMMAU5RzU+mX4O9IDEEs9lds7BYtI=
