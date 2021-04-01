@@ -91,10 +91,6 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 				Value: fmt.Sprintf("`pronouns`: see how pronouns are used in a sentence (optionally with your name)\n`pronouns list`: list all pronouns known to %v\n`pronouns submit`: submit a pronoun set to be added", ctx.Bot.Username),
 			},
 			{
-				Name:  "Explanations",
-				Value: "`explain`: get a list of all registered explanations (aliases: `e`, `ex`)\n`explain <topic>`: explain the given topic",
-			},
-			{
 				Name:  "For staff",
 				Value: "You can blacklist most commands, with the exception of `explain`, using the `blacklist` command.\nYou can also change the prefixes the bot uses with the `prefix` command.",
 			},
@@ -102,12 +98,6 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 		Footer: &discord.EmbedFooter{
 			Text: "Use `help <command>` for more information on a specific command.",
 		},
-	}
-	if c.Config.Bot.Support.Invite != "" {
-		e.Fields = append(e.Fields, discord.EmbedField{
-			Name:  "Support server",
-			Value: fmt.Sprintf("Use this link to join the support server, for bot questions and term additions/requests: %v", c.Config.Bot.Support.Invite),
-		})
 	}
 
 	// if custom help fields are defined, add those
