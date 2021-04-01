@@ -6,9 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"flag"
+
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
-	flag "github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -21,14 +22,10 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		cat        string
 	)
 
-	fs.BoolVarP(&showHidden, "show-hidden", "h", false, "")
-	fs.StringVarP(&cat, "category", "c", "", "")
+	fs.BoolVar(&showHidden, "h", false, "")
+	fs.StringVar(&cat, "c", "", "")
 
-	err = fs.Parse(ctx.Args)
-	if err != nil {
-		_, err = ctx.Sendf("You didn't give a valid input for this command. Usage:\n> ``%v%v %v``", c.Config.Bot.Prefixes[0], ctx.Command, ctx.Cmd.Usage)
-		return
-	}
+	fs.Parse(ctx.Args)
 	ctx.Args = fs.Args()
 
 	// we can't check for this normally because of the flags above

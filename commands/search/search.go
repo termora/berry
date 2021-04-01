@@ -21,7 +21,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Summary:     "Search for a term",
 		Description: "Search for a term. Prefix your search with `!` to show the first result.",
-		Usage:       "[--category/-c <category>] [--show-hidden/-h] <search term>",
+		Usage:       "[-c <category>] [-h] <search term>",
 
 		Blacklistable: true,
 
