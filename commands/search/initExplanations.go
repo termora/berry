@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/diamondburned/arikawa/v2/api"
+	"github.com/diamondburned/arikawa/v2/utils/json/option"
 	"github.com/starshine-sys/bcr"
 )
 
@@ -29,7 +31,25 @@ func (c *commands) initExplanations(r *bcr.Router) (out []*bcr.Command) {
 
 			Cooldown: 1 * time.Second,
 			Command: func(ctx *bcr.Context) (err error) {
-				_, err = ctx.Send(e.Description, nil)
+				m := ctx.NewMessage()
+				if ctx.Message.Reference != nil {
+					m = m.Reference(ctx.Message.Reference.MessageID)
+
+					var o bool = false
+
+					m = m.AllowedMentions(&api.AllowedMentions{
+						Parse: []api.AllowedMentionType{api.AllowUserMention},
+
+						RepliedUser: option.Bool(&o),
+					})
+
+					if len(ctx.Message.Mentions) > 0 {
+						o = true
+						m.Data.AllowedMentions.RepliedUser = option.Bool(&o)
+					}
+				}
+
+				_, err = m.Content(e.Description).Send()
 				return err
 			},
 		}))

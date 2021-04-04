@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/diamondburned/arikawa/v2/api"
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v2/utils/json/option"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -15,16 +17,35 @@ func (c *commands) explanation(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
+	// create a new message object
+	m := ctx.NewMessage()
+	if ctx.Message.Reference != nil {
+		m = m.Reference(ctx.Message.Reference.MessageID)
+
+		var o bool = false
+
+		m = m.AllowedMentions(&api.AllowedMentions{
+			Parse: []api.AllowedMentionType{api.AllowUserMention},
+
+			RepliedUser: option.Bool(&o),
+		})
+
+		if len(ctx.Message.Mentions) > 0 {
+			o = true
+			m.Data.AllowedMentions.RepliedUser = option.Bool(&o)
+		}
+	}
+
 	// just cycle through all of these, it's fine (probably)
 	if ctx.RawArgs != "" {
 		for _, e := range ex {
-			if strings.ToLower(ctx.RawArgs) == e.Name {
-				_, err = ctx.Send(e.Description, nil)
+			if strings.EqualFold(ctx.RawArgs, e.Name) {
+				_, err = m.Content(e.Description).Send()
 				return err
 			}
 			for _, alias := range e.Aliases {
-				if strings.ToLower(ctx.RawArgs) == alias {
-					_, err = ctx.Send(e.Description, nil)
+				if strings.EqualFold(ctx.RawArgs, alias) {
+					_, err = m.Content(e.Description).Send()
 					return err
 				}
 			}
@@ -33,15 +54,16 @@ func (c *commands) explanation(ctx *bcr.Context) (err error) {
 
 	var x string
 	for _, e := range ex {
-		x += fmt.Sprintf("%v: `%v`\n", e.ID, e.Name)
+		x += fmt.Sprintf("- `%v`\n", e.Name)
 	}
 	if x == "" {
 		x = "No explanations."
 	}
-	_, err = ctx.Send("", &discord.Embed{
+
+	_, err = m.Embed(&discord.Embed{
 		Title:       "All explanations",
 		Description: x,
 		Color:       db.EmbedColour,
-	})
+	}).Send()
 	return err
 }
