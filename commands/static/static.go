@@ -106,7 +106,8 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 	})
 
 	help.AddSubcommand(&bcr.Command{
-		Name: "commands",
+		Name:    "commands",
+		Aliases: []string{"cmds"},
 
 		Summary:  "Show a list of all commands",
 		Cooldown: 1 * time.Second,
@@ -130,8 +131,6 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Summary: "Export all terms in a DM",
 		Usage:   "[--compress|-x]",
 
-		Cooldown: time.Minute,
-
 		Command: c.export,
 	}))
 
@@ -139,7 +138,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 
 	// thing
 	if _, err := os.Stat("custom_commands.json"); err != nil {
-		return "Static commands", o
+		return "Bot info commands", o
 	}
 
 	bytes, err := os.ReadFile("custom_commands.json")

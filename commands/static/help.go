@@ -80,11 +80,11 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 		Fields: []discord.EmbedField{
 			{
 				Name:  "Bot info",
-				Value: "`help`: show a list of commands, and some info about the bot (alias: `h`)\n`help privacy`: show the bot's privacy policy\n`help commands`: show a full list of commands\n`invite`: get an invite link for the bot",
+				Value: "`help`: show a list of commands, and some info about the bot (alias: `h`)\n`help privacy`: show the bot's privacy policy\n`help commands`: show a full list of commands\n`credits`: show the people who contributed to the bot\n`invite`: get an invite link for the bot",
 			},
 			{
 				Name:  "Terms",
-				Value: "`search`: search the database for a term (alias: `s`)\n`random`: show a random term (alias: `r`)",
+				Value: "`search`: search the database for a term (alias: `s`)\n`random`: show a random term (alias: `r`)\n`define`: show the term with the given name, or the closest match (alias: `d`)",
 			},
 			{
 				Name:  "Pronouns",
