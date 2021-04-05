@@ -16,7 +16,10 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	var term *db.Term
+	var (
+		exact bool
+		term  *db.Term
+	)
 
 	id, err := strconv.Atoi(ctx.RawArgs)
 	if err == nil {
@@ -28,11 +31,13 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 			}
 			return c.DB.InternalError(ctx, err)
 		}
+		exact = true
 	} else {
 		term, err = c.DB.TermName(ctx.RawArgs)
 		if err != nil && errors.Cause(err) != pgx.ErrNoRows {
 			return c.DB.InternalError(ctx, err)
 		} else if err == nil {
+			exact = true
 			goto found
 		}
 
@@ -50,6 +55,12 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 	}
 
 found:
-	_, err = ctx.Send("", term.TermEmbed(c.Config.TermBaseURL()))
+	m := ctx.NewMessage()
+
+	if !exact {
+		m = m.Content("I couldn't find a term exactly matching that name, but here's the closest match:")
+	}
+
+	_, err = m.Embed(term.TermEmbed(c.Config.TermBaseURL())).Send()
 	return
 }
