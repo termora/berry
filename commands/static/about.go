@@ -1,6 +1,7 @@
 package static
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"os/exec"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/dustin/go-humanize"
+	"github.com/georgysavva/scany/pgxscan"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -28,7 +30,38 @@ func init() {
 	}
 }
 
+type category struct {
+	ID    int
+	Name  string
+	Count int
+}
+
 func (c *Commands) about(ctx *bcr.Context) (err error) {
+	// get term count
+	var (
+		total = c.DB.TermCount()
+
+		pronouns   int
+		categories []category
+	)
+	err = pgxscan.Select(context.Background(), c.DB.Pool, &categories, "select categories.id, categories.name, count(terms.id) from categories inner join terms on categories.id = terms.category group by categories.id order by categories.id")
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+	err = c.DB.Pool.QueryRow(context.Background(), "select count(id) from pronouns").Scan(&pronouns)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+	terms := discord.EmbedField{
+		Name:   "Terms",
+		Value:  fmt.Sprintf("**%v** total", total),
+		Inline: true,
+	}
+	for _, c := range categories {
+		terms.Value += fmt.Sprintf("\n**%v** %v terms", c.Count, c.Name)
+	}
+	terms.Value += fmt.Sprintf("\n\n**%v** pronouns", pronouns)
+
 	stats := runtime.MemStats{}
 	runtime.ReadMemStats(&stats)
 
@@ -73,19 +106,10 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			Value:  fmt.Sprintf("%v / %v (%v garbage collected)\n%v goroutines", humanize.Bytes(stats.Alloc), humanize.Bytes(stats.Sys), humanize.Bytes(stats.TotalAlloc), runtime.NumGoroutine()),
 			Inline: false,
 		},
-		{
-			Name:   "Terms",
-			Value:  fmt.Sprint(c.DB.TermCount()),
-			Inline: true,
-		},
-		{
-			Name:   "Credits",
-			Value:  fmt.Sprintf("Check `%vcredits`!", ctx.Prefix),
-			Inline: true,
-		},
+		terms,
 		{
 			Name:   "Source code",
-			Value:  fmt.Sprintf("[GitHub](%v)\n/ Licensed under the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)", c.Config.Bot.Git),
+			Value:  fmt.Sprintf("[GitHub](%v)\n/ [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) license", c.Config.Bot.Git),
 			Inline: true,
 		},
 	}...)
