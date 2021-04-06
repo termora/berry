@@ -175,12 +175,11 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 
 	a.AddSubcommand(&bcr.Command{
 		Name:    "setcw",
-		Summary: "Set a term's CW",
+		Summary: "Set a term's CW. Use `-clear` to clear.",
 		Usage:   "<id> <content warning>",
 
-		CustomPermissions: c,
-
-		Command: c.setCW,
+		CustomPermissions: directorCheck,
+		Command:           c.setCW,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -188,9 +187,8 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Set a term's note",
 		Usage:   "<id> <note>",
 
-		CustomPermissions: c,
-
-		Command: c.setNote,
+		CustomPermissions: directorCheck,
+		Command:           c.setNote,
 	})
 
 	a.AddSubcommand(&bcr.Command{

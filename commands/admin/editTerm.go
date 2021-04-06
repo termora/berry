@@ -15,7 +15,48 @@ import (
 
 func (c *Admin) editTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(3); err != nil {
-		_, err = ctx.Send("Not enough arguments. Valid subcommands are: `title`, `desc`, `source`, `aliases`, `image`, `tags`.", nil)
+		e := &discord.Embed{
+			Title:       "Edit term",
+			Description: fmt.Sprintf("```%vadmin editterm <part> <ID> <new|-clear>```", ctx.Prefix),
+
+			Fields: []discord.EmbedField{
+				{
+					Name: "​",
+					Value: `Available parts to edit are:
+- title
+- desc (description)
+- source ("Coined by")
+- aliases ("Synonyms")
+- tags
+
+For ` + "`aliases`" + ` and ` + "`tags`" + `, you can use "-clear", with no quotes, to clear them.`,
+				},
+				{
+					Name:  "`title`",
+					Value: "The term's new title",
+				},
+				{
+					Name:  "`desc`",
+					Value: "The term's new description. Note that this should be wrapped in \"quotes\" to preserve newlines.",
+				},
+				{
+					Name:  "`source`",
+					Value: "The term's new source.",
+				},
+				{
+					Name:  "`aliases`",
+					Value: "The term's new synonyms. Synonyms should be space separated; if a synonym has a space in it, wrap it in \"quotes\".",
+				},
+				{
+					Name:  "`tags`",
+					Value: "The term's new tags, space separated, like `aliases`.",
+				},
+			},
+
+			Color: ctx.Router.EmbedColor,
+		}
+
+		_, err = ctx.Send("", e)
 		return
 	}
 
@@ -204,7 +245,7 @@ func (c *Admin) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 func (c *Admin) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 	var aliases []string
 	if ctx.Args[2] != "clear" {
-		aliases = strings.Split(strings.Join(ctx.Args[2:], " "), "\n")
+		aliases = ctx.Args[2:]
 	}
 
 	if len(strings.Join(aliases, ", ")) > 1000 {

@@ -9,7 +9,7 @@ import (
 
 func (c *Admin) setCW(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
-		_, err = ctx.Send("Not enough arguments provided: need ID and CW (or \"clear\"", nil)
+		_, err = ctx.Send("Not enough arguments provided: need ID and CW (or \"clear\")", nil)
 		return err
 	}
 
@@ -26,7 +26,7 @@ func (c *Admin) setCW(ctx *bcr.Context) (err error) {
 	// h
 	// didn't we have a helper function for this??? oh well
 	cw := strings.TrimSpace(strings.TrimPrefix(ctx.RawArgs, ctx.Args[0]))
-	if cw == "clear" {
+	if cw == "clear" || cw == "-clear" {
 		cw = ""
 	}
 
