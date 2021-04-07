@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
-	github.com/diamondburned/arikawa/v2 v2.0.5
+	github.com/diamondburned/arikawa/v2 v2.0.6-0.20210406223428-37d285184a39
 	github.com/dustin/go-humanize v1.0.0
 	github.com/georgysavva/scany v0.2.7
 	github.com/getsentry/sentry-go v0.10.0

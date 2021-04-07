@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/diamondburned/arikawa/v2/api"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
@@ -104,7 +103,10 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 
 	// if the channel is an announcement channel, also publish the post
 	if ch.Type == discord.GuildNews {
-		ctx.State.FastRequest("POST", api.EndpointChannels+m.ChannelID.String()+"/messages/"+m.ID.String()+"/crosspost")
+		_, err = ctx.State.CrosspostMessage(m.ChannelID, m.ID)
+		if err != nil {
+			c.Sugar.Errorf("Error crossposting message: %v", err)
+		}
 	}
 
 	// if it didn't fit in one message, send all the others
@@ -121,7 +123,10 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 
 			// if the channel is an announcement channel, also publish the post
 			if ch.Type == discord.GuildNews {
-				ctx.State.FastRequest("POST", api.EndpointChannels+msg.ChannelID.String()+"/messages/"+msg.ID.String()+"/crosspost")
+				_, err = ctx.State.CrosspostMessage(msg.ChannelID, msg.ID)
+				if err != nil {
+					c.Sugar.Errorf("Error crossposting message: %v", err)
+				}
 			}
 		}
 	}
