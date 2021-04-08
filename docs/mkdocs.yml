@@ -1,0 +1,38 @@
+site_name: Termora
+
+site_url: https://termora.org/docs/
+
+nav:
+  - Home: '../'
+  - 'index.md'
+  - 'api.md'
+  - 'Self-hosting':
+    - 'self-hosting/install.md'
+    - 'self-hosting/admin.md'
+  - 'Invite the bot': 'https://termora.org/invite'
+  - 'Support server': 'https://termora.org/server'
+
+repo_url: https://github.com/termora/berry
+edit_uri: ""
+
+plugins:
+  - search
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.instant
+    - navigation.top
+  logo: assets/icon.png
+  favicon: assets/icon.png
+  font: false
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+extra_css:
+  - assets/style.css
