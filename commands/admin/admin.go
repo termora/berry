@@ -6,6 +6,7 @@ import (
 	"github.com/diamondburned/arikawa/v2/api/webhook"
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/diamondburned/arikawa/v2/gateway"
+	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
 )
@@ -224,7 +225,12 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Name:        "restart",
 		Summary:     "Restart the bot",
 		Description: "If the `-s`/`--silent` flag is set, don't change the bot's status",
-		Usage:       "[delay] [-s/--silent]",
+		Usage:       "[delay]",
+
+		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
+			fs.BoolP("silent", "s", false, "If this flag is used, don't set the bot's status")
+			return fs
+		},
 
 		OwnerOnly: true,
 		Command:   c.restart,
@@ -275,6 +281,12 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Add a term from a correctly formatted message.",
 		Usage:   "<message link|ID>",
 		Args:    bcr.MinArgs(1),
+
+		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
+			fs.StringP("category", "c", "", "Category")
+			fs.BoolP("raw-source", "r", false, "Use the provided source as-is")
+			return fs
+		},
 
 		CustomPermissions: directorCheck,
 		Command:           c.importFromMessage,

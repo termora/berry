@@ -6,8 +6,6 @@ import (
 	"os/exec"
 	"time"
 
-	flag "github.com/spf13/pflag"
-
 	"github.com/starshine-sys/bcr"
 )
 
@@ -41,15 +39,7 @@ func (c *Admin) update(ctx *bcr.Context) (err error) {
 }
 
 func (c *Admin) restart(ctx *bcr.Context) (err error) {
-	var silent bool
-
-	fs := flag.NewFlagSet("", flag.ContinueOnError)
-	fs.BoolVarP(&silent, "silent", "s", false, "If this flag is used, don't set the bot's status")
-	err = fs.Parse(ctx.Args)
-	if err != nil {
-		return c.DB.InternalError(ctx, err)
-	}
-	ctx.Args = fs.Args()
+	silent, _ := ctx.Flags.GetBool("silent")
 
 	if len(ctx.Args) > 0 {
 		t, err := time.ParseDuration(ctx.Args[0])

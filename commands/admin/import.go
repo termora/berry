@@ -7,7 +7,6 @@ import (
 
 	"github.com/diamondburned/arikawa/v2/api/webhook"
 	"github.com/diamondburned/arikawa/v2/discord"
-	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -17,14 +16,8 @@ var msgRegex = regexp.MustCompile(`\*\*Name:\*\* (.*)\n\*\*Category:\*\* (.*)\n\
 var tagsRegex = regexp.MustCompile(`\*\*Tags:\*\* (.*)`)
 
 func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
-	var flag string
-	var rawSource bool
-
-	fs := pflag.NewFlagSet("", pflag.ContinueOnError)
-	fs.StringVarP(&flag, "category", "c", "", "Category")
-	fs.BoolVarP(&rawSource, "raw-source", "r", false, "Use the provided source as-is")
-	fs.Parse(ctx.Args)
-	ctx.Args = fs.Args()
+	flag, _ := ctx.Flags.GetString("category")
+	rawSource, _ := ctx.Flags.GetBool("raw-source")
 
 	msg, err := ctx.ParseMessage(ctx.Args[0])
 	if err != nil {
