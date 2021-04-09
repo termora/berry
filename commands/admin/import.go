@@ -11,7 +11,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-var msgRegex = regexp.MustCompile(`\*\*Name:\*\* (.*)\n\*\*Category:\*\* (.*)\n\*\*Description:\*\* ([\s\S]*)\n\*\*Coined by:\*\* (.*)`)
+var msgRegex = regexp.MustCompile(`\*\*Name:\*\*(.*)\n\*\*Category:\*\*(.*)\n\*\*Description:\*\*([\s\S]*)\n\*\*Coined by:\*\*(.*)`)
 
 var tagsRegex = regexp.MustCompile(`\*\*Tags:\*\* (.*)`)
 
@@ -86,14 +86,14 @@ func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 		}
 
 		// category
-		cat, err := c.DB.CategoryID(groups[2])
+		cat, err := c.DB.CategoryID(strings.TrimSpace(groups[2]))
 		if err == nil {
 			t.Category = cat
 			t.CategoryName = groups[2]
 		}
 
-		t.Description = groups[3]
-		t.Source = groups[4]
+		t.Description = strings.TrimSpace(groups[3])
+		t.Source = strings.TrimSpace(groups[4])
 
 		if g := tagsRegex.FindStringSubmatch(msg.Content); len(g) > 1 {
 			tags := strings.Split(g[1], ",")
@@ -113,7 +113,7 @@ done:
 	if t.Aliases == nil {
 		t.Aliases = []string{}
 	}
-	if !rawSource && !bcr.HasAnyPrefix(t.Source, "Coined by", "Unknown", "unknown") {
+	if !rawSource && !bcr.HasAnyPrefix(t.Source, "Coined by", "Unknown", "unknown", "Already") {
 		t.Source = fmt.Sprintf("Coined by %v", t.Source)
 	}
 
