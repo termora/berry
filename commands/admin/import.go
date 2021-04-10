@@ -11,7 +11,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-var msgRegex = regexp.MustCompile(`\*\*Name:\*\*(.*)\n\*\*Category:\*\*(.*)\n\*\*Description:\*\*([\s\S]*)\n\*\*Coined by:\*\*(.*)`)
+var msgRegex = regexp.MustCompile(`\*\*Name:?\*\*:?(.*)\n\*\*Category:?\*\*:?(.*)\n\*\*Description:?\*\*:?([\s\S]*)\n\*\*Coined by:?\*\*:?(.*)`)
 
 var tagsRegex = regexp.MustCompile(`\*\*Tags:\*\* (.*)`)
 
