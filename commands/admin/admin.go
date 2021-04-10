@@ -292,6 +292,9 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Command:           c.importFromMessage,
 	})
 
+	i := bot.Router.AddCommand(bot.Router.AliasMust("ai", nil, []string{"admin", "import"}, nil))
+	i.Args = bcr.MinArgs(1)
+
 	// set status
 	// this is in admin because of the `guild` owner command
 	var o sync.Once

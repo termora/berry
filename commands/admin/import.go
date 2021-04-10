@@ -130,10 +130,20 @@ done:
 		t.Category = cat
 	}
 
-	// add the category to the tags
+	// add the category to the tags, if it's not already in there
 	cat := c.DB.CategoryFromID(t.Category)
 	t.CategoryName = cat.Name
-	t.Tags = append(t.Tags, cat.Name)
+
+	catInTags := false
+	for _, tag := range t.Tags {
+		if tag == cat.Name {
+			catInTags = true
+			break
+		}
+	}
+	if !catInTags {
+		t.Tags = append(t.Tags, cat.Name)
+	}
 
 	termMsg, err := ctx.Send("Do you want to add this term?", t.TermEmbed(c.Config.TermBaseURL()))
 	if err != nil {
