@@ -48,6 +48,7 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 			}
 			if len(terms) == 0 {
 				_, err = ctx.Sendf("No term found.")
+				return err
 			}
 
 			term = terms[0]
