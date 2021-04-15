@@ -32,6 +32,9 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 	} else {
 		aliases = strings.Split(ctx.Args[3], ",")
 	}
+	for i := range aliases {
+		aliases[i] = strings.TrimSpace(aliases[i])
+	}
 
 	source := ctx.Args[4]
 
