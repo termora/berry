@@ -61,6 +61,17 @@ func (t *Term) Warning() bool {
 
 // TermEmbed creates a Discord embed from a term object
 func (t *Term) TermEmbed(baseURL string) *discord.Embed {
+	defer AddCount()
+
+	e := &discord.Embed{
+		Title:     t.Name,
+		Color:     EmbedColour,
+		Timestamp: discord.NewTimestamp(t.Created),
+		Footer: &discord.EmbedFooter{
+			Text: fmt.Sprintf("ID: %v | Category: %v (ID: %v) | Created", t.ID, t.CategoryName, t.Category),
+		},
+	}
+
 	var (
 		desc = t.Description
 		cw   = t.ContentWarnings
@@ -73,39 +84,50 @@ func (t *Term) TermEmbed(baseURL string) *discord.Embed {
 		cw = strings.ReplaceAll(cw, "(##", "("+baseURL)
 	}
 
-	defer AddCount()
+	if cw != "" {
+		desc = "||" + desc + "||"
 
-	fields := make([]discord.EmbedField, 0)
+		if len(desc) < 1024 {
+			e.Description = fmt.Sprintf("**Content warning: %v**", cw)
+		} else {
+			e.Fields = append(e.Fields, discord.EmbedField{
+				Name:  "​",
+				Value: fmt.Sprintf("**Content warning: %v**", cw),
+			})
+		}
+	}
+
+	if len(desc) < 1024 && cw != "" {
+		e.Fields = append(e.Fields, discord.EmbedField{
+			Name:  "Description",
+			Value: desc,
+		})
+	} else {
+		e.Description = desc
+	}
+
 	if len(t.Aliases) != 0 {
-		fields = append(fields, discord.EmbedField{
+		e.Fields = append(e.Fields, discord.EmbedField{
 			Name:  "Synonyms",
 			Value: strings.Join(t.Aliases, ", "),
 		})
 	}
 
-	if cw != "" {
-		desc = "||" + t.Description + "||"
-		fields = append(fields, discord.EmbedField{
-			Name:  "Content warning",
-			Value: cw,
-		})
-	}
-
 	if note != "" {
-		fields = append(fields, discord.EmbedField{
+		e.Fields = append(e.Fields, discord.EmbedField{
 			Name:  "Note",
 			Value: note,
 		})
 	}
 
 	if t.Warning() {
-		fields = append(fields, discord.EmbedField{
+		e.Fields = append(e.Fields, discord.EmbedField{
 			Name:  "Warning",
 			Value: "This term is only in this glossary for the sake of completeness. It may be derogatory, exclusionary, or harmful, especially when applied to other people and not as a self-description. Use this term with extreme caution.",
 		})
 	}
 
-	fields = append(fields, discord.EmbedField{
+	e.Fields = append(e.Fields, discord.EmbedField{
 		Name:  "Source",
 		Value: t.Source,
 	})
@@ -123,35 +145,20 @@ func (t *Term) TermEmbed(baseURL string) *discord.Embed {
 			}
 		}
 
-		fields = append(fields, discord.EmbedField{
+		e.Fields = append(e.Fields, discord.EmbedField{
 			Name:  "Tag(s)",
 			Value: b.String(),
 		})
 	}
 
-	var u string
 	if baseURL != "" {
-		u = baseURL + url.PathEscape(strings.ToLower(t.Name))
+		e.URL = baseURL + url.PathEscape(strings.ToLower(t.Name))
 	}
 
-	var i *discord.EmbedImage
 	if t.ImageURL != "" {
-		i = &discord.EmbedImage{
+		e.Image = &discord.EmbedImage{
 			URL: t.ImageURL,
 		}
-	}
-
-	e := &discord.Embed{
-		Title:       t.Name,
-		URL:         u,
-		Description: desc,
-		Color:       EmbedColour,
-		Timestamp:   discord.NewTimestamp(t.Created),
-		Fields:      fields,
-		Footer: &discord.EmbedFooter{
-			Text: fmt.Sprintf("ID: %v | Category: %v (ID: %v) | Created", t.ID, t.CategoryName, t.Category),
-		},
-		Image: i,
 	}
 
 	return e
