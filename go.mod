@@ -23,7 +23,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/pflag v1.0.5
 	github.com/starshine-sys/bcr v0.15.1-0.20210410114633-9045049e0f12
-	github.com/starshine-sys/pkgo v0.2.1
+	github.com/starshine-sys/pkgo v0.3.2-0.20210426103511-1124ec82220c
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c // indirect
