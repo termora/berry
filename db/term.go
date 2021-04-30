@@ -32,7 +32,8 @@ type Term struct {
 	Source          string    `json:"source"`
 	Created         time.Time `json:"created"`
 	LastModified    time.Time `json:"last_modified"`
-	Tags            []string  `json:"tags,omitempty"`
+	Tags            []string  `json:"-"`
+	DisplayTags     []string  `json:"tags,omitempty"`
 	ContentWarnings string    `json:"content_warnings,omitempty"`
 	ImageURL        string    `json:"image_url,omitempty"`
 
@@ -132,15 +133,15 @@ func (t *Term) TermEmbed(baseURL string) *discord.Embed {
 		Value: t.Source,
 	})
 
-	if len(t.Tags) > 0 {
+	if len(t.DisplayTags) > 0 {
 		var b strings.Builder
-		for i, tag := range t.Tags {
+		for i, tag := range t.DisplayTags {
 			if b.Len() >= 500 {
-				b.WriteString(fmt.Sprintf("\nToo many to list (showing %v/%v)", i, len(t.Tags)))
+				b.WriteString(fmt.Sprintf("\nToo many to list (showing %v/%v)", i, len(t.DisplayTags)))
 				break
 			}
 			b.WriteString(tag)
-			if i != len(t.Tags)-1 {
+			if i != len(t.DisplayTags)-1 {
 				b.WriteString(", ")
 			}
 		}

@@ -8,7 +8,7 @@ import (
 
 // Tags gets all tags from the database
 func (db *Db) Tags() (s []string, err error) {
-	err = pgxscan.Select(context.Background(), db.Pool, &s, "select distinct unnest(tags) as tags from public.terms order by tags")
+	err = db.Pool.QueryRow(context.Background(), "select array(select display from tags order by tags)").Scan(&s)
 	return
 }
 

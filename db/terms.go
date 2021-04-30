@@ -27,7 +27,8 @@ func (db *Db) TermCount() (count int) {
 // GetTerms gets all terms not blocked by the given mask
 func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url,
+	array(select display from public.tags where normalized = any(t.tags)) as display_tags
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0 and t.category = c.id
 	order by t.name, t.id`, mask)
@@ -37,7 +38,8 @@ func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 // GetCategoryTerms gets terms by category
 func (db *Db) GetCategoryTerms(id int, mask TermFlag) (terms []*Term, err error) {
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url,
+	array(select display from public.tags where normalized = any(t.tags)) as display_tags
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0 and t.category = $2
 	and t.category = c.id
@@ -52,6 +54,7 @@ func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 	}
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url,
+	array(select display from public.tags where normalized = any(t.tags)) as display_tags,
 	ts_rank_cd(t.searchtext, websearch_to_tsquery('english', $1), 8) as rank,
 	ts_headline(t.description, websearch_to_tsquery('english', $1), 'StartSel=**, StopSel=**') as headline
 	from public.terms as t, public.categories as c
@@ -65,7 +68,9 @@ func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 func (db *Db) TermName(n string) (t *Term, err error) {
 	t = &Term{}
 	err = pgxscan.Get(context.Background(), db.Pool, t, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags, t.image_url from public.terms as t, public.categories as c where (t.name ilike $1 or $2 ilike any(t.aliases)) and t.category = c.id`, n, n)
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags, t.image_url,
+	array(select display from public.tags where normalized = any(t.tags)) as display_tags
+	from public.terms as t, public.categories as c where (t.name ilike $1 or $2 ilike any(t.aliases)) and t.category = c.id`, n, n)
 	return t, err
 }
 
@@ -82,6 +87,7 @@ func (db *Db) SearchCat(input string, cat, limit int, showHidden bool) (terms []
 
 	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url,
+	array(select display from public.tags where normalized = any(t.tags)) as display_tags,
 	ts_rank_cd(t.searchtext, websearch_to_tsquery('english', $1), 8) as rank,
 	ts_headline(t.description, websearch_to_tsquery('english', $1), 'StartSel=**, StopSel=**') as headline
 	from public.terms as t, public.categories as c
@@ -120,17 +126,21 @@ func (db *Db) RemoveTerm(id int) (err error) {
 func (db *Db) GetTerm(id int) (t *Term, err error) {
 	t = &Term{}
 	err = pgxscan.Get(context.Background(), db.Pool, t, `select
-	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags, t.image_url from public.terms as t, public.categories as c where t.id = $1 and t.category = c.id`, id)
+	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags, t.image_url,
+	array(select display from public.tags where normalized = any(t.tags)) as display_tags
+	from public.terms as t, public.categories as c where t.id = $1 and t.category = c.id`, id)
 	return t, err
 }
 
 // RandomTerm gets a random term from the database
-func (db *Db) RandomTerm() (t *Term, err error) {
+func (db *Db) RandomTerm(ignore []string) (t *Term, err error) {
 	var terms []*Term
-	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags
+	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags,
+	array(select display from public.tags where normalized = any(t.tags)) as display_tags
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0 and t.category = c.id
-	order by t.id`, FlagRandomHidden)
+	and not $2 && tags
+	order by t.id`, FlagRandomHidden, ignore)
 	if err != nil {
 		return
 	}
@@ -144,13 +154,15 @@ func (db *Db) RandomTerm() (t *Term, err error) {
 }
 
 // RandomTermCategory gets a random term from the database from the specified category
-func (db *Db) RandomTermCategory(id int) (t *Term, err error) {
+func (db *Db) RandomTermCategory(id int, ignore []string) (t *Term, err error) {
 	var terms []*Term
-	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags
+	err = pgxscan.Select(context.Background(), db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags,
+	array(select display from public.tags where normalized = any(t.tags)) as display_tags
 	from public.terms as t, public.categories as c
 	where t.flags & $1 = 0 and t.category = c.id
 	and t.category = $2
-	order by t.id`, FlagRandomHidden, id)
+	and not $3 && tags
+	order by t.id`, FlagRandomHidden, id, ignore)
 	if err != nil {
 		return
 	}

@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -349,6 +350,15 @@ func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 	var tags []string
 	if ctx.Args[2] != "clear" {
 		tags = ctx.Args[2:]
+	}
+
+	for i := range tags {
+		_, err = c.DB.Pool.Exec(context.Background(), `insert into public.tags (normalized, display) values ($1, $2)
+		on conflict (normalized) do update set display = $2`, strings.ToLower(tags[i]), tags[i])
+		if err != nil {
+			c.Sugar.Errorf("Error adding tag: %v", err)
+		}
+		tags[i] = strings.ToLower(tags[i])
 	}
 
 	err = c.DB.UpdateTags(t.ID, tags)

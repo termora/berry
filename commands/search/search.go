@@ -3,6 +3,7 @@ package search
 import (
 	"time"
 
+	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
 )
@@ -34,6 +35,11 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Summary: "Show a random term (optionally filtering by category)",
 		Usage:   "[category]",
+
+		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
+			fs.StringSliceP("ignore-tags", "i", []string{}, "Specific tags (comma-separated) to ignore")
+			return fs
+		},
 
 		Cooldown:      time.Second,
 		Blacklistable: true,
