@@ -8,6 +8,7 @@ import (
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4"
 )
 
 // EmbedColour is the embed colour used throughout the bot
@@ -149,6 +150,10 @@ func (db *Db) RandomTerm(ignore []string) (t *Term, err error) {
 		return terms[0], nil
 	}
 
+	if len(terms) == 0 {
+		return nil, pgx.ErrNoRows
+	}
+
 	n := rand.Intn(len(terms) - 1)
 	return terms[n], nil
 }
@@ -169,6 +174,10 @@ func (db *Db) RandomTermCategory(id int, ignore []string) (t *Term, err error) {
 
 	if len(terms) == 1 {
 		return terms[0], nil
+	}
+
+	if len(terms) == 0 {
+		return nil, pgx.ErrNoRows
 	}
 
 	n := rand.Intn(len(terms) - 1)

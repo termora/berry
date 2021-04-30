@@ -4,13 +4,15 @@ import (
 	"context"
 	"strings"
 
+	"github.com/jackc/pgx/v4"
+	"github.com/pkg/errors"
 	"github.com/starshine-sys/bcr"
 )
 
 func (c *commands) random(ctx *bcr.Context) (err error) {
 	ignore, _ := ctx.Flags.GetStringSlice("ignore-tags")
 	for i := range ignore {
-		ignore[i] = strings.TrimSpace(ignore[i])
+		ignore[i] = strings.ToLower(strings.TrimSpace(ignore[i]))
 	}
 	err = c.DB.Pool.QueryRow(context.Background(), "select array(select )").Scan(&ignore)
 	if err != nil {
@@ -29,6 +31,10 @@ func (c *commands) random(ctx *bcr.Context) (err error) {
 	// grab a random term
 	t, err := c.DB.RandomTerm(ignore)
 	if err != nil {
+		if errors.Cause(err) == pgx.ErrNoRows {
+			_, err = ctx.Send("No terms found! Are you sure you're not excluding every possible term?", nil)
+			return
+		}
 		return c.DB.InternalError(ctx, err)
 	}
 
@@ -46,6 +52,10 @@ func (c *commands) randomCategory(ctx *bcr.Context, ignore []string) (b bool, er
 
 	t, err := c.DB.RandomTermCategory(cat, ignore)
 	if err != nil {
+		if errors.Cause(err) == pgx.ErrNoRows {
+			_, err = ctx.Send("No terms found! Are you sure you're not excluding every possible term?", nil)
+			return true, nil
+		}
 		return true, c.DB.InternalError(ctx, err)
 	}
 
