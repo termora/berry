@@ -17,7 +17,7 @@ type searchData struct {
 
 func (s *site) search(c echo.Context) (err error) {
 	q := template.HTML(bluemonday.UGCPolicy().Sanitize(c.QueryParam("q")))
-	terms, err := s.db.Search(c.QueryParam("q"), 0)
+	terms, err := s.db.Search(c.QueryParam("q"), 0, []string{})
 	if err != nil {
 		return c.Render(http.StatusNotFound, "noQuery.html", searchData{Conf: s.conf, Query: q})
 	}

@@ -10,7 +10,7 @@ import (
 )
 
 func (r *api) search(c echo.Context) (err error) {
-	terms, err := r.db.Search(c.Param("term"), 0)
+	terms, err := r.db.Search(c.Param("term"), 0, []string{})
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
 			return c.NoContent(http.StatusNoContent)

@@ -42,7 +42,7 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		}
 
 		{
-			terms, err := c.DB.Search(ctx.RawArgs, 1)
+			terms, err := c.DB.Search(ctx.RawArgs, 1, nil)
 			if err != nil {
 				return c.DB.InternalError(ctx, err)
 			}

@@ -49,7 +49,7 @@ func (db *Db) GetCategoryTerms(id int, mask TermFlag) (terms []*Term, err error)
 }
 
 // Search searches the database for terms
-func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
+func (db *Db) Search(input string, limit int, ignore []string) (terms []*Term, err error) {
 	if limit == 0 {
 		limit = 50
 	}
@@ -60,8 +60,9 @@ func (db *Db) Search(input string, limit int) (terms []*Term, err error) {
 	ts_headline(t.description, websearch_to_tsquery('english', $1), 'StartSel=**, StopSel=**') as headline
 	from public.terms as t, public.categories as c
 	where t.searchtext @@ websearch_to_tsquery('english', $1) and t.category = c.id and t.flags & $3 = 0
+	and not $4 && tags
 	order by rank desc
-	limit $2`, input, limit, FlagSearchHidden)
+	limit $2`, input, limit, FlagSearchHidden, ignore)
 	return terms, err
 }
 
@@ -76,7 +77,7 @@ func (db *Db) TermName(n string) (t *Term, err error) {
 }
 
 // SearchCat searches for terms from a single category
-func (db *Db) SearchCat(input string, cat, limit int, showHidden bool) (terms []*Term, err error) {
+func (db *Db) SearchCat(input string, cat, limit int, showHidden bool, ignore []string) (terms []*Term, err error) {
 	if limit == 0 {
 		limit = 50
 	}
@@ -93,8 +94,9 @@ func (db *Db) SearchCat(input string, cat, limit int, showHidden bool) (terms []
 	ts_headline(t.description, websearch_to_tsquery('english', $1), 'StartSel=**, StopSel=**') as headline
 	from public.terms as t, public.categories as c
 	where t.searchtext @@ websearch_to_tsquery('english', $1) and t.category = c.id and t.flags & $3 = 0 and t.category = $4
+	and not $5 && tags
 	order by rank desc
-	limit $2`, input, limit, flags, cat)
+	limit $2`, input, limit, flags, cat, ignore)
 	return terms, err
 }
 

@@ -20,10 +20,13 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	var (
 		showHidden bool
 		cat        string
+		ignore     string
+		ignoreTags = []string{}
 	)
 
 	fs.BoolVar(&showHidden, "h", false, "")
 	fs.StringVar(&cat, "c", "", "")
+	fs.StringVar(&ignore, "i", "", "")
 
 	fs.Parse(ctx.Args)
 	ctx.Args = fs.Args()
@@ -33,6 +36,14 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
 		_, err = ctx.Send("No search term provided.", nil)
 		return err
+	}
+
+	// set tags to ignore
+	if ignore != "" {
+		ignoreTags = strings.Split(ignore, ",")
+		for i := range ignoreTags {
+			ignoreTags[i] = strings.ToLower(strings.TrimSpace(ignoreTags[i]))
+		}
 	}
 
 	search := strings.Join(ctx.Args, " ")
@@ -47,7 +58,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	var terms []*db.Term
 	if cat == "" {
 		// no category given, so just search *all* terms
-		terms, err = c.DB.Search(search, limit)
+		terms, err = c.DB.Search(search, limit, ignoreTags)
 		if err != nil {
 			return c.DB.InternalError(ctx, err)
 		}
@@ -61,7 +72,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 			return err
 		}
 
-		terms, err = c.DB.SearchCat(search, category, limit, showHidden)
+		terms, err = c.DB.SearchCat(search, category, limit, showHidden, ignoreTags)
 		if err != nil {
 			return c.DB.InternalError(ctx, err)
 		}
