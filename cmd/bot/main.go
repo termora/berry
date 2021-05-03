@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/diamondburned/arikawa/v2/state/store"
 	"github.com/getsentry/sentry-go"
 	"go.uber.org/zap"
 
@@ -70,6 +71,8 @@ func main() {
 	if err != nil {
 		sugar.Fatalf("Error creating bot: %v", err)
 	}
+	b.Router.State.Cabinet.MessageStore = store.Noop
+
 	b.Owner(c.Bot.BotOwners...)
 
 	// if the bot is sharded, set the number and count
