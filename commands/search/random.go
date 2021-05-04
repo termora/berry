@@ -1,7 +1,6 @@
 package search
 
 import (
-	"context"
 	"strings"
 
 	"github.com/jackc/pgx/v4"
@@ -13,10 +12,6 @@ func (c *commands) random(ctx *bcr.Context) (err error) {
 	ignore, _ := ctx.Flags.GetStringSlice("ignore-tags")
 	for i := range ignore {
 		ignore[i] = strings.ToLower(strings.TrimSpace(ignore[i]))
-	}
-	err = c.DB.Pool.QueryRow(context.Background(), "select array(select )").Scan(&ignore)
-	if err != nil {
-		c.Report(ctx, err)
 	}
 
 	// if theres arguments, try a category
