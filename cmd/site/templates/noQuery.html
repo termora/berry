@@ -7,6 +7,10 @@
     <link rel="shortcut icon" type="image/png" href="/static/favicon.png" />
     <link rel="stylesheet" href="/static/style.css">
     <title>Search | {{.Conf.SiteName}}</title>
+
+    {{if .Conf.Plausible.URL}}
+    <script async defer data-domain="{{.Conf.Plausible.Domain}}" src="{{.Conf.Plausible.URL}}"></script>
+    {{end}}
 </head>
 
 <body>

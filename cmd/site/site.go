@@ -39,9 +39,15 @@ type conf struct {
 	Port        string
 
 	SiteName string `yaml:"site_name"`
+	BaseURL  string `yaml:"base_url"`
 	Invite   string `yaml:"invite_url"`
 	Git      string
 	Contact  bool
+
+	Plausible struct {
+		Domain string
+		URL    string
+	}
 }
 
 func main() {
