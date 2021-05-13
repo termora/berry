@@ -61,9 +61,16 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
-		Name:    "list",
-		Summary: "List all terms, optionally filtering by a category",
-		Usage:   "[category]",
+		Name:        "list",
+		Summary:     "List all terms, optionally filtering by a category",
+		Description: "List all terms, optionally filtering by category. Use `--full` to show a list with every term's description.",
+		Usage:       "[category]",
+
+		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
+			fs.BoolP("full", "f", false, "Show all terms' full descriptions")
+			fs.BoolP("file", "F", false, "Send the list of terms as a file")
+			return fs
+		},
 
 		Cooldown:      time.Second,
 		Blacklistable: true,
