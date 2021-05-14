@@ -111,7 +111,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	ps.Usage = "<search term>"
 
 	ls := bot.Router.AddCommand(bot.Router.AliasMust(
-		"lgbt", []string{"lgbtq", "l"},
+		"lgbt", []string{"lgbtq", "l", "mogai", "queer"},
 		[]string{"search"},
 		bcr.DefaultArgTransformer("-c lgbtq+", ""),
 	))
