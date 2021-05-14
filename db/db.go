@@ -43,6 +43,8 @@ type Db struct {
 
 	sentry    *sentry.Hub
 	useSentry bool
+
+	Searcher
 }
 
 // Init ...
@@ -60,6 +62,8 @@ func Init(url string, sugar *zap.SugaredLogger) (db *Db, err error) {
 		Pool:       pool,
 		Sugar:      sugar,
 		GuildCache: guildCache,
+
+		Searcher: NewPsqlSearcher(pool),
 	}
 
 	return
