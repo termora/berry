@@ -1,11 +1,15 @@
 package pronouns
 
 import (
+	"context"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v2/gateway"
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 	"github.com/starshine-sys/bcr"
@@ -31,12 +35,54 @@ func (c *commands) use(ctx *bcr.Context) (err error) {
 	}
 
 	if len(sets) > 1 {
-		s := fmt.Sprintf("Found more than one set matching your input! Please be more specific.\nSets found:\n")
-		for _, p := range sets {
-			s += fmt.Sprintf("- %s\n", p)
+		s := fmt.Sprintf("Found more than one set matching your input! Please type in the number matching the set you want to use:\n")
+		for i, p := range sets {
+			s += fmt.Sprintf("%d: %s\n", i+1, p)
 		}
 		_, err = ctx.NewMessage().Content(s).BlockMentions().Send()
-		return err
+		if err != nil {
+			return err
+		}
+
+		// get which pronouns to use
+		c, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		defer cancel()
+
+		v := ctx.State.WaitFor(c, func(i interface{}) bool {
+			v, ok := i.(*gateway.MessageCreateEvent)
+			if !ok {
+				return false
+			}
+
+			if v.Author.ID != ctx.Author.ID || v.ChannelID != ctx.Message.ChannelID {
+				return false
+			}
+
+			isNumber, _ := regexp.MatchString(`^\d+$`, v.Content)
+			return isNumber
+		})
+
+		if v == nil {
+			_, err = ctx.Send("Timed out.", nil)
+			return err
+		}
+
+		num, err := strconv.Atoi(v.(*gateway.MessageCreateEvent).Content)
+		if err != nil {
+			_, err = ctx.Send("I couldn't parse your input as a number.", nil)
+			return err
+		}
+
+		if num > len(sets) {
+			_, err = ctx.Send("The number you gave is too high.", nil)
+			return err
+		}
+		if num < 1 {
+			_, err = ctx.Send("The number you gave is too low.", nil)
+			return err
+		}
+
+		sets = []*db.PronounSet{sets[num-1]}
 	}
 	// use the first set
 	set := sets[0]
