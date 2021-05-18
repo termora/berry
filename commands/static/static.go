@@ -126,15 +126,29 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Command:       c.cmdInvite,
 	}))
 
-	o = append(o, bot.Router.AddCommand(&bcr.Command{
+	export := bot.Router.AddCommand(&bcr.Command{
 		Name:    "export",
 		Summary: "Export all terms in a DM",
 		Usage:   "[--compress|-x]",
 
 		Command: c.export,
-	}))
+	})
 
-	o = append(o, help)
+	export.AddSubcommand(&bcr.Command{
+		Name:    "csv",
+		Summary: "Export terms as a CSV file",
+
+		Command: c.exportCSV,
+	})
+
+	export.AddSubcommand(&bcr.Command{
+		Name:    "xlsx",
+		Summary: "Export terms as a XLSX file",
+
+		Command: c.exportXLSX,
+	})
+
+	o = append(o, help, export)
 
 	// thing
 	if _, err := os.Stat("custom_commands.json"); err != nil {
