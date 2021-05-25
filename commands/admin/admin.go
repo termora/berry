@@ -91,9 +91,12 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	})
 
 	a.AddSubcommand(&bcr.Command{
-		Name:    "addterm",
-		Aliases: []string{"add-term"},
-		Summary: "Add a term",
+		Name:        "addterm",
+		Aliases:     []string{"add-term"},
+		Summary:     "Add a term",
+		Description: "Add a term. Separate names with newlines",
+		Usage:       "<names...>",
+		Args:        bcr.MinArgs(1),
 
 		CustomPermissions: directorCheck,
 

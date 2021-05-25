@@ -1,7 +1,9 @@
 package admin
 
 import (
+	"context"
 	"strings"
+	"time"
 
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
@@ -9,102 +11,120 @@ import (
 )
 
 func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
-	if err = ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("Please provide a term name.", nil)
-		return err
+	t := &db.Term{}
+
+	names := strings.Split(ctx.RawArgs, "\n")
+	t.Name = names[0]
+	if len(names) > 1 {
+		t.Aliases = names[1:]
 	}
 
-	term := &db.Term{Name: ctx.RawArgs}
-	ctx.AdditionalParams["term"] = term
+	embed := discord.Embed{
+		Title: t.Name,
+		Color: db.EmbedColour,
+	}
+	if len(t.Aliases) > 0 {
+		embed.Fields = append(embed.Fields, discord.EmbedField{
+			Name:  "Synonyms",
+			Value: strings.Join(t.Aliases, ", "),
+		})
+	}
 
-	_, err = ctx.Sendf("Creating a term with the name `%v`. To cancel at any time, send `cancel`.\nPlease type the name of the category this term belongs to:", ctx.RawArgs)
+	info, err := ctx.Send(
+		"Adding a new term; to cancel at any time, type `cancel`.\nPlease send the description.",
+		&embed,
+	)
+	if err != nil {
+		return
+	}
+
+	m, timeout := ctx.WaitForMessage(ctx.Channel.ID, ctx.Author.ID, 15*time.Minute, nil)
+	if timeout {
+		_, err = ctx.Send(":x: Timed out.", nil)
+		return
+	}
+	if strings.EqualFold(m.Content, "cancel") {
+		_, err = ctx.Send(":x: Cancelled.", nil)
+		return
+	}
+
+	t.Description = m.Content
+	embed.Description = m.Content
+
+	_, err = ctx.Edit(info, "Adding a new term; to cancel at any time, type `cancel`.\nPlease send the source.", &embed)
 	if err != nil {
 		return err
 	}
+	ctx.State.DeleteMessage(m.ChannelID, m.ID)
 
-	// oh gods there's so much nesting there's no way we're gonna comment this
-	// whoever sees this later, good luck, please burn this - Jake
-	ctx.AddMessageHandler(ctx.Channel.ID, ctx.Author.ID, func(ctx *bcr.Context, m discord.Message) {
-		if m.Content == "cancel" {
-			ctx.Send("Term creation cancelled.", nil)
-			return
-		}
-		cat, err := c.DB.CategoryID(m.Content)
+	m, timeout = ctx.WaitForMessage(ctx.Channel.ID, ctx.Author.ID, 15*time.Minute, nil)
+	if timeout {
+		_, err = ctx.Send(":x: Timed out.", nil)
+		return
+	}
+	if strings.EqualFold(m.Content, "cancel") {
+		_, err = ctx.Send(":x: Cancelled.", nil)
+		return
+	}
+
+	t.Source = m.Content
+
+	_, err = ctx.Edit(info, "Adding a new term; to cancel at any time, type `cancel`.\nPlease send a list of tags, separated by newlines.\n__Note that the first tag needs to be a valid category name__.", t.TermEmbed(""))
+	if err != nil {
+		return err
+	}
+	ctx.State.DeleteMessage(m.ChannelID, m.ID)
+
+	m, timeout = ctx.WaitForMessage(ctx.Channel.ID, ctx.Author.ID, 15*time.Minute, nil)
+	if timeout {
+		_, err = ctx.Send(":x: Timed out.", nil)
+		return
+	}
+	if strings.EqualFold(m.Content, "cancel") {
+		_, err = ctx.Send(":x: Cancelled.", nil)
+		return
+	}
+
+	tags := strings.Split(m.Content, "\n")
+	category, err := c.DB.CategoryID(tags[0])
+	if err != nil {
+		_, err = ctx.Sendf(":x: Couldn't find a category with that name (``%v``).", tags[0])
+	}
+
+	t.Category = category
+	t.CategoryName = tags[0]
+	t.DisplayTags = tags
+	for _, tag := range tags {
+		t.Tags = append(t.Tags, strings.ToLower(strings.TrimSpace(tag)))
+
+		_, err = c.DB.Pool.Exec(context.Background(), `insert into public.tags (normalized, display) values ($1, $2)
+		on conflict (normalized) do update set display = $2`, strings.ToLower(strings.TrimSpace(tag)), tag)
 		if err != nil {
-			_, err = ctx.Send("Could not find that category, cancelled.", nil)
-			return
+			c.Sugar.Errorf("Error adding tag: %v", err)
 		}
-		if cat == 0 {
-			return
-		}
+	}
 
-		t := ctx.AdditionalParams["term"].(*db.Term)
-		t.Category = cat
-		ctx.AdditionalParams["term"] = t
-		_, err = ctx.Sendf("Category set to `%v` (ID %v). Please type the description:", m.Content, cat)
-		if err != nil {
-			return
-		}
+	_, err = ctx.Edit(info, "Are you sure you want to add this term?", t.TermEmbed(""))
+	if err != nil {
+		return err
+	}
+	ctx.State.DeleteMessage(m.ChannelID, m.ID)
 
-		ctx.AddMessageHandler(ctx.Channel.ID, ctx.Author.ID, func(ctx *bcr.Context, m discord.Message) {
-			if m.Content == "cancel" {
-				ctx.Send("Term creation cancelled.", nil)
-				return
-			}
-			t := ctx.AdditionalParams["term"].(*db.Term)
-			t.Description = m.Content
-			if len(t.Description) > 1800 {
-				_, err = ctx.Send("Description too long (maximum 1800 characters).", nil)
-				return
-			}
-			ctx.AdditionalParams["term"] = t
-			_, err := ctx.Send("Description set. Please type the source:", nil)
-			if err != nil {
-				return
-			}
+	yes, timeout := ctx.YesNoHandler(*info, ctx.Author.ID)
+	if timeout {
+		_, err = ctx.Send(":x: Operation timed out.", nil)
+		return
+	}
+	if !yes {
+		_, err = ctx.Send(":x: Cancelled.", nil)
+		return
+	}
 
-			ctx.AddMessageHandler(ctx.Channel.ID, ctx.Author.ID, func(ctx *bcr.Context, m discord.Message) {
-				if m.Content == "cancel" {
-					ctx.Send("Term creation cancelled.", nil)
-					return
-				}
-				t := ctx.AdditionalParams["term"].(*db.Term)
-				t.Source = m.Content
-				ctx.AdditionalParams["term"] = t
-				_, err := ctx.Send("Source set. Please type a *newline separated* list of aliases/synonyms, or \"none\" to set no aliases:", nil)
-				if err != nil {
-					return
-				}
+	t, err = c.DB.AddTerm(t)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
 
-				ctx.AddMessageHandler(ctx.Channel.ID, ctx.Author.ID, func(ctx *bcr.Context, m discord.Message) {
-					if m.Content == "cancel" {
-						ctx.Send("Term creation cancelled.", nil)
-						return
-					}
-					t := ctx.AdditionalParams["term"].(*db.Term)
-					t.Aliases = strings.Split(m.Content, "\n")
-					if m.Content == "none" {
-						t.Aliases = []string{}
-					}
-
-					msg, err := ctx.Send("Term finished. React with ✅ to finish adding it, or with ❌ to cancel. Preview:", t.TermEmbed(""))
-					if err != nil {
-						return
-					}
-
-					if yes, timeout := ctx.YesNoHandler(*msg, ctx.Author.ID); !yes || timeout {
-						ctx.Send("Cancelled.", nil)
-						return
-					}
-					t, err = c.DB.AddTerm(t)
-					if err != nil {
-						c.DB.InternalError(ctx, err)
-						return
-					}
-				})
-			})
-		})
-	})
-
+	_, err = ctx.Sendf("Added term with ID %v.", t.ID)
 	return
 }
