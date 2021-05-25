@@ -3,6 +3,7 @@ package search
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/starshine-sys/bcr"
@@ -140,7 +141,7 @@ func (c *commands) fullList(ctx *bcr.Context, terms []*db.Term, showAsFile bool)
 		embeds[i].Footer.Text = fmt.Sprintf("Page %v/%v", i+1, len(embeds))
 	}
 
-	m, err := ctx.PagedEmbed(embeds, false)
+	m, _, err := ctx.PagedEmbedTimeout(embeds, false, time.Hour)
 	if err != nil {
 		return err
 	}
