@@ -110,7 +110,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 
 	// actually send the search results
-	msg, err := ctx.PagedEmbed(embeds, false)
+	msg, timer, err := ctx.PagedEmbedTimeout(embeds, false, 15*time.Minute)
 	if err != nil {
 		c.Report(ctx, err)
 		return err
@@ -201,9 +201,6 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	// if it timed out, return
 	// and try to clean up reactions too
 	if v == nil {
-		if p, _ := ctx.State.Permissions(ctx.Channel.ID, ctx.Bot.ID); p.Has(discord.PermissionManageMessages) {
-			ctx.State.DeleteAllReactions(msg.ChannelID, msg.ID)
-		}
 		return
 	}
 
@@ -213,6 +210,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 
 	// delete the original message, then send the definition
+	timer.Stop()
 	ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID)
 	_, err = ctx.Send("", termSlices[page][n-1].TermEmbed(c.Config.TermBaseURL()))
 	return
