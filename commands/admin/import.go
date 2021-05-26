@@ -12,9 +12,9 @@ import (
 	"github.com/termora/berry/db"
 )
 
-var msgRegex = regexp.MustCompile(`(?i)\*\*Name:?\*\*:?(.*)\n\*\*Category:?\*\*:?(.*)\n\*\*Description:?\*\*:?([\s\S]*)\n\*\*Coined by:?\*\*:?(.*)`)
+var msgRegex = regexp.MustCompile(`(?i)\*?\*?Name:?\*?\*?:?(.*)\n\*?\*?Category:?\*?\*?:?(.*)\n\*?\*?Description:?\*?\*?:?([\s\S]*)\n\*?\*?Coined by:?\*?\*?:?(.*)`)
 
-var tagsRegex = regexp.MustCompile(`(?i)\*\*Tags:\*\* (.*)`)
+var tagsRegex = regexp.MustCompile(`(?i)\*?\*?Tags:\*?\*? (.*)`)
 
 func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 	flag, _ := ctx.Flags.GetString("category")
