@@ -40,6 +40,16 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 	}))
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
+		Name: "feedback",
+
+		Summary:  "Send feedback to the developers!",
+		Cooldown: 1 * time.Second,
+
+		Blacklistable: true,
+		Command:       c.feedback,
+	}))
+
+	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name: "credits",
 
 		Summary:  "A list of people who helped create the bot",

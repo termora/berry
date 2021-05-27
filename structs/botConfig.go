@@ -57,6 +57,9 @@ type BotConfig struct {
 
 		// this will be used by t;invite and t;about if set
 		CustomInvite string `json:"custom_invite"`
+
+		FeedbackChannel      discord.ChannelID `json:"feedback_channel"`
+		FeedbackBlockedUsers []discord.UserID  `json:"feedback_blocked_users"`
 	}
 
 	// QuickNotes is a map of notes that can quickly be set with `t;admin setnote`
