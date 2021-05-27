@@ -96,6 +96,7 @@ func (c *Admin) guildCount(s *state.State, ch chan int) {
 			ch <- len(g)
 			// set the list of guilds in c, used for the `guilds` admin command
 			c.guilds = g
+			c.GuildCount = int64(len(g))
 		}
 
 		// only run this once every hour

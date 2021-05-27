@@ -3,20 +3,19 @@ package static
 import (
 	"context"
 	"fmt"
-	"math"
+	"net/url"
 	"os/exec"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/diamondburned/arikawa/v2/discord"
 	"github.com/dustin/go-humanize"
+	"github.com/dustin/go-humanize/english"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
-
-// uh this isn't semver, this is just. increment the number when we feel like it i guess
-const botVersion = "v7"
 
 var gitVer string
 
@@ -24,9 +23,9 @@ func init() {
 	git := exec.Command("git", "rev-parse", "--short", "HEAD")
 	// ignoring errors *should* be fine? if there's no output we just fall back to "unknown"
 	b, _ := git.Output()
-	gitVer = string(b)
+	gitVer = strings.TrimSpace(string(b))
 	if gitVer == "" {
-		gitVer = "unknown"
+		gitVer = "[unknown]"
 	}
 }
 
@@ -37,6 +36,77 @@ type category struct {
 }
 
 func (c *Commands) about(ctx *bcr.Context) (err error) {
+	t := time.Now()
+
+	msg, err := ctx.Send("...", nil)
+	if err != nil {
+		return err
+	}
+
+	latency := time.Since(t).Round(time.Millisecond)
+
+	// this will return 0ms in the first minute after the bot is restarted
+	// can't do much about that though
+	heartbeat := ctx.State.Gateway.PacerLoop.EchoBeat.Time().Sub(ctx.State.Gateway.PacerLoop.SentBeat.Time()).Round(time.Millisecond)
+
+	stats := runtime.MemStats{}
+	runtime.ReadMemStats(&stats)
+
+	e := discord.Embed{
+		Author: &discord.EmbedAuthor{
+			Icon: ctx.Bot.AvatarURL(),
+			Name: "About " + ctx.Bot.Username,
+		},
+		Color: db.EmbedColour,
+		Fields: []discord.EmbedField{
+			{
+				Name:   "Ping",
+				Value:  fmt.Sprintf("Heartbeat: %v\nMessage: %v", heartbeat, latency),
+				Inline: true,
+			},
+			{
+				Name:   "Go version",
+				Value:  fmt.Sprintf("%v\n%v/%v", runtime.Version(), runtime.GOOS, runtime.GOARCH),
+				Inline: true,
+			},
+		},
+		Footer: &discord.EmbedFooter{
+			Text: "Version " + gitVer + " | Page 2/2",
+		},
+		Timestamp: discord.NowTimestamp(),
+	}
+
+	if c.Config.Sharded {
+		e.Fields = append(e.Fields, discord.EmbedField{
+			Name:   "Shard",
+			Value:  fmt.Sprintf("#%v (%v total)", c.Router.State.Gateway.Identifier.Shard.ShardID(), c.Router.State.Gateway.Identifier.Shard.NumShards()),
+			Inline: true,
+		})
+	}
+
+	servers := humanize.Comma(c.GuildCount)
+	if c.Config.Sharded {
+		servers += fmt.Sprintf("\nShard %v of %v", c.Router.State.Gateway.Identifier.Shard.ShardID()+1, c.Router.State.Gateway.Identifier.Shard.NumShards())
+	}
+
+	e.Fields = append(e.Fields, discord.EmbedField{
+		Name:   "Servers",
+		Value:  servers,
+		Inline: true,
+	}, discord.EmbedField{
+		Name: "Memory usage",
+		Value: fmt.Sprintf(
+			"%v / %v (%v garbage collected)\n%v goroutines",
+			humanize.Bytes(stats.Alloc), humanize.Bytes(stats.Sys),
+			humanize.Bytes(stats.TotalAlloc), runtime.NumGoroutine(),
+		),
+		Inline: true,
+	}, discord.EmbedField{
+		Name:   "Uptime",
+		Value:  fmt.Sprintf("%v\nSince %v UTC", bcr.HumanizeDuration(bcr.DurationPrecisionSeconds, time.Since(c.start)), c.start.Format("2006-02-01 15:04:05")),
+		Inline: true,
+	})
+
 	// get term count
 	var (
 		total = c.DB.TermCount()
@@ -44,94 +114,55 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 		pronouns   int
 		categories []category
 	)
-	err = pgxscan.Select(context.Background(), c.DB.Pool, &categories, "select categories.id, categories.name, count(terms.id) from categories inner join terms on categories.id = terms.category group by categories.id order by categories.id")
+	err = pgxscan.Select(context.Background(), c.DB.Pool, &categories, `select
+	categories.id, categories.name, count(terms.id)
+	from categories
+	inner join terms on categories.id = terms.category
+	group by categories.id order by categories.id`)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
+
 	err = c.DB.Pool.QueryRow(context.Background(), "select count(id) from pronouns").Scan(&pronouns)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
-	terms := discord.EmbedField{
-		Name:   "Terms",
-		Value:  fmt.Sprintf("**%v** total", total),
-		Inline: true,
-	}
-	for _, c := range categories {
-		terms.Value += fmt.Sprintf("\n**%v** %v terms", c.Count, c.Name)
-	}
-	terms.Value += fmt.Sprintf("\n\n**%v** pronouns", pronouns)
 
-	stats := runtime.MemStats{}
-	runtime.ReadMemStats(&stats)
+	{
+		slice := []string{}
 
-	fields := []discord.EmbedField{
-		{
-			Name:   "Bot version",
-			Value:  fmt.Sprintf("%v-%v ([bcr](https://github.com/starshine-sys/bcr) v%v)", botVersion, gitVer, bcr.Version()),
-			Inline: true,
-		},
-		{
-			Name:   "Go version",
-			Value:  runtime.Version(),
-			Inline: true,
-		},
-		{
+		for _, c := range categories {
+			slice = append(slice, fmt.Sprintf("%v %v terms", c.Count, c.Name))
+		}
+
+		e.Fields = append(e.Fields, discord.EmbedField{
+			Name: "Numbers",
+			Value: fmt.Sprintf(
+				"%v terms (%v)\n%v pronouns",
+				total,
+				english.OxfordWordSeries(slice, "and"),
+				pronouns,
+			),
+		}, discord.EmbedField{
 			Name:   "Invite",
-			Value:  fmt.Sprintf("[Invite link](%v)", invite(ctx)),
+			Value:  c.invite(ctx),
 			Inline: true,
-		},
-	}
-
-	if c.Config.Sharded {
-		fields = append(fields, discord.EmbedField{
-			Name:   "Shard",
-			Value:  fmt.Sprintf("#%v (%v total)", c.Router.State.Gateway.Identifier.Shard.ShardID(), c.Router.State.Gateway.Identifier.Shard.NumShards()),
+		}, discord.EmbedField{
+			Name:   "Source code",
+			Value:  fmt.Sprintf("[GitHub](%v) / [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) license", c.Config.Bot.Git),
 			Inline: true,
 		})
 	}
 
-	fields = append(fields, []discord.EmbedField{
-		{
-			Name: "Uptime",
-			Value: fmt.Sprintf(
-				"%v\n(Since %v)",
-				prettyDurationString(time.Since(c.start)),
-				c.start.Format("Jan _2 2006, 15:04:05 MST"),
-			),
-			Inline: true,
-		},
-		{
-			Name:   "Memory used",
-			Value:  fmt.Sprintf("%v / %v (%v garbage collected)\n%v goroutines", humanize.Bytes(stats.Alloc), humanize.Bytes(stats.Sys), humanize.Bytes(stats.TotalAlloc), runtime.NumGoroutine()),
-			Inline: false,
-		},
-		terms,
-		{
-			Name:   "Source code",
-			Value:  fmt.Sprintf("[GitHub](%v)\n/ [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) license", c.Config.Bot.Git),
-			Inline: true,
-		},
-	}...)
-
-	embed := &discord.Embed{
-		Title: "About",
-		Color: db.EmbedColour,
-		Footer: &discord.EmbedFooter{
-			Text: "Made with Arikawa",
-		},
-		Thumbnail: &discord.EmbedThumbnail{
-			URL: ctx.Bot.AvatarURL(),
-		},
-		Timestamp: discord.NewTimestamp(time.Now()),
-		Fields:    fields,
-	}
-
-	_, err = ctx.Send("", embed)
+	_, err = ctx.Edit(msg, "", &e)
 	return
 }
 
-func invite(ctx *bcr.Context) string {
+func (c *Commands) invite(ctx *bcr.Context) string {
+	if c.Config.Bot.CustomInvite != "" {
+		return c.Config.Bot.CustomInvite
+	}
+
 	// perms is the list of permissions the bot will be granted by default
 	var perms = discord.PermissionViewChannel +
 		discord.PermissionReadMessageHistory +
@@ -145,25 +176,10 @@ func invite(ctx *bcr.Context) string {
 	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&scope=applications.commands%%20bot", ctx.Bot.ID, perms)
 }
 
-func prettyDurationString(duration time.Duration) (out string) {
-	var days, hours, hoursFrac, minutes float64
-
-	hours = duration.Hours()
-	hours, hoursFrac = math.Modf(hours)
-	minutes = hoursFrac * 60
-
-	hoursFrac = math.Mod(hours, 24)
-	days = (hours - hoursFrac) / 24
-	hours = hours - (days * 24)
-	minutes = minutes - math.Mod(minutes, 1)
-
-	if days != 0 {
-		out += fmt.Sprintf("%v days, ", days)
+func urlParse(s string) string {
+	u, err := url.Parse(s)
+	if err != nil {
+		return s
 	}
-	if hours != 0 {
-		out += fmt.Sprintf("%v hours, ", hours)
-	}
-	out += fmt.Sprintf("%v minutes", minutes)
-
-	return
+	return u.Host
 }

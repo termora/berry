@@ -54,6 +54,9 @@ type BotConfig struct {
 
 		HelpFields   []discord.EmbedField `json:"help_fields"`
 		CreditFields []discord.EmbedField `json:"credit_fields"`
+
+		// this will be used by t;invite and t;about if set
+		CustomInvite string `json:"custom_invite"`
 	}
 
 	// QuickNotes is a map of notes that can quickly be set with `t;admin setnote`

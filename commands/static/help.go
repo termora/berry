@@ -110,6 +110,6 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 }
 
 func (c *Commands) cmdInvite(ctx *bcr.Context) (err error) {
-	_, err = ctx.Sendf("Use this link to invite me to your server: <%v>\n\nYou can use the `help permissions` command to get a detailed explanation of all permissions required.", invite(ctx))
+	_, err = ctx.Sendf("Use this link to invite me to your server: <%v>\n\nYou can use the `help permissions` command to get a detailed explanation of all permissions required.", c.invite(ctx))
 	return
 }

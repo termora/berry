@@ -23,6 +23,8 @@ type Bot struct {
 
 	Sentry    *sentry.Hub
 	UseSentry bool
+
+	GuildCount int64
 }
 
 // Module is a single module/category of commands

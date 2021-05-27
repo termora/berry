@@ -18,7 +18,7 @@ type Commands struct {
 
 // Init ...
 func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
-	c := &Commands{Bot: bot, start: time.Now()}
+	c := &Commands{Bot: bot, start: time.Now().UTC()}
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name: "ping",
 
