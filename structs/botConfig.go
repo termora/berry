@@ -62,6 +62,13 @@ type BotConfig struct {
 		FeedbackBlockedUsers []discord.UserID  `json:"feedback_blocked_users"`
 	}
 
+	// BotLists is tokens for the two bot lists the bot is on
+	// will POST guild count every hour
+	BotLists struct {
+		TopGG  string `json:"top.gg"`
+		BotsGG string `json:"bots.gg"`
+	} `json:"bot_lists"`
+
 	// QuickNotes is a map of notes that can quickly be set with `t;admin setnote`
 	QuickNotes map[string]string `json:"quick_notes"`
 

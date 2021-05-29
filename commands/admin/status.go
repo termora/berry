@@ -2,7 +2,9 @@ package admin
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/diamondburned/arikawa/v2/state"
@@ -97,11 +99,73 @@ func (c *Admin) guildCount(s *state.State, ch chan int) {
 			// set the list of guilds in c, used for the `guilds` admin command
 			c.guilds = g
 			c.GuildCount = int64(len(g))
+
+			// post guild count if needed
+			if err = c.postGuildCount(len(g)); err != nil {
+				c.Sugar.Errorf("Error posting guild count: %v", err)
+			}
 		}
 
 		// only run this once every hour
 		time.Sleep(1 * time.Hour)
 	}
+}
+
+func (c *Admin) postGuildCount(count int) (err error) {
+	u, err := c.Router.State.Me()
+	if err != nil {
+		return
+	}
+
+	if c.Config.BotLists.TopGG != "" {
+		url := fmt.Sprintf("https://top.gg/api/bots/%v/stats", u.ID)
+
+		c.Sugar.Infof("Posting guild count (%v) to top.gg's API", count)
+
+		body := fmt.Sprintf(`{"server_count": %v}`, count)
+
+		req, err := http.NewRequest("POST", url, strings.NewReader(body))
+		if err != nil {
+			return err
+		}
+
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", c.Config.BotLists.TopGG)
+
+		resp, err := (&http.Client{}).Do(req)
+		if err != nil {
+			return err
+		}
+		resp.Body.Close()
+
+		c.Sugar.Infof("Posted guild count to top.gg's API")
+	}
+
+	if c.Config.BotLists.BotsGG != "" {
+		url := fmt.Sprintf("https://discord.bots.gg/api/v1/bots/%v/stats", u.ID)
+
+		c.Sugar.Infof("Posting guild count (%v) to discord.bots.gg's API", count)
+
+		body := fmt.Sprintf(`{"guildCount": %v}`, count)
+
+		req, err := http.NewRequest("POST", url, strings.NewReader(body))
+		if err != nil {
+			return err
+		}
+
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", c.Config.BotLists.BotsGG)
+
+		resp, err := (&http.Client{}).Do(req)
+		if err != nil {
+			return err
+		}
+		resp.Body.Close()
+
+		c.Sugar.Infof("Posted guild count to discord.bots.gg's API")
+	}
+
+	return nil
 }
 
 func urlParse(s string) string {
