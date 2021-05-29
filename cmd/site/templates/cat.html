@@ -48,12 +48,20 @@
         <hr />
         <p style="text-align: right;">
             <small>
-                <button onclick="myFunction()">Toggle dark mode</button>
+                <button onclick="myFunction()">light mode</button>
 
                 <script>
                    function myFunction() {
                    var element = document.body;
                    element.classList.toggle("light-mode");
+                  }
+                </script>
+                <button onclick="myFunction()">dark mode</button>
+
+                <script>
+                   function myFunction() {
+                   var element = document.body;
+                   element.classList.toggle("dark-mode");
                   }
                 </script>
                 <a href="/contact">Contact</a> &middot;
