@@ -71,7 +71,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			},
 		},
 		Footer: &discord.EmbedFooter{
-			Text: "Version " + gitVer + " | Page 2/2",
+			Text: "Version " + gitVer,
 		},
 		Timestamp: discord.NowTimestamp(),
 	}
