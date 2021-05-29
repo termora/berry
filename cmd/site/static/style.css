@@ -10,9 +10,9 @@ body {
     padding: 0
 }
 
-.dark-mode {
-    background-color: black;
-    color: white;
+.light-mode {
+    background-color: white;
+    color: black;
 }
 
 html {
