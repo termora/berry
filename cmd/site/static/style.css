@@ -15,6 +15,11 @@ body {
     color: black;
 }
 
+.dark-mode {
+    background-color: black;
+    color: white;
+}
+
 html {
     transition: color 300ms, background-color 300ms;
 }
