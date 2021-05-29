@@ -48,22 +48,18 @@
         <hr />
         <p style="text-align: right;">
             <small>
-                <button onclick="myFunction()">light mode</button>
+                <button onclick="dark()">Toggle Theme</button>
 
                 <script>
-                   function myFunction() {
-                   var element = document.body;
-                   element.classList.toggle("light-mode");
-                  }
-                </script>
-                <button onclick="myFunction()">dark mode</button>
-
-                <script>
-                   function myFunction() {
+                   function dark() {
                    var element = document.body;
                    element.classList.toggle("dark-mode");
                   }
                 </script>
+
+               
+
+                
                 <a href="/contact">Contact</a> &middot;
                 <a href="{{.Conf.Git}}">Source</a> &middot;
                 <a href="{{.Conf.Invite}}">Invite {{.Conf.SiteName}}</a><br />
