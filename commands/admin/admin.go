@@ -280,6 +280,14 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	})
 
 	a.AddSubcommand(&bcr.Command{
+		Name:    "update-tags",
+		Summary: "Bulk update a list of term's tags. Input in CSV format",
+
+		CustomPermissions: c,
+		Command:           c.updateTags,
+	})
+
+	a.AddSubcommand(&bcr.Command{
 		Name:    "import",
 		Summary: "Add a term from a correctly formatted message.",
 		Usage:   "<message link|ID>",
