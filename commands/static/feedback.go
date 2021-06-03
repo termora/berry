@@ -43,32 +43,30 @@ func (c *Commands) feedback(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	g, err := ctx.State.Guild(ctx.Message.GuildID)
-	if err != nil {
-		return c.DB.InternalError(ctx, err)
+	e := discord.Embed{
+		Author: &discord.EmbedAuthor{
+			Icon: ctx.Author.AvatarURL(),
+			Name: fmt.Sprintf("%v#%v (%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
+		},
+		Description: ctx.RawArgs,
+
+		Fields: []discord.EmbedField{{
+			Name:  "Source",
+			Value: fmt.Sprintf("https://discord.com/channels/%v/%v/%v", ctx.Message.GuildID, ctx.Message.ChannelID, ctx.Message.ID),
+		}},
+
+		Footer: &discord.EmbedFooter{
+			Text: fmt.Sprintf("DM from %v#%v", ctx.Author.Username, ctx.Author.Discriminator),
+		},
+		Timestamp: discord.NowTimestamp(),
+		Color:     db.EmbedColour,
 	}
 
-	_, err = ctx.State.SendEmbed(
-		c.Config.Bot.FeedbackChannel,
-		discord.Embed{
-			Author: &discord.EmbedAuthor{
-				Icon: ctx.Author.AvatarURL(),
-				Name: fmt.Sprintf("%v#%v (%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
-			},
-			Description: ctx.RawArgs,
+	if ctx.Guild != nil {
+		e.Footer.Text = fmt.Sprintf("Guild: %v (%v)", ctx.Guild.Name, ctx.Guild.ID)
+	}
 
-			Fields: []discord.EmbedField{{
-				Name:  "Source",
-				Value: fmt.Sprintf("https://discord.com/channels/%v/%v/%v", ctx.Message.GuildID, ctx.Message.ChannelID, ctx.Message.ID),
-			}},
-
-			Footer: &discord.EmbedFooter{
-				Text: fmt.Sprintf("Guild: %v (%v)", g.Name, g.ID),
-			},
-			Timestamp: discord.NowTimestamp(),
-			Color:     db.EmbedColour,
-		},
-	)
+	_, err = ctx.State.SendEmbed(c.Config.Bot.FeedbackChannel, e)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
