@@ -24,9 +24,9 @@ func (s *site) tag(c echo.Context) (err error) {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.Render(http.StatusOK, "terms.html", renderData{
+	return c.Render(http.StatusOK, "terms.html", (&renderData{
 		Conf:  s.conf,
 		Tag:   tag,
 		Terms: terms,
-	})
+	}).parse(c))
 }

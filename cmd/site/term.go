@@ -37,8 +37,8 @@ func (s *site) term(c echo.Context) (err error) {
 	t.Note = strings.ReplaceAll(t.Note, "(##", "(/term/")
 	t.ContentWarnings = strings.ReplaceAll(t.ContentWarnings, "(##", "(/term/")
 
-	return c.Render(http.StatusOK, "term.html", renderData{
+	return c.Render(http.StatusOK, "term.html", (&renderData{
 		Conf: s.conf,
 		Term: t,
-	})
+	}).parse(c))
 }

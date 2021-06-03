@@ -12,8 +12,8 @@ func (s *site) index(c echo.Context) (err error) {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.Render(http.StatusOK, "index.html", renderData{
+	return c.Render(http.StatusOK, "index.html", (&renderData{
 		Conf: s.conf,
 		Tags: tags,
-	})
+	}).parse(c))
 }

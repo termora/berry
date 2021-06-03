@@ -36,4 +36,4 @@
     <p>ID: {{.Term.ID}}, category: {{.Term.CategoryName}} (ID: {{.Term.Category}})</p>
     <p class="created">Created: {{.Term.Created | timeToDate}}</p>
 </div>
-{{template "footer.html"}}
+{{template "footer.html" .}}

@@ -39,5 +39,14 @@ func funcMap() template.FuncMap {
 			return len(s)
 		},
 		"title": strings.Title,
+		"pageStyle": func(darkMode string) template.CSS {
+			if darkMode == "false" {
+				return template.CSS("")
+			} else if darkMode == "true" {
+				return template.CSS(`body { color: #dcddde; background-color: #36393f; }`)
+			} else {
+				return template.CSS(`@media (prefers-color-scheme: dark) { body { color: #dcddde; background-color: #36393f; } }`)
+			}
+		},
 	}
 }

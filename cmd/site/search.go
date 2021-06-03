@@ -13,15 +13,15 @@ func (s *site) search(c echo.Context) (err error) {
 	terms, err := s.db.Search(c.QueryParam("q"), 0, []string{})
 
 	if err != nil || len(terms) == 0 {
-		return c.Render(http.StatusNotFound, "noQuery.html", renderData{
+		return c.Render(http.StatusNotFound, "noQuery.html", (&renderData{
 			Conf:  s.conf,
 			Query: q,
-		})
+		}).parse(c))
 	}
 
-	return c.Render(http.StatusOK, "results.html", renderData{
+	return c.Render(http.StatusOK, "results.html", (&renderData{
 		Conf:  s.conf,
 		Terms: terms,
 		Query: q,
-	})
+	}).parse(c))
 }
