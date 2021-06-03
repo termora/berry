@@ -141,6 +141,9 @@ func main() {
 		panic(err)
 	}
 	err = yaml.Unmarshal(configFile, &c)
+	if err != nil {
+		sugar.Fatalf("Error loading configuration file: %v", err)
+	}
 	sugar.Info("Loaded configuration file.")
 
 	d, err := db.Init(c.DatabaseURL, sugar)
@@ -165,13 +168,15 @@ func main() {
 
 	// get port
 	port := c.Port
-	strings.TrimPrefix(port, ":")
+
 	if port == "" {
 		port = "1300"
+	} else {
+		port = strings.TrimPrefix(port, ":")
 	}
 
 	go func() {
-		if err := e.Start(":" + c.Port); err != nil {
+		if err := e.Start(":" + port); err != nil {
 			sugar.Info("Shutting down server")
 		}
 	}()
