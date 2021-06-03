@@ -1,10 +1,4 @@
 {{template "header.html" .}}
-<div class="search">
-    <form action="/search">
-        <input type="text" class="searchBox" id="searchBox" name="q" placeholder="Search">
-        <input type="submit" class="searchButton" value="🔍">
-    </form>
-</div>
 <div class="terms">
     {{if (eq .Tag "untagged")}}
     <h3>List of untagged terms</h3>
