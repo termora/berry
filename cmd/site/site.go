@@ -50,6 +50,15 @@ type conf struct {
 	}
 }
 
+type renderData struct {
+	Conf  conf
+	Tag   string
+	Tags  []string
+	Term  *db.Term
+	Terms []*db.Term
+	Query template.HTML
+}
+
 func main() {
 	t := &T{
 		templates: template.Must(template.New("").

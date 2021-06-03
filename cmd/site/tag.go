@@ -24,11 +24,9 @@ func (s *site) tag(c echo.Context) (err error) {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	data := struct {
-		Conf  conf
-		Tag   string
-		Terms []*db.Term
-	}{s.conf, tag, terms}
-
-	return c.Render(http.StatusOK, "terms.html", data)
+	return c.Render(http.StatusOK, "terms.html", renderData{
+		Conf:  s.conf,
+		Tag:   tag,
+		Terms: terms,
+	})
 }
