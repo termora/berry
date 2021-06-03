@@ -36,7 +36,16 @@
         <div class="footer">
             <hr />
             <p style="text-align: right;">
-                <small>
+                <button onclick="dark()">Toggle Theme</button>
+
+                <script>
+                   function dark() {
+                   var element = document.body;
+                   element.classList.toggle("dark-mode");
+                  }
+                </script>
+
+             
                     <a href="/contact">Contact</a> &middot;
                     <a href="{{.Conf.Git}}">Source</a> &middot;
                     <a href="{{.Conf.Invite}}">Invite {{.Conf.SiteName}}</a><br />

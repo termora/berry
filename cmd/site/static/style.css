@@ -10,6 +10,22 @@ body {
     padding: 0
 }
 
+.light-mode {
+    background-color: white;
+    color: black;
+}
+
+.dark-mode {
+    background-color: black;
+    color: white;
+}
+
+html {
+    transition: color 300ms, background-color 300ms;
+}
+
+
+
 .search {
     text-align: center;
 }
@@ -27,12 +43,6 @@ body {
     padding: 10px 20px;
 }
 
-@media (prefers-color-scheme: dark) {
-    body {
-        color: #dcddde;
-        background-color: #36393f;
-    }
-}
 
 .content {
     margin: 10px;
