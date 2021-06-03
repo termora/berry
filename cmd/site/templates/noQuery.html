@@ -1,40 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/png" href="/static/favicon.png" />
-    <link rel="stylesheet" href="/static/style.css">
-    <title>Search | {{.Conf.SiteName}}</title>
-
-    {{if .Conf.Plausible.URL}}
-    <script async defer data-domain="{{.Conf.Plausible.Domain}}" src="{{.Conf.Plausible.URL}}"></script>
+{{template "header.html"}}
+<div class="404">
+    <h3>Search</h3>
+    {{if .Query}}
+    <p>No results were found for <code>{{.Query}}</code>. <a href="/">Try searching for something else?</a></p>
+    {{else}}
+    <p>You did not input a query.</p>
     {{end}}
-</head>
-
-<body>
-    <div class="404">
-        <h1><a href="/">{{.Conf.SiteName}}</a></h1>
-        <h3>Search</h3>
-        {{if .Query}}
-        <p>No results were found for <code>{{.Query}}</code>. <a href="/">Try searching for something else?</a></p>
-        {{else}}
-        <p>You did not input a query.</p>
-        {{end}}
-    </div>
-
-    <div class="footer">
-        <hr />
-        <p style="text-align: right;">
-            <small>
-                <a href="/contact">Contact</a> &middot;
-                <a href="{{.Conf.Git}}">Source</a> &middot;
-                <a href="{{.Conf.Invite}}">Invite {{.Conf.SiteName}}</a><br />
-                The bot and website are licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU AGPLv3</a>.
-            </small>
-        </p>
-    </div>
-</body>
-
-</html>
+</div>
+{{template "footer.html"}}
