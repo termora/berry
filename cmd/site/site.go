@@ -15,7 +15,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/termora/berry/db"
 	"go.uber.org/zap"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type site struct {
