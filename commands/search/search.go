@@ -21,8 +21,8 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Aliases: []string{"s"},
 
 		Summary:     "Search for a term",
-		Description: "Search for a term. Prefix your search with `!` to show the first result.\nUse the `-c` flag to limit search results to a specific category, and use `-i` to ignore specific tags.",
-		Usage:       "[-c <category>] [-h] [-i tags] <search term>",
+		Description: "Search for a term. Prefix your search with `!` to show the first result.\nUse the `-c` flag to limit search results to a specific category, and use `-i` to ignore specific tags. Use `-no-cw` to hide all terms with a CW.",
+		Usage:       "[-c <category>] [-h] [-i tags] [-no-cw] <search term>",
 
 		Blacklistable: true,
 

@@ -19,11 +19,13 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	var (
 		showHidden bool
+		noCW       bool
 		cat        string
 		ignore     string
 		ignoreTags = []string{}
 	)
 
+	fs.BoolVar(&noCW, "no-cw", false, "")
 	fs.BoolVar(&showHidden, "h", false, "")
 	fs.StringVar(&cat, "c", "", "")
 	fs.StringVar(&ignore, "i", "", "")
@@ -82,6 +84,17 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 		_, err = ctx.Send("No results found.", nil)
 		return err
 	}
+
+	filter := []*db.Term{}
+	if noCW {
+		for _, t := range terms {
+			if t.ContentWarnings == "" {
+				filter = append(filter, t)
+			}
+		}
+		terms = filter
+	}
+
 	// if there's only one term, just show that one
 	if len(terms) == 1 {
 		_, err = ctx.Send("", terms[0].TermEmbed(c.Config.TermBaseURL()))

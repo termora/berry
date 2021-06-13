@@ -103,7 +103,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 		Inline: true,
 	}, discord.EmbedField{
 		Name:   "Uptime",
-		Value:  fmt.Sprintf("%v\nSince %v UTC", bcr.HumanizeDuration(bcr.DurationPrecisionSeconds, time.Since(c.start)), c.start.Format("2006-02-01 15:04:05")),
+		Value:  fmt.Sprintf("%v\nSince %v UTC", bcr.HumanizeDuration(bcr.DurationPrecisionSeconds, time.Since(c.start)), c.start.Format("2006-01-02 15:04:05")),
 		Inline: true,
 	})
 
