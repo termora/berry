@@ -21,7 +21,13 @@ func (c *Admin) update(ctx *bcr.Context) (err error) {
 		_, err = ctx.Send(fmt.Sprintf("Error pulling repository:\n```%v```", err), nil)
 		return err
 	}
-	_, err = ctx.Send(fmt.Sprintf("Git:\n```%v```", string(pullOutput)), nil)
+
+	output := string(pullOutput)
+	if len(output) > 1900 {
+		output = "...\n" + output[:len(output)-1900]
+	}
+
+	_, err = ctx.Send(fmt.Sprintf("Git:\n```%v```", output), nil)
 	if err != nil {
 		return err
 	}
@@ -33,8 +39,17 @@ func (c *Admin) update(ctx *bcr.Context) (err error) {
 		_, err = ctx.Send(fmt.Sprintf("Error building:\n```%v```", err), nil)
 		return err
 	}
+
+	output = string(updateOutput)
+	if len(output) > 1900 {
+		output = "...\n" + output[:len(output)-1900]
+	}
+	if output == "" {
+		output = "[no output]"
+	}
+
 	buildTime := time.Since(t).Round(time.Millisecond)
-	_, err = ctx.Send(fmt.Sprintf("`go build` (%v):\n```%v```", buildTime, bcr.DefaultValue(string(updateOutput), "[no output]")), nil)
+	_, err = ctx.Send(fmt.Sprintf("`go build` (%v):\n```%v```", buildTime, output), nil)
 	return
 }
 
