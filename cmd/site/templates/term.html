@@ -1,74 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/png" href="/static/favicon.png" />
-    <link rel="stylesheet" href="/static/style.css">
-    <title>{{.Term.Name}} | {{.Conf.SiteName}}</title>
-
-    {{if .Conf.Plausible.URL}}
-    <script async defer data-domain="{{.Conf.Plausible.Domain}}" src="{{.Conf.Plausible.URL}}"></script>
+{{template "header.html" .}}
+<div class="term">
+    <h3>{{.Term.Name}}</h3>
+    {{if .Term.Aliases}}
+        <h4>Aliases: {{.Term.Aliases | join ", " }}</h4>
     {{end}}
-
-    <meta property="og:site_name" content="{{.Conf.SiteName}}">
-    <meta property="og:title" content="{{.Term.Name}}">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{.Conf.BaseURL}}/term/{{.Term.Name | lower | urlEncode}}">
-</head>
-
-<body>
-    <div class="term">
-        <h1><a href="/">{{.Conf.SiteName}}</a></h1>
-        <h3>{{.Term.Name}}</h3>
-        {{if .Term.Aliases}}
-            <h4>Aliases: {{.Term.Aliases | join ", " }}</h4>
-        {{end}}
-        {{if .Term.ContentWarnings}}
-        <p><strong>Content Warning</strong></p>
-        <blockquote>
-            {{.Term.ContentWarnings | markdownParse}}
-        </blockquote>
-        {{end}}
-        <p><strong>Description</strong><br>
-        <blockquote>
-            {{.Term.Description | markdownParse}}
-        </blockquote>
-        </p>
-        <p><strong>Source</strong>
-        <blockquote>
-            {{.Term.Source | markdownParse}}
-        </blockquote>
-        {{if .Term.Note}}
-        <p><strong>Note</strong></p>
-        <blockquote>
-            {{.Term.Note | markdownParse}}
-        </blockquote>
-        {{end}}
-        {{if .Term.Tags}}
-        <p>
-            <strong>Tags</strong>
-            <br />
-            {{.Term.DisplayTags | join ", "}}
-        </p>
-        {{end}}
-        </p>
-        <p>ID: {{.Term.ID}}, category: {{.Term.CategoryName}} (ID: {{.Term.Category}})</p>
-        <p class="created">Created: {{.Term.Created | timeToDate}}</p>
-    </div>
-
-    <div class="footer">
-        <hr />
-        <p style="text-align: right;">
-            <small>
-                <a href="/contact">Contact</a> &middot;
-                <a href="{{.Conf.Git}}">Source</a> &middot;
-                <a href="{{.Conf.Invite}}">Invite {{.Conf.SiteName}}</a><br />
-                The bot and website are licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU AGPLv3</a>.
-            </small>
-        </p>
-    </div>
-</body>
-
-</html>
+    {{if .Term.ContentWarnings}}
+    <p><strong>Content Warning</strong></p>
+    <blockquote>
+        {{.Term.ContentWarnings | markdownParse}}
+    </blockquote>
+    {{end}}
+    <p><strong>Description</strong><br>
+    <blockquote>
+        {{.Term.Description | markdownParse}}
+    </blockquote>
+    </p>
+    <p><strong>Source</strong>
+    <blockquote>
+        {{.Term.Source | markdownParse}}
+    </blockquote>
+    {{if .Term.Note}}
+    <p><strong>Note</strong></p>
+    <blockquote>
+        {{.Term.Note | markdownParse}}
+    </blockquote>
+    {{end}}
+    {{if .Term.Tags}}
+    <p>
+        <strong>Tags</strong>
+        <br />
+        {{.Term.DisplayTags | join ", "}}
+    </p>
+    {{end}}
+    </p>
+    <p>ID: {{.Term.ID}}, category: {{.Term.CategoryName}} (ID: {{.Term.Category}})</p>
+    <p class="created">Created: {{.Term.Created | timeToDate}}</p>
+</div>
+{{template "footer.html" .}}

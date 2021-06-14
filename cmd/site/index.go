@@ -12,10 +12,8 @@ func (s *site) index(c echo.Context) (err error) {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	data := struct {
-		Conf conf
-		Tags []string
-	}{s.conf, tags}
-
-	return c.Render(http.StatusOK, "index.html", data)
+	return c.Render(http.StatusOK, "index.html", (&renderData{
+		Conf: s.conf,
+		Tags: tags,
+	}).parse(c))
 }

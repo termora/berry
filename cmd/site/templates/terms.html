@@ -1,58 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/png" href="/static/favicon.png" />
-    <link rel="stylesheet" href="/static/style.css">
-    <title>{{.Conf.SiteName}}</title>
-
-    {{if .Conf.Plausible.URL}}
-    <script async defer data-domain="{{.Conf.Plausible.Domain}}" src="{{.Conf.Plausible.URL}}"></script>
+{{template "header.html" .}}
+<div class="terms">
+    {{if (eq .Tag "untagged")}}
+    <h3>List of untagged terms</h3>
+    {{else}}
+    <h3>List of terms tagged "{{.Tag | sanitize}}"</h3>
     {{end}}
-
-    <meta property="og:site_name" content="{{.Conf.SiteName}}">
-    <meta property="og:title" content="{{.Tag}}">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{.Conf.BaseURL}}/tag/{{.Tag | urlEncode}}">
-</head>
-
-<body>
-    <h1><a href="/">{{.Conf.SiteName}}</a></h1>
-    <div class="search">
-        <form action="/search">
-            <input type="text" class="searchBox" id="searchBox" name="q" placeholder="Search">
-            <input type="submit" class="searchButton" value="🔍">
-        </form>
-    </div>
-    <div class="terms">
-        {{if (eq .Tag "untagged")}}
-        <h3>List of untagged terms</h3>
-        {{else}}
-        <h3>List of terms tagged "{{.Tag | sanitize}}"</h3>
+    <ul>
+        {{if .Terms}}
+        {{range .Terms}}
+        <li><a href="/term/{{.Name | lower | urlEncode}}">{{.Name}}</a> ({{if .Aliases}}{{.Aliases | join ", "}}{{else}}no aliases{{end}})</li>
         {{end}}
-        <ul>
-            {{if .Terms}}
-            {{range .Terms}}
-            <li><a href="/term/{{.Name | lower | urlEncode}}">{{.Name}}</a> ({{if .Aliases}}{{.Aliases | join ", "}}{{else}}no aliases{{end}})</li>
-            {{end}}
-            {{else}}
-            No terms found.
-            {{end}}
-        </ul>
-    </div>
-    <div class="footer">
-        <hr />
-        <p style="text-align: right;">
-            <small>
-                <a href="/contact">Contact</a> &middot;
-                <a href="{{.Conf.Git}}">Source</a> &middot;
-                <a href="{{.Conf.Invite}}">Invite {{.Conf.SiteName}}</a><br />
-                The bot and website are licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU AGPLv3</a>.
-            </small>
-        </p>
-    </div>
-</body>
-
-</html>
+        {{else}}
+        No terms found.
+        {{end}}
+    </ul>
+</div>
+{{template "footer.html" .}}
