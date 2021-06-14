@@ -21,15 +21,15 @@ type BotConfig struct {
 	Bot struct {
 		Prefixes []string
 
-		BotOwners    []discord.UserID  `json:"bot_owners"`
-		AdminServers []discord.GuildID `json:"admin_servers"`
+		BotOwners   []discord.UserID `json:"bot_owners"`
+		Permissions struct {
+			Admins    []discord.RoleID `json:"admins"`
+			Directors []discord.RoleID `json:"directors"`
+		} `json:"permissions"`
 
 		Support struct {
 			Invite         string
 			PronounChannel discord.ChannelID `json:"pronoun_channel"`
-
-			// StaffRoles is a slice of roles that can perform *some* bot admin actions on the admin server
-			StaffRoles []discord.RoleID `json:"staff_roles"`
 		}
 
 		TermLog struct {

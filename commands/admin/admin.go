@@ -15,55 +15,11 @@ import (
 type Admin struct {
 	*bot.Bot
 
-	admins []string
-
 	guilds []discord.Guild
 
 	stopStatus chan bool
 
 	WebhookClient *webhook.Client
-}
-
-func (Admin) String() string {
-	return "Bot Admin"
-}
-
-// Check ...
-func (c *Admin) Check(ctx *bcr.Context) (bool, error) {
-	if c.Config.Bot.AdminServers != nil {
-		var inServer bool
-		for _, s := range c.Config.Bot.AdminServers {
-			if ctx.Message.GuildID == s {
-				inServer = true
-				break
-			}
-		}
-		if !inServer {
-			return false, nil
-		}
-	}
-	for _, id := range c.Config.Bot.BotOwners {
-		if id == ctx.Author.ID {
-			return true, nil
-		}
-	}
-
-	if len(c.admins) == 0 {
-		admins, err := c.DB.GetAdmins()
-		if err != nil {
-			c.Sugar.Error("Error getting admins:", err)
-			return false, err
-		}
-		c.admins = admins
-	}
-
-	for _, id := range c.admins {
-		if id == ctx.Author.ID.String() {
-			return true, nil
-		}
-	}
-
-	return false, nil
 }
 
 // Init ...
@@ -75,13 +31,14 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		c.WebhookClient = webhook.New(c.Config.Bot.TermLog.ID, c.Config.Bot.TermLog.Token)
 	}
 
-	directorCheck := &directors{admin: c}
+	admins := bot.Router.RequireRole("Bot Admin", c.Config.Bot.Permissions.Admins...)
+	directors := bot.Router.RequireRole("Director", append(c.Config.Bot.Permissions.Admins, c.Config.Bot.Permissions.Directors...)...)
 
 	a := bot.Router.AddCommand(&bcr.Command{
 		Name:    "admin",
 		Summary: "Admin commands",
 
-		CustomPermissions: c,
+		CustomPermissions: admins,
 		Hidden:            true,
 
 		Command: func(ctx *bcr.Context) (err error) {
@@ -98,7 +55,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:       "<names...>",
 		Args:        bcr.MinArgs(1),
 
-		CustomPermissions: directorCheck,
+		CustomPermissions: directors,
 
 		Command: c.addTerm,
 	}).AddSubcommand(&bcr.Command{
@@ -108,7 +65,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Add a term by passing all parameters to the command invocation",
 		Usage:   "<name> <category> <description> <aliases, comma separated> <source>",
 
-		CustomPermissions: c,
+		CustomPermissions: admins,
 		Command:           c.aio,
 	})
 
@@ -118,9 +75,8 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Delete a term",
 		Usage:   "<id>",
 
-		CustomPermissions: c,
-
-		Command: c.delTerm,
+		CustomPermissions: admins,
+		Command:           c.delTerm,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -129,9 +85,8 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Add a category",
 		Usage:   "<name>",
 
-		CustomPermissions: c,
-
-		Command: c.addCategory,
+		CustomPermissions: admins,
+		Command:           c.addCategory,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -140,9 +95,8 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Add a pronoun set",
 		Usage:   "<subjective>/<objective>/<poss. determiner>/<poss. pronoun>/<reflexive>",
 
-		CustomPermissions: c,
-
-		Command: c.addPronouns,
+		CustomPermissions: admins,
+		Command:           c.addPronouns,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -151,9 +105,8 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Add an explanation",
 		Usage:   "<names...>(newline)<explanation>",
 
-		CustomPermissions: c,
-
-		Command: c.addExplanation,
+		CustomPermissions: admins,
+		Command:           c.addExplanation,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -162,9 +115,8 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Set whether or not this explanation can be triggered as a command",
 		Usage:   "<id> <bool>",
 
-		CustomPermissions: c,
-
-		Command: c.toggleExplanationCmd,
+		CustomPermissions: admins,
+		Command:           c.toggleExplanationCmd,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -172,9 +124,8 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Set a term's flags",
 		Usage:   "<id> <flag mask>",
 
-		CustomPermissions: c,
-
-		Command: c.setFlags,
+		CustomPermissions: admins,
+		Command:           c.setFlags,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -182,7 +133,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Set a term's CW. Use `-clear` to clear.",
 		Usage:   "<id> <content warning>",
 
-		CustomPermissions: directorCheck,
+		CustomPermissions: directors,
 		Command:           c.setCW,
 	})
 
@@ -191,7 +142,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Set a term's note",
 		Usage:   "<id> <note>",
 
-		CustomPermissions: directorCheck,
+		CustomPermissions: directors,
 		Command:           c.setNote,
 	})
 
@@ -201,19 +152,8 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Edit a term",
 		Usage:   "<part to edit> <id> <text>",
 
-		CustomPermissions: directorCheck,
-
-		Command: c.editTerm,
-	})
-
-	a.AddSubcommand(&bcr.Command{
-		Name:    "addadmin",
-		Aliases: []string{"add-admin"},
-		Summary: "Add an admin",
-		Usage:   "<user ID/mention>",
-
-		OwnerOnly: true,
-		Command:   c.addAdmin,
+		CustomPermissions: directors,
+		Command:           c.editTerm,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -244,7 +184,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Get an error by ID",
 		Usage:   "<error ID>",
 
-		CustomPermissions: c,
+		CustomPermissions: admins,
 		Command:           c.error,
 	})
 
@@ -261,29 +201,15 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Show a list of terms added since `date`.\n`date` must be in `yyyy-mm-dd` format.",
 		Usage:   "<channel> <date>",
 
-		CustomPermissions: c,
+		CustomPermissions: admins,
 		Command:           c.changelog,
-	})
-
-	a.AddSubcommand(&bcr.Command{
-		Name:    "token",
-		Summary: "Get an API token",
-
-		CustomPermissions: c,
-		Command:           c.token,
-	}).AddSubcommand(&bcr.Command{
-		Name:    "refresh",
-		Summary: "Refresh your API token",
-
-		CustomPermissions: c,
-		Command:           c.refreshToken,
 	})
 
 	a.AddSubcommand(&bcr.Command{
 		Name:    "update-tags",
 		Summary: "Bulk update a list of term's tags. Input in CSV format",
 
-		CustomPermissions: c,
+		CustomPermissions: admins,
 		Command:           c.updateTags,
 	})
 
@@ -299,7 +225,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 			return fs
 		},
 
-		CustomPermissions: directorCheck,
+		CustomPermissions: directors,
 		Command:           c.importFromMessage,
 	})
 

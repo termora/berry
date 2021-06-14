@@ -42,7 +42,7 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 
 	var isStaff bool
 	for _, r := range m.Member.RoleIDs {
-		for _, s := range bot.Config.Bot.Support.StaffRoles {
+		for _, s := range bot.Config.Bot.Permissions.Directors {
 			if r == s {
 				isStaff = true
 				break
