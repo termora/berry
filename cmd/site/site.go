@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -50,6 +52,76 @@ type conf struct {
 	}
 }
 
+type renderData struct {
+	Conf  conf
+	Path  string
+	Dark  string
+	Tag   string
+	Tags  []string
+	Term  *db.Term
+	Terms []*db.Term
+	Query template.HTML
+}
+
+func (r *renderData) parse(c echo.Context) renderData {
+	r.Path = c.Request().URL.Path
+
+	if cookie, err := c.Request().Cookie("dark"); err == nil {
+		r.Dark = cookie.Value
+	} else {
+		r.Dark = ""
+	}
+
+	return *r
+}
+
+func setDarkPreferences(c echo.Context) (err error) {
+	set := c.Request().URL.Query().Get("set")
+	back := c.Request().URL.Query().Get("back")
+
+	cookie, err := c.Request().Cookie("dark")
+	if err != nil && err != http.ErrNoCookie {
+		return err
+	}
+
+	if (set == "true" || set == "false" || set == "reset") && cookie == nil {
+		cookie = &http.Cookie{
+			Name: "dark",
+		}
+	}
+
+	if set != "" {
+		switch set {
+		case "true":
+			{
+				cookie.Value = "true"
+				break
+			}
+		case "false":
+			{
+				cookie.Value = "false"
+				break
+			}
+		case "reset":
+			{
+				cookie.Value = ""
+				cookie.Expires = time.Now()
+			}
+		}
+	}
+
+	if cookie != nil {
+		log.Println("writing cookie: " + cookie.Value)
+		c.SetCookie(cookie)
+	}
+
+	if back == "" {
+		back = "/"
+	}
+
+	return c.Redirect(302, back)
+}
+
 func main() {
 	t := &T{
 		templates: template.Must(template.New("").
@@ -69,6 +141,9 @@ func main() {
 		panic(err)
 	}
 	err = yaml.Unmarshal(configFile, &c)
+	if err != nil {
+		sugar.Fatalf("Error loading configuration file: %v", err)
+	}
 	sugar.Info("Loaded configuration file.")
 
 	d, err := db.Init(c.DatabaseURL, sugar)
@@ -84,6 +159,8 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Static("/static", "static")
 
+	e.GET("/dark", setDarkPreferences)
+
 	e.GET("/", s.index)
 	e.GET("/term/:term", s.term)
 	e.GET("/tag/:tag", s.tag)
@@ -91,13 +168,15 @@ func main() {
 
 	// get port
 	port := c.Port
-	strings.TrimPrefix(port, ":")
+
 	if port == "" {
 		port = "1300"
+	} else {
+		port = strings.TrimPrefix(port, ":")
 	}
 
 	go func() {
-		if err := e.Start(":" + c.Port); err != nil {
+		if err := e.Start(":" + port); err != nil {
 			sugar.Info("Shutting down server")
 		}
 	}()

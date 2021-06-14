@@ -1,5 +1,6 @@
 .idea
 *.code-workspace
+.vscode
 
 # config files
 config.json
