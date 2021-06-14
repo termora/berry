@@ -38,7 +38,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Name:    "admin",
 		Summary: "Admin commands",
 
-		CustomPermissions: admins,
+		CustomPermissions: directors,
 		Hidden:            true,
 
 		Command: func(ctx *bcr.Context) (err error) {
@@ -95,7 +95,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Add a pronoun set",
 		Usage:   "<subjective>/<objective>/<poss. determiner>/<poss. pronoun>/<reflexive>",
 
-		CustomPermissions: admins,
+		CustomPermissions: directors,
 		Command:           c.addPronouns,
 	})
 
@@ -105,12 +105,12 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Add an explanation",
 		Usage:   "<names...>(newline)<explanation>",
 
-		CustomPermissions: admins,
+		CustomPermissions: directors,
 		Command:           c.addExplanation,
 	})
 
 	a.AddSubcommand(&bcr.Command{
-		Name:    "toggleExplanationCmd",
+		Name:    "toggleexplanationcmd",
 		Aliases: []string{"toggle-explanation-cmd"},
 		Summary: "Set whether or not this explanation can be triggered as a command",
 		Usage:   "<id> <bool>",
@@ -124,7 +124,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Set a term's flags",
 		Usage:   "<id> <flag mask>",
 
-		CustomPermissions: admins,
+		CustomPermissions: directors,
 		Command:           c.setFlags,
 	})
 
