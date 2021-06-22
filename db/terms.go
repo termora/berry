@@ -67,12 +67,11 @@ func (db *Db) Search(input string, limit int, ignore []string) (terms []*Term, e
 }
 
 // TermName gets a term by name
-func (db *Db) TermName(n string) (t *Term, err error) {
-	t = &Term{}
-	err = pgxscan.Get(context.Background(), db.Pool, t, `select
+func (db *Db) TermName(n string) (t []*Term, err error) {
+	err = pgxscan.Select(context.Background(), db.Pool, &t, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags, t.image_url,
 	array(select display from public.tags where normalized = any(t.tags)) as display_tags
-	from public.terms as t, public.categories as c where (t.name ilike $1 or $2 ilike any(t.aliases)) and t.category = c.id limit 1`, n, n)
+	from public.terms as t, public.categories as c where (t.name ilike $1 or $2 ilike any(t.aliases)) and t.category = c.id`, n, n)
 	return t, err
 }
 

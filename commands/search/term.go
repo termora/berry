@@ -26,18 +26,23 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		term, err = c.DB.GetTerm(id)
 		if err != nil {
 			if errors.Cause(err) == pgx.ErrNoRows {
-				_, err = ctx.Sendf("❌ No term with that ID found.")
+				_, err = ctx.Sendf("No term with that ID found.")
 				return
 			}
 			return c.DB.InternalError(ctx, err)
 		}
 		exact = true
 	} else {
-		term, err = c.DB.TermName(ctx.RawArgs)
-		if err != nil && errors.Cause(err) != pgx.ErrNoRows {
+		terms, err := c.DB.TermName(ctx.RawArgs)
+		if err != nil {
 			return c.DB.InternalError(ctx, err)
-		} else if err == nil {
+		} else if err == nil && len(terms) > 0 {
+			if len(terms) > 1 {
+				return c.search(ctx)
+			}
+
 			exact = true
+			term = terms[0]
 			goto found
 		}
 
