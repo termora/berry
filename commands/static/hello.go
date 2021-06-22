@@ -25,16 +25,7 @@ func (c *Commands) hello(ctx *bcr.Context) (err error) {
 	// if there's a non-nil error, chances are PK hasn't registered the message yet
 	// so just fall back to a normal user
 	if err != nil {
-		member, err := ctx.ParseMember(ctx.Author.ID.String())
-		if err != nil {
-			name = ctx.Author.Username
-		} else {
-			if member.Nick != "" {
-				name = member.Nick
-			} else {
-				name = ctx.Author.Username
-			}
-		}
+		name = ctx.Author.Mention()
 	} else {
 		name = m.Member.Name
 	}
