@@ -229,6 +229,14 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Command:           c.importFromMessage,
 	})
 
+	a.AddSubcommand(&bcr.Command{
+		Name:    "upload",
+		Summary: "Upload a file",
+
+		CustomPermissions: directors,
+		Command:           c.upload,
+	})
+
 	i := bot.Router.AddCommand(bot.Router.AliasMust("ai", nil, []string{"admin", "import"}, nil))
 	i.Args = bcr.MinArgs(1)
 

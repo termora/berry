@@ -99,6 +99,27 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Command:       c.tags,
 	}))
 
+	list = append(list, bot.Router.AddCommand(&bcr.Command{
+		Name:    "files",
+		Summary: "Show a list of all files in the database.",
+		Usage:   "[filter]",
+
+		Cooldown:      time.Second,
+		Blacklistable: true,
+		Command:       c.files,
+	}))
+
+	list = append(list, bot.Router.AddCommand(&bcr.Command{
+		Name:    "file",
+		Summary: "Show a file by name or ID.",
+		Usage:   "<ID|name>",
+		Args:    bcr.MinArgs(1),
+
+		Cooldown:      time.Second,
+		Blacklistable: true,
+		Command:       c.file,
+	}))
+
 	// aliases
 	ps := bot.Router.AddCommand(bot.Router.AliasMust(
 		"plural", nil,
