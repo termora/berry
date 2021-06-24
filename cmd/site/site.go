@@ -5,8 +5,6 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
-	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -75,53 +73,6 @@ func (r *renderData) parse(c echo.Context) renderData {
 	return *r
 }
 
-func setDarkPreferences(c echo.Context) (err error) {
-	set := c.Request().URL.Query().Get("set")
-	back := c.Request().URL.Query().Get("back")
-
-	cookie, err := c.Request().Cookie("dark")
-	if err != nil && err != http.ErrNoCookie {
-		return err
-	}
-
-	if (set == "true" || set == "false" || set == "reset") && cookie == nil {
-		cookie = &http.Cookie{
-			Name: "dark",
-		}
-	}
-
-	if set != "" {
-		switch set {
-		case "true":
-			{
-				cookie.Value = "true"
-				break
-			}
-		case "false":
-			{
-				cookie.Value = "false"
-				break
-			}
-		case "reset":
-			{
-				cookie.Value = ""
-				cookie.Expires = time.Now()
-			}
-		}
-	}
-
-	if cookie != nil {
-		log.Println("writing cookie: " + cookie.Value)
-		c.SetCookie(cookie)
-	}
-
-	if back == "" {
-		back = "/"
-	}
-
-	return c.Redirect(302, back)
-}
-
 func main() {
 	t := &T{
 		templates: template.Must(template.New("").
@@ -165,6 +116,7 @@ func main() {
 	e.GET("/term/:term", s.term)
 	e.GET("/tag/:tag", s.tag)
 	e.GET("/search", s.search)
+	e.GET("/file/:id/:filename", s.file)
 
 	// get port
 	port := c.Port
