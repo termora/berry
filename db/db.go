@@ -9,6 +9,7 @@ import (
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/starshine-sys/snowflake/v2"
 	"github.com/termora/berry/structs"
 	"go.uber.org/zap"
 )
@@ -41,6 +42,8 @@ type Db struct {
 
 	Config *structs.BotConfig
 
+	Snowflake *snowflake.Generator
+
 	sentry    *sentry.Hub
 	useSentry bool
 }
@@ -57,12 +60,19 @@ func Init(url string, sugar *zap.SugaredLogger) (db *Db, err error) {
 	}
 
 	db = &Db{
+		Snowflake:  snowflake.NewGen(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
 		Pool:       pool,
 		Sugar:      sugar,
 		GuildCache: guildCache,
 	}
 
 	return
+}
+
+// Time gets the time from a snowflake
+func (db *Db) Time(s snowflake.ID) time.Time {
+	t, _ := db.Snowflake.Parse(s)
+	return t
 }
 
 func initDB(s *zap.SugaredLogger, url string) (*pgxpool.Pool, error) {

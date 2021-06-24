@@ -27,6 +27,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/starshine-sys/bcr v0.17.2-0.20210614172013-bead3bac30bc
 	github.com/starshine-sys/pkgo v0.3.2
+	github.com/starshine-sys/snowflake/v2 v2.0.0
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
