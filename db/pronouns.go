@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"math/rand"
+	"strings"
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4"
@@ -34,6 +35,8 @@ var (
 func (db *Db) GetPronoun(forms ...string) (sets []*PronounSet, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting pronouns %v", strings.Join(forms, "/"))
 
 	switch len(forms) {
 	case 0:
@@ -79,6 +82,8 @@ func (db *Db) RandomPronouns() (p *PronounSet, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Getting random pronouns")
+
 	err = pgxscan.Select(ctx, db.Pool, &pronouns, `select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns order by id`)
 	if err != nil {
 		return
@@ -98,6 +103,8 @@ func (db *Db) AddPronoun(p PronounSet) (id int, err error) {
 		return 0, ErrNoForms
 	}
 
+	Debug("Adding pronouns %s", p)
+
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -109,6 +116,8 @@ func (db *Db) AddPronoun(p PronounSet) (id int, err error) {
 func (db *Db) Pronouns() (p []*PronounSet, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting all pronouns")
 
 	err = pgxscan.Select(ctx, db.Pool, &p, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns order by sorting, subjective, objective, poss_det, poss_pro, reflexive")
 	return

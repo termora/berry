@@ -34,6 +34,8 @@ func (db *Db) AddFile(filename, contentType string, data []byte) (f *File, err e
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Adding file with name %v, content type %v, data length %v", filename, contentType, len(data))
+
 	err = pgxscan.Get(ctx, db.Pool, f, "insert into files (id, filename, content_type, data) values ($1, $2, $3, $4) returning *", db.Snowflake.Get(), filename, contentType, data)
 	if err != nil {
 		return nil, err
@@ -50,6 +52,8 @@ func (db *Db) AddFile(filename, contentType string, data []byte) (f *File, err e
 func (db *Db) File(id snowflake.ID) (f File, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting file with ID %v", id)
 
 	err = pgxscan.Get(ctx, db.Pool, &f, "select * from files where id = $1", id)
 	if err != nil {
@@ -68,6 +72,8 @@ func (db *Db) Files() (f []File, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Getting all files")
+
 	err = pgxscan.Select(ctx, db.Pool, &f, "select id, filename, content_type, source, description from files order by filename asc")
 	return
 }
@@ -76,6 +82,8 @@ func (db *Db) Files() (f []File, err error) {
 func (db *Db) FileName(s string) (f []File, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting files containing %v", s)
 
 	err = pgxscan.Select(ctx, db.Pool, &f, "select id, filename, content_type, source, description from files where position(lower($1) in lower(filename)) > 0 order by filename asc", s)
 	return

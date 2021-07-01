@@ -9,6 +9,8 @@ func (db *Db) Tags() (s []string, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Getting all tags")
+
 	err = db.Pool.QueryRow(ctx, "select array(select display from tags order by tags)").Scan(&s)
 	return
 }
@@ -17,6 +19,8 @@ func (db *Db) Tags() (s []string, err error) {
 func (db *Db) TagTerms(tag string) (t []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting terms with tag %v", tag)
 
 	err = pgxscan.Select(ctx, db.Pool, &t, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.image_url from public.terms as t, public.categories as c
@@ -28,6 +32,8 @@ func (db *Db) TagTerms(tag string) (t []*Term, err error) {
 func (db *Db) UntaggedTerms() (t []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting untagged terms")
 
 	err = pgxscan.Select(ctx, db.Pool, &t, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.image_url from public.terms as t, public.categories as c

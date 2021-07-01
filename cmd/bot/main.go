@@ -9,8 +9,10 @@ import (
 	"time"
 
 	"github.com/diamondburned/arikawa/v2/state/store"
+	"github.com/diamondburned/arikawa/v2/utils/wsutil"
 	"github.com/getsentry/sentry-go"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/spf13/pflag"
 	bcrbot "github.com/starshine-sys/bcr/bot"
@@ -23,21 +25,51 @@ import (
 	"github.com/termora/berry/db"
 )
 
+var (
+	shard int
+	debug bool
+)
+
+func init() {
+	pflag.IntVarP(&shard, "shard", "s", 0, "Shard number")
+	pflag.BoolVarP(&debug, "debug", "d", true, "Debug logging")
+	pflag.Parse()
+}
+
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	logger, err := zap.NewDevelopment()
+	// set up a logger
+	zcfg := zap.NewProductionConfig()
+	zcfg.Encoding = "console"
+	zcfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	zcfg.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	zcfg.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
+	zcfg.EncoderConfig.EncodeDuration = zapcore.StringDurationEncoder
+
+	if debug {
+		zcfg.Level.SetLevel(zapcore.DebugLevel)
+	} else {
+		zcfg.Level.SetLevel(zapcore.InfoLevel)
+	}
+
+	logger, err := zcfg.Build(zap.AddStacktrace(zapcore.ErrorLevel))
 	if err != nil {
 		panic(err)
 	}
+
 	zap.RedirectStdLog(logger)
 	sugar := logger.Sugar()
 
 	c := getConfig(sugar)
 
+	if debug {
+		wsutil.WSDebug = sugar.Debug
+		db.Debug = sugar.Debugf
+	}
+
 	// command-line flags, mostly sharding
-	pflag.IntVarP(&c.Shard, "shard", "s", 0, "Shard number")
-	pflag.Parse()
+	c.Shard = shard
 	c.Sharded = c.NumShards > 1
 
 	// create a Sentry config
@@ -72,6 +104,10 @@ func main() {
 		sugar.Fatalf("Error creating bot: %v", err)
 	}
 	b.Router.State.Cabinet.MessageStore = store.Noop
+
+	b.Router.State.Gateway.ErrorLog = func(err error) {
+		sugar.Errorf("Gateway error: %v", err)
+	}
 
 	b.Owner(c.Bot.BotOwners...)
 

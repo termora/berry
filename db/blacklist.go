@@ -17,6 +17,8 @@ func (db *Db) IsBlacklisted(guildID, channelID string) (b bool) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Checking if channel %v is blacklisted", channelID)
+
 	db.Pool.QueryRow(ctx, "select $1 = any(server.blacklist) from (select * from public.servers where id = $2) as server", channelID, guildID).Scan(&b)
 	return b
 }
@@ -39,6 +41,9 @@ func (db *Db) AddToBlacklist(guildID string, channelIDs []string) (err error) {
 	if commandTag.RowsAffected() != 1 {
 		return ErrorNoRowsAffected
 	}
+
+	Debug("Added %v to blacklist", channelIDs)
+
 	return err
 }
 
@@ -58,6 +63,9 @@ func (db *Db) RemoveFromBlacklist(guildID, channelID string) (err error) {
 	if commandTag.RowsAffected() != 1 {
 		return ErrorNoRowsAffected
 	}
+
+	Debug("Removed %v from blacklist", channelID)
+
 	return err
 }
 
@@ -65,6 +73,8 @@ func (db *Db) RemoveFromBlacklist(guildID, channelID string) (err error) {
 func (db *Db) GetBlacklist(guildID string) (b []string, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting blacklist for %v", guildID)
 
 	err = db.Pool.QueryRow(ctx, "select blacklist from public.servers where id = $1", guildID).Scan(&b)
 	return b, err

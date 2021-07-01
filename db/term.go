@@ -64,6 +64,8 @@ func (t *Term) Warning() bool {
 func (t *Term) TermEmbed(baseURL string) *discord.Embed {
 	defer AddCount()
 
+	Debug("Creating term embed for %v", t.ID)
+
 	e := &discord.Embed{
 		Title:     t.Name,
 		Color:     EmbedColour,

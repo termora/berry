@@ -15,6 +15,8 @@ func (db *Db) CategoryID(s string) (id int, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Getting category with name %v", s)
+
 	err = db.Pool.QueryRow(ctx, "select id from public.categories where lower(name) = lower($1)", s).Scan(&id)
 	return
 }
@@ -23,6 +25,8 @@ func (db *Db) CategoryID(s string) (id int, err error) {
 func (db *Db) GetCategories() (c []*Category, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting categories")
 
 	err = pgxscan.Select(ctx, db.Pool, &c, `select id, name
 	from public.categories`)
@@ -35,6 +39,8 @@ func (db *Db) CategoryFromID(id int) (c *Category) {
 
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting category with ID %v", id)
 
 	pgxscan.Get(ctx, db.Pool, c, `select id, name
 	from public.categories where id = $1`, id)

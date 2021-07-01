@@ -23,6 +23,8 @@ func (db *Db) TermCount() (count int) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Getting term count")
+
 	db.Pool.QueryRow(ctx, "select count(id) from public.terms").Scan(&count)
 	return count
 }
@@ -31,6 +33,8 @@ func (db *Db) TermCount() (count int) {
 func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting terms matching flags %v", mask)
 
 	err = pgxscan.Select(ctx, db.Pool, &terms, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url,
@@ -45,6 +49,8 @@ func (db *Db) GetTerms(mask TermFlag) (terms []*Term, err error) {
 func (db *Db) GetCategoryTerms(id int, mask TermFlag) (terms []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting terms in category %v matching flags %v", id, mask)
 
 	err = pgxscan.Select(ctx, db.Pool, &terms, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.flags, t.tags, t.content_warnings, t.image_url,
@@ -61,6 +67,8 @@ func (db *Db) Search(input string, limit int, ignore []string) (terms []*Term, e
 	if limit == 0 {
 		limit = 50
 	}
+
+	Debug("Searching for terms `%v`, limit %v, ignoring `%v`", input, limit, ignore)
 
 	ctx, cancel := db.Context()
 	defer cancel()
@@ -83,6 +91,8 @@ func (db *Db) TermName(n string) (t []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Getting term with name %v", n)
+
 	err = pgxscan.Select(ctx, db.Pool, &t, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags, t.image_url,
 	array(select display from public.tags where normalized = any(t.tags)) as display_tags
@@ -95,6 +105,8 @@ func (db *Db) SearchCat(input string, cat, limit int, showHidden bool, ignore []
 	if limit == 0 {
 		limit = 50
 	}
+
+	Debug("Searching for terms `%v` in category %v, limit %v, ignoring `%v`", input, cat, limit, ignore)
 
 	flags := FlagSearchHidden
 	if showHidden {
@@ -126,6 +138,8 @@ func (db *Db) AddTerm(t *Term) (*Term, error) {
 		t.Tags = []string{}
 	}
 
+	Debug("Adding term %v", t.Name)
+
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -137,6 +151,8 @@ func (db *Db) AddTerm(t *Term) (*Term, error) {
 func (db *Db) RemoveTerm(id int) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Deleting term %v", id)
 
 	commandTag, err := db.Pool.Exec(ctx, "delete from public.terms where id = $1", id)
 	if err != nil {
@@ -155,6 +171,8 @@ func (db *Db) GetTerm(id int) (t *Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Getting term %v", id)
+
 	err = pgxscan.Get(ctx, db.Pool, t, `select
 	t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags, t.image_url,
 	array(select display from public.tags where normalized = any(t.tags)) as display_tags
@@ -168,6 +186,8 @@ func (db *Db) RandomTerm(ignore []string) (t *Term, err error) {
 
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting random term ignoring `%v`", ignore)
 
 	err = pgxscan.Select(ctx, db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags,
 	array(select display from public.tags where normalized = any(t.tags)) as display_tags
@@ -198,6 +218,8 @@ func (db *Db) RandomTermCategory(id int, ignore []string) (t *Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Getting random term in %v ignoring `%v`", id, ignore)
+
 	err = pgxscan.Select(ctx, db.Pool, &terms, `select t.id, t.category, c.name as category_name, t.name, t.aliases, t.description, t.note, t.source, t.created, t.last_modified, t.content_warnings, t.flags, t.tags,
 	array(select display from public.tags where normalized = any(t.tags)) as display_tags
 	from public.terms as t, public.categories as c
@@ -226,6 +248,8 @@ func (db *Db) SetFlags(id int, flags TermFlag) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Setting flags for %v to %v", id, flags)
+
 	commandTag, err := db.Pool.Exec(ctx, "update public.terms set flags = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", flags, id)
 	if err != nil {
 		return
@@ -241,6 +265,8 @@ func (db *Db) SetFlags(id int, flags TermFlag) (err error) {
 func (db *Db) SetCW(id int, text string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Setting cw for %v to `%v`", id, text)
 
 	commandTag, err := db.Pool.Exec(ctx, "update public.terms set content_warnings = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", text, id)
 	if err != nil {
@@ -258,6 +284,8 @@ func (db *Db) UpdateDesc(id int, desc string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Updating description for %v to `%v`", id, desc)
+
 	commandTag, err := db.Pool.Exec(ctx, "update public.terms set description = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", desc, id)
 	if err != nil {
 		return
@@ -272,6 +300,8 @@ func (db *Db) UpdateDesc(id int, desc string) (err error) {
 func (db *Db) UpdateSource(id int, source string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Updating source for %v to `%v`", id, source)
 
 	commandTag, err := db.Pool.Exec(ctx, "update public.terms set source = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", source, id)
 	if err != nil {
@@ -288,6 +318,8 @@ func (db *Db) UpdateTitle(id int, title string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Updating title for %v to `%v`", id, title)
+
 	commandTag, err := db.Pool.Exec(ctx, "update public.terms set name = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", title, id)
 	if err != nil {
 		return
@@ -298,10 +330,12 @@ func (db *Db) UpdateTitle(id int, title string) (err error) {
 	return
 }
 
-// UpdateImage updates the title for a term
+// UpdateImage updates the image for a term
 func (db *Db) UpdateImage(id int, img string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Updating image for %v to `%v`", id, img)
 
 	commandTag, err := db.Pool.Exec(ctx, "update public.terms set image_url = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", img, id)
 	if err != nil {
@@ -317,6 +351,8 @@ func (db *Db) UpdateImage(id int, img string) (err error) {
 func (db *Db) UpdateAliases(id int, aliases []string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Updating aliases for %v to `%v`", id, aliases)
 
 	var commandTag pgconn.CommandTag
 	if len(aliases) > 0 {
@@ -338,6 +374,8 @@ func (db *Db) SetNote(id int, note string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Updating note for %v to `%v`", id, note)
+
 	var commandTag pgconn.CommandTag
 	if len(note) > 0 {
 		commandTag, err = db.Pool.Exec(ctx, "update public.terms set note = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", note, id)
@@ -357,6 +395,8 @@ func (db *Db) SetNote(id int, note string) (err error) {
 func (db *Db) UpdateTags(id int, tags []string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Updating tags for %v to `%v`", id, tags)
 
 	_, err = db.Pool.Exec(ctx, "update public.terms set tags = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", tags, id)
 	return

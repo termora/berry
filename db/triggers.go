@@ -22,6 +22,8 @@ func (db *Db) AddExplanation(e *Explanation) (ex *Explanation, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Adding explanation %v with description %v", e.Name, e.Description)
+
 	err = db.Pool.QueryRow(ctx, "insert into public.explanations (name, aliases, description) values ($1, $2, $3) returning id, created", e.Name, e.Aliases, e.Description).Scan(&e.ID, &e.Created)
 	return e, err
 }
@@ -33,6 +35,8 @@ func (db *Db) GetExplanation(s string) (e *Explanation, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Getting explanation with name %v", s)
+
 	err = pgxscan.Get(ctx, db.Pool, e, "select id, name, aliases, description, created, as_command from public.explanations where lower(name) = lower($1) order by id desc limit 1", s)
 	return e, err
 }
@@ -41,6 +45,8 @@ func (db *Db) GetExplanation(s string) (e *Explanation, err error) {
 func (db *Db) GetAllExplanations() (e []*Explanation, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Getting all explanations")
 
 	err = pgxscan.Select(ctx, db.Pool, &e, "select id, name, aliases, description, created, as_command from public.explanations order by id")
 	return e, err
@@ -51,6 +57,8 @@ func (db *Db) GetCmdExplanations() (e []*Explanation, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
+	Debug("Getting command explanations")
+
 	err = pgxscan.Select(ctx, db.Pool, &e, "select id, name, aliases, description, created, as_command from public.explanations where as_command = true order by id")
 	return e, err
 }
@@ -59,6 +67,8 @@ func (db *Db) GetCmdExplanations() (e []*Explanation, err error) {
 func (db *Db) SetAsCommand(id int, b bool) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
+
+	Debug("Setting %v as command: %v", id, b)
 
 	commandTag, err := db.Pool.Exec(ctx, "update public.explanations set as_command = $1 where id = $2", b, id)
 	if err != nil {

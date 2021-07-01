@@ -14,6 +14,9 @@ import (
 	"go.uber.org/zap"
 )
 
+// Debug is a debug logging function
+var Debug = func(template string, args ...interface{}) {}
+
 var termCounter struct {
 	count uint64
 	mu    sync.RWMutex
