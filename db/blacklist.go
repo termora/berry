@@ -1,7 +1,6 @@
 package db
 
 import (
-	"context"
 	"errors"
 
 	"github.com/starshine-sys/bcr"
@@ -15,7 +14,10 @@ var (
 
 // IsBlacklisted returns true if a channel is blacklisted
 func (db *Db) IsBlacklisted(guildID, channelID string) (b bool) {
-	db.Pool.QueryRow(context.Background(), "select $1 = any(server.blacklist) from (select * from public.servers where id = $2) as server", channelID, guildID).Scan(&b)
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	db.Pool.QueryRow(ctx, "select $1 = any(server.blacklist) from (select * from public.servers where id = $2) as server", channelID, guildID).Scan(&b)
 	return b
 }
 
@@ -26,7 +28,11 @@ func (db *Db) AddToBlacklist(guildID string, channelIDs []string) (err error) {
 			return ErrorAlreadyBlacklisted
 		}
 	}
-	commandTag, err := db.Pool.Exec(context.Background(), "update public.servers set blacklist = array_cat(blacklist, $1) where id = $2", channelIDs, guildID)
+
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	commandTag, err := db.Pool.Exec(ctx, "update public.servers set blacklist = array_cat(blacklist, $1) where id = $2", channelIDs, guildID)
 	if err != nil {
 		return err
 	}
@@ -41,7 +47,11 @@ func (db *Db) RemoveFromBlacklist(guildID, channelID string) (err error) {
 	if !db.IsBlacklisted(guildID, channelID) {
 		return ErrorNotBlacklisted
 	}
-	commandTag, err := db.Pool.Exec(context.Background(), "update public.servers set blacklist = array_remove(blacklist, $1) where id = $2", channelID, guildID)
+
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	commandTag, err := db.Pool.Exec(ctx, "update public.servers set blacklist = array_remove(blacklist, $1) where id = $2", channelID, guildID)
 	if err != nil {
 		return err
 	}
@@ -53,7 +63,10 @@ func (db *Db) RemoveFromBlacklist(guildID, channelID string) (err error) {
 
 // GetBlacklist returns the channel blacklist for guildID
 func (db *Db) GetBlacklist(guildID string) (b []string, err error) {
-	err = db.Pool.QueryRow(context.Background(), "select blacklist from public.servers where id = $1", guildID).Scan(&b)
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	err = db.Pool.QueryRow(ctx, "select blacklist from public.servers where id = $1", guildID).Scan(&b)
 	return b, err
 }
 

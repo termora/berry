@@ -1,7 +1,6 @@
 package pronouns
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -55,7 +54,10 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	_, err = c.DB.Pool.Exec(context.Background(), "insert into pronoun_msgs (message_id, subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5, $6)", msg.ID, p[0], p[1], p[2], p[3], p[4])
+	con, cancel := c.DB.Context()
+	defer cancel()
+
+	_, err = c.DB.Pool.Exec(con, "insert into pronoun_msgs (message_id, subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5, $6)", msg.ID, p[0], p[1], p[2], p[3], p[4])
 	if err == nil {
 		// if the error's non-nil, the message was still sent
 		// so don't just return immediately

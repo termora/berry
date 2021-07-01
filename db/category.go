@@ -1,8 +1,6 @@
 package db
 
 import (
-	"context"
-
 	"github.com/georgysavva/scany/pgxscan"
 )
 
@@ -14,13 +12,19 @@ type Category struct {
 
 // CategoryID gets the ID from a category name
 func (db *Db) CategoryID(s string) (id int, err error) {
-	err = db.Pool.QueryRow(context.Background(), "select id from public.categories where lower(name) = lower($1)", s).Scan(&id)
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	err = db.Pool.QueryRow(ctx, "select id from public.categories where lower(name) = lower($1)", s).Scan(&id)
 	return
 }
 
 // GetCategories ...
 func (db *Db) GetCategories() (c []*Category, err error) {
-	err = pgxscan.Select(context.Background(), db.Pool, &c, `select id, name
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	err = pgxscan.Select(ctx, db.Pool, &c, `select id, name
 	from public.categories`)
 	return c, err
 }
@@ -28,7 +32,11 @@ func (db *Db) GetCategories() (c []*Category, err error) {
 // CategoryFromID ...
 func (db *Db) CategoryFromID(id int) (c *Category) {
 	c = &Category{}
-	pgxscan.Get(context.Background(), db.Pool, c, `select id, name
+
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	pgxscan.Get(ctx, db.Pool, c, `select id, name
 	from public.categories where id = $1`, id)
 	return c
 }

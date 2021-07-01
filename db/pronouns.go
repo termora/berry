@@ -1,7 +1,6 @@
 package db
 
 import (
-	"context"
 	"errors"
 	"math/rand"
 
@@ -33,31 +32,34 @@ var (
 // GetPronoun gets a pronoun from the database
 // gods this function is shit but idc, if it works it works
 func (db *Db) GetPronoun(forms ...string) (sets []*PronounSet, err error) {
+	ctx, cancel := db.Context()
+	defer cancel()
+
 	switch len(forms) {
 	case 0:
 		return nil, ErrNoForms
 	case 1:
-		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) order by sorting, subjective, objective, poss_det, poss_pro, reflexive", forms[0])
+		err = pgxscan.Select(ctx, db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) order by sorting, subjective, objective, poss_det, poss_pro, reflexive", forms[0])
 		if err != nil {
 			return
 		}
 	case 2:
-		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) order by sorting, subjective, objective, poss_det, poss_pro, reflexive", forms[0], forms[1])
+		err = pgxscan.Select(ctx, db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) order by sorting, subjective, objective, poss_det, poss_pro, reflexive", forms[0], forms[1])
 		if err != nil {
 			return
 		}
 	case 3:
-		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) and lower(poss_det) = lower($3) order by sorting, subjective, objective, poss_det, poss_pro, reflexive", forms[0], forms[1], forms[2])
+		err = pgxscan.Select(ctx, db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) and lower(poss_det) = lower($3) order by sorting, subjective, objective, poss_det, poss_pro, reflexive", forms[0], forms[1], forms[2])
 		if err != nil {
 			return
 		}
 	case 4:
-		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) and lower(poss_det) = lower($3) and lower(poss_pro) = lower($4) order by sorting, subjective, objective, poss_det, poss_pro, reflexive", forms[0], forms[1], forms[2], forms[3])
+		err = pgxscan.Select(ctx, db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) and lower(poss_det) = lower($3) and lower(poss_pro) = lower($4) order by sorting, subjective, objective, poss_det, poss_pro, reflexive", forms[0], forms[1], forms[2], forms[3])
 		if err != nil {
 			return
 		}
 	case 5:
-		err = pgxscan.Select(context.Background(), db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) and lower(poss_det) = lower($3) and lower(poss_pro) = lower($4) and lower(reflexive) = lower($5) order by sorting, subjective, objective, poss_det, poss_pro, reflexive", forms[0], forms[1], forms[2], forms[3], forms[4])
+		err = pgxscan.Select(ctx, db.Pool, &sets, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns where lower(subjective) = lower($1) and lower(objective) = lower($2) and lower(poss_det) = lower($3) and lower(poss_pro) = lower($4) and lower(reflexive) = lower($5) order by sorting, subjective, objective, poss_det, poss_pro, reflexive", forms[0], forms[1], forms[2], forms[3], forms[4])
 		if err != nil {
 			return
 		}
@@ -73,7 +75,11 @@ func (db *Db) GetPronoun(forms ...string) (sets []*PronounSet, err error) {
 // RandomPronouns gets a random pronoun set from the database
 func (db *Db) RandomPronouns() (p *PronounSet, err error) {
 	var pronouns []*PronounSet
-	err = pgxscan.Select(context.Background(), db.Pool, &pronouns, `select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns order by id`)
+
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	err = pgxscan.Select(ctx, db.Pool, &pronouns, `select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns order by id`)
 	if err != nil {
 		return
 	}
@@ -92,12 +98,18 @@ func (db *Db) AddPronoun(p PronounSet) (id int, err error) {
 		return 0, ErrNoForms
 	}
 
-	err = db.Pool.QueryRow(context.Background(), "insert into pronouns (subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5) returning id", p.Subjective, p.Objective, p.PossDet, p.PossPro, p.Reflexive).Scan(&id)
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	err = db.Pool.QueryRow(ctx, "insert into pronouns (subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5) returning id", p.Subjective, p.Objective, p.PossDet, p.PossPro, p.Reflexive).Scan(&id)
 	return id, err
 }
 
 // Pronouns ...
 func (db *Db) Pronouns() (p []*PronounSet, err error) {
-	err = pgxscan.Select(context.Background(), db.Pool, &p, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns order by sorting, subjective, objective, poss_det, poss_pro, reflexive")
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	err = pgxscan.Select(ctx, db.Pool, &p, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns order by sorting, subjective, objective, poss_det, poss_pro, reflexive")
 	return
 }

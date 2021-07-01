@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"context"
 	"fmt"
 	"regexp"
 	"strings"
@@ -162,7 +161,10 @@ done:
 	}
 
 	for i := range t.Tags {
-		_, err = c.DB.Pool.Exec(context.Background(), `insert into public.tags (normalized, display) values ($1, $2)
+		con, cancel := c.DB.Context()
+		defer cancel()
+
+		_, err = c.DB.Pool.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(t.Tags[i]), t.Tags[i])
 		if err != nil {
 			c.Sugar.Errorf("Error adding tag: %v", err)

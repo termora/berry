@@ -1,8 +1,6 @@
 package admin
 
 import (
-	"context"
-
 	"github.com/starshine-sys/bcr"
 )
 
@@ -16,7 +14,10 @@ func (c *Admin) addCategory(ctx *bcr.Context) (err error) {
 	// check if a category with that name exists
 	var e bool
 
-	err = c.DB.Pool.QueryRow(context.Background(), "select exists (select from categories where lower(name) = lower($1))", ctx.RawArgs).Scan(&e)
+	con, cancel := c.DB.Context()
+	defer cancel()
+
+	err = c.DB.Pool.QueryRow(con, "select exists (select from categories where lower(name) = lower($1))", ctx.RawArgs).Scan(&e)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
@@ -30,7 +31,10 @@ func (c *Admin) addCategory(ctx *bcr.Context) (err error) {
 	// add the category
 	var id int
 
-	err = c.DB.Pool.QueryRow(context.Background(), "insert into public.categories (name) values ($1) returning id", ctx.RawArgs).Scan(&id)
+	con, cancel = c.DB.Context()
+	defer cancel()
+
+	err = c.DB.Pool.QueryRow(con, "insert into public.categories (name) values ($1) returning id", ctx.RawArgs).Scan(&id)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}

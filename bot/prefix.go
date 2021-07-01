@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"context"
 	"strings"
 
 	"github.com/diamondburned/arikawa/v2/discord"
@@ -24,7 +23,10 @@ func (bot *Bot) PrefixesFor(id discord.GuildID) (s []string) {
 		return bot.Config.Bot.Prefixes
 	}
 
-	err := bot.DB.Pool.QueryRow(context.Background(), "select prefixes from public.servers where id = $1", id.String()).Scan(&s)
+	ctx, cancel := bot.DB.Context()
+	defer cancel()
+
+	err := bot.DB.Pool.QueryRow(ctx, "select prefixes from public.servers where id = $1", id.String()).Scan(&s)
 	if err != nil {
 		bot.Sugar.Errorf("Error getting prefixes for %v: %v", id, err)
 		// return the default prefixes

@@ -1,7 +1,6 @@
 package db
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/georgysavva/scany/pgxscan"
@@ -31,7 +30,11 @@ func (f File) URL() string {
 // AddFile adds a file
 func (db *Db) AddFile(filename, contentType string, data []byte) (f *File, err error) {
 	f = &File{}
-	err = pgxscan.Get(context.Background(), db.Pool, f, "insert into files (id, filename, content_type, data) values ($1, $2, $3, $4) returning *", db.Snowflake.Get(), filename, contentType, data)
+
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	err = pgxscan.Get(ctx, db.Pool, f, "insert into files (id, filename, content_type, data) values ($1, $2, $3, $4) returning *", db.Snowflake.Get(), filename, contentType, data)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +48,10 @@ func (db *Db) AddFile(filename, contentType string, data []byte) (f *File, err e
 
 // File gets a file from the database
 func (db *Db) File(id snowflake.ID) (f File, err error) {
-	err = pgxscan.Get(context.Background(), db.Pool, &f, "select * from files where id = $1", id)
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	err = pgxscan.Get(ctx, db.Pool, &f, "select * from files where id = $1", id)
 	if err != nil {
 		return
 	}
@@ -59,12 +65,18 @@ func (db *Db) File(id snowflake.ID) (f File, err error) {
 
 // Files gets all files
 func (db *Db) Files() (f []File, err error) {
-	err = pgxscan.Select(context.Background(), db.Pool, &f, "select id, filename, content_type, source, description from files order by filename asc")
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	err = pgxscan.Select(ctx, db.Pool, &f, "select id, filename, content_type, source, description from files order by filename asc")
 	return
 }
 
 // FileName returns files with the given string in their name
 func (db *Db) FileName(s string) (f []File, err error) {
-	err = pgxscan.Select(context.Background(), db.Pool, &f, "select id, filename, content_type, source, description from files where position(lower($1) in lower(filename)) > 0 order by filename asc", s)
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	err = pgxscan.Select(ctx, db.Pool, &f, "select id, filename, content_type, source, description from files where position(lower($1) in lower(filename)) > 0 order by filename asc", s)
 	return
 }

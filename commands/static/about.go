@@ -1,7 +1,6 @@
 package static
 
 import (
-	"context"
 	"fmt"
 	"net/url"
 	"os/exec"
@@ -114,7 +113,11 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 		pronouns   int
 		categories []category
 	)
-	err = pgxscan.Select(context.Background(), c.DB.Pool, &categories, `select
+
+	con, cancel := c.DB.Context()
+	defer cancel()
+
+	err = pgxscan.Select(con, c.DB.Pool, &categories, `select
 	categories.id, categories.name, count(terms.id)
 	from categories
 	inner join terms on categories.id = terms.category
@@ -123,7 +126,10 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	err = c.DB.Pool.QueryRow(context.Background(), "select count(id) from pronouns").Scan(&pronouns)
+	con, cancel = c.DB.Context()
+	defer cancel()
+
+	err = c.DB.Pool.QueryRow(con, "select count(id) from pronouns").Scan(&pronouns)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}

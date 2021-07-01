@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"context"
 	"strings"
 	"time"
 
@@ -97,7 +96,10 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 	for _, tag := range tags {
 		t.Tags = append(t.Tags, strings.ToLower(strings.TrimSpace(tag)))
 
-		_, err = c.DB.Pool.Exec(context.Background(), `insert into public.tags (normalized, display) values ($1, $2)
+		con, cancel := c.DB.Context()
+		defer cancel()
+
+		_, err = c.DB.Pool.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(strings.TrimSpace(tag)), tag)
 		if err != nil {
 			c.Sugar.Errorf("Error adding tag: %v", err)
