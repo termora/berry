@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/ReneKroon/ttlcache/v2 v2.7.0
-	github.com/diamondburned/arikawa/v2 v2.0.7-0.20210411235605-20166f33cc8d
+	github.com/diamondburned/arikawa/v3 v3.0.0-20210630071930-af35c03b8e77
 	github.com/dustin/go-humanize v1.0.0
 	github.com/georgysavva/scany v0.2.8
 	github.com/getsentry/sentry-go v0.11.0
@@ -25,7 +25,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/pflag v1.0.5
-	github.com/starshine-sys/bcr v0.17.2-0.20210614172013-bead3bac30bc
+	github.com/starshine-sys/bcr v0.18.0
 	github.com/starshine-sys/pkgo v0.3.2
 	github.com/starshine-sys/snowflake/v2 v2.0.0
 	go.uber.org/multierr v1.7.0 // indirect

@@ -3,8 +3,8 @@ package pronouns
 import (
 	"fmt"
 
-	"github.com/diamondburned/arikawa/v2/discord"
-	"github.com/diamondburned/arikawa/v2/gateway"
+	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/termora/berry/db"
 )
 
@@ -23,6 +23,8 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	if m.Member.User.Bot {
 		return
 	}
+
+	s, _ := bot.Router.StateFromGuildID(m.GuildID)
 
 	var exists bool
 
@@ -56,8 +58,8 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	// if the member isn't staff, return
 	if !isStaff {
 		// also remove their reaction if possible
-		if p, _ := bot.Router.State.Permissions(m.ChannelID, bot.Router.Bot.ID); p.Has(discord.PermissionManageMessages) && m.Emoji.Name == "✅" {
-			bot.Router.State.DeleteUserReaction(m.ChannelID, m.MessageID, m.UserID, "✅")
+		if p, _ := s.Permissions(m.ChannelID, bot.Router.Bot.ID); p.Has(discord.PermissionManageMessages) && m.Emoji.Name == "✅" {
+			s.DeleteUserReaction(m.ChannelID, m.MessageID, m.UserID, "✅")
 		}
 
 		return
@@ -79,11 +81,11 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	if err != nil {
 		bot.Sugar.Errorf("Error adding pronoun set: %v", err)
 		// this is the only one we DM the person who approved it for
-		ch, chErr := bot.Router.State.CreatePrivateChannel(m.Member.User.ID)
+		ch, chErr := s.CreatePrivateChannel(m.Member.User.ID)
 		if chErr != nil {
 			return
 		}
-		bot.Router.State.SendMessage(ch.ID, fmt.Sprintf("There was an error adding the pronoun set:\n```%v```", err), nil)
+		s.SendMessage(ch.ID, fmt.Sprintf("There was an error adding the pronoun set:\n```%v```", err))
 		return
 	}
 
@@ -98,7 +100,7 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	}
 
 	// get the message
-	msg, err := bot.Router.State.Message(m.ChannelID, m.MessageID)
+	msg, err := s.Message(m.ChannelID, m.MessageID)
 	if err != nil {
 		bot.Sugar.Errorf("Error getting message: %v", err)
 		return
@@ -119,7 +121,7 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	}
 	e.Timestamp = discord.NowTimestamp()
 
-	_, err = bot.Router.State.EditEmbed(msg.ChannelID, msg.ID, e)
+	_, err = s.EditEmbeds(msg.ChannelID, msg.ID, e)
 	if err != nil {
 		bot.Sugar.Errorf("Error editing message: %v", err)
 		return

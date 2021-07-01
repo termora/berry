@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/dustin/go-humanize"
 	"github.com/dustin/go-humanize/english"
 	"github.com/georgysavva/scany/pgxscan"
@@ -75,22 +75,14 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 		Timestamp: discord.NowTimestamp(),
 	}
 
-	if c.Config.Sharded {
-		e.Fields = append(e.Fields, discord.EmbedField{
-			Name:   "Shard",
-			Value:  fmt.Sprintf("#%v (%v total)", c.Router.State.Gateway.Identifier.Shard.ShardID(), c.Router.State.Gateway.Identifier.Shard.NumShards()),
-			Inline: true,
-		})
-	}
-
-	servers := humanize.Comma(c.GuildCount)
-	if c.Config.Sharded {
-		servers += fmt.Sprintf("\nShard %v of %v", c.Router.State.Gateway.Identifier.Shard.ShardID()+1, c.Router.State.Gateway.Identifier.Shard.NumShards())
-	}
-
 	e.Fields = append(e.Fields, discord.EmbedField{
-		Name:   "Servers",
-		Value:  servers,
+		Name: "Servers",
+		Value: fmt.Sprintf(
+			"%v\nShard %v of %v",
+			humanize.Comma(c.GuildCount),
+			ctx.State.Gateway.Identifier.Shard.ShardID()+1,
+			ctx.Router.ShardManager.NumShards(),
+		),
 		Inline: true,
 	}, discord.EmbedField{
 		Name: "Memory usage",

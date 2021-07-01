@@ -3,9 +3,11 @@ package admin
 import (
 	"sync"
 
-	"github.com/diamondburned/arikawa/v2/api/webhook"
-	"github.com/diamondburned/arikawa/v2/discord"
-	"github.com/diamondburned/arikawa/v2/gateway"
+	"github.com/diamondburned/arikawa/v3/api/webhook"
+	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/diamondburned/arikawa/v3/gateway/shard"
+	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
@@ -165,21 +167,6 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	})
 
 	a.AddSubcommand(&bcr.Command{
-		Name:        "restart",
-		Summary:     "Restart the bot",
-		Description: "If the `-s`/`--silent` flag is set, don't change the bot's status",
-		Usage:       "[delay]",
-
-		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
-			fs.BoolP("silent", "s", false, "If this flag is used, don't set the bot's status")
-			return fs
-		},
-
-		OwnerOnly: true,
-		Command:   c.restart,
-	})
-
-	a.AddSubcommand(&bcr.Command{
 		Name:    "error",
 		Summary: "Get an error by ID",
 		Usage:   "<error ID>",
@@ -240,12 +227,14 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	i := bot.Router.AddCommand(bot.Router.AliasMust("ai", nil, []string{"admin", "import"}, nil))
 	i.Args = bcr.MinArgs(1)
 
-	// set status
-	// this is in admin because of the `guild` owner command
-	var o sync.Once
-	bot.Router.State.AddHandler(func(d *gateway.ReadyEvent) {
-		o.Do(func() {
-			c.setStatusLoop(bot.Router.State)
+	bot.Router.ShardManager.ForEach(func(s shard.Shard) {
+		state := s.(*state.State)
+
+		state.AddHandler(func(_ *gateway.ReadyEvent) {
+			var o sync.Once
+			o.Do(func() {
+				go c.setStatusLoop(state)
+			})
 		})
 	})
 

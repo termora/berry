@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 	"github.com/starshine-sys/bcr"

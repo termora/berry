@@ -77,8 +77,8 @@ github.com/dgraph-io/badger v1.6.0/go.mod h1:zwt7syl517jmP8s94KqSxTlM6IMsdhYy6ps
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-farm v0.0.0-20190423205320-6a90982ecee2/go.mod h1:SqUrOPUnsFjfmXRMNPybcSiG0BgUW2AuFH8PAnS2iTw=
-github.com/diamondburned/arikawa/v2 v2.0.7-0.20210411235605-20166f33cc8d h1:gl44Yw3Z9aXA+Y8/uzVsTFUAysCRAwgDnO4UbYUBVW0=
-github.com/diamondburned/arikawa/v2 v2.0.7-0.20210411235605-20166f33cc8d/go.mod h1:e+lhS20ni2luFEU06Pc8paCxgZL99/RZb77dOC82CF0=
+github.com/diamondburned/arikawa/v3 v3.0.0-20210630071930-af35c03b8e77 h1:J/FO9EGtvOMKRIQZUAPJsepv/3NeDS6MdeAYp+CTMpY=
+github.com/diamondburned/arikawa/v3 v3.0.0-20210630071930-af35c03b8e77/go.mod h1:sNqM/iGXuH87wEH1rpQBEY1PR0AAkRKJuUhJGOdo7To=
 github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
@@ -460,8 +460,8 @@ github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnIn
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
 github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/spf13/viper v1.3.2/go.mod h1:ZiWeW+zYFKm7srdB9IoDzzZXaJaI5eL9QjNiN/DMA2s=
-github.com/starshine-sys/bcr v0.17.2-0.20210614172013-bead3bac30bc h1:2+MiULY2ZokswTr7TJN9UvR7JcAwvx0our6mHGhgxBE=
-github.com/starshine-sys/bcr v0.17.2-0.20210614172013-bead3bac30bc/go.mod h1:1j9GalRPP0PWRA+VBf6oCndO5a2ZKFDoFiRDMHFAHD8=
+github.com/starshine-sys/bcr v0.18.0 h1:TfARrsrrjiWojZtFDM8hI7tsB4wyFp4mb8wBeZCaDy4=
+github.com/starshine-sys/bcr v0.18.0/go.mod h1:UuFCKV8iLp9eFz1wEZCC4+xav+vsf2u3u8kK7fZmlFE=
 github.com/starshine-sys/pkgo v0.3.2 h1:6T7e7Qm61uvpmu9v6byy7aRyp9ixpqJElKNoqb5mO6A=
 github.com/starshine-sys/pkgo v0.3.2/go.mod h1:/MObIv0vRt273UyDtuPdMNgADYhOh+h7VPccO6Zh9V8=
 github.com/starshine-sys/snowflake/v2 v2.0.0 h1:rVDUw1tXe1nDcGTMMAU5RzU+mX4O9IDEEs9lds7BYtI=

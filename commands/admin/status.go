@@ -7,7 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/diamondburned/arikawa/v2/state"
+	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/diamondburned/arikawa/v3/state"
 )
 
 // this is in admin to better integrate with the `guilds` admin command
@@ -18,7 +20,10 @@ func (c *Admin) setStatusLoop(s *state.State) {
 
 	// spin off a function to fetch the guild count (well, actually fetch all guilds)
 	// it's also used by `t!admin guilds`, which is why we run this even if the server count isn't shown in the bot's status
-	go c.guildCount(s, countChan)
+	if s.Gateway.Identifier.Shard.ShardID() == 0 {
+		c.Sugar.Debugf("Spawning guildCount function on shard %v", s.Gateway.Identifier.Shard.ShardID())
+		go c.guildCount(s, countChan)
+	}
 
 	for {
 		// if something else set a static status, return
@@ -41,11 +46,17 @@ func (c *Admin) setStatusLoop(s *state.State) {
 			status = st
 		}
 		// if the bot is sharded, also add the shard number to the status
-		if c.Config.Sharded && c.Config.Bot.ShowShard {
-			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID(), s.Gateway.Identifier.Shard.NumShards())
+		if c.Router.ShardManager.NumShards() > 1 && c.Config.Bot.ShowShard {
+			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID()+1, c.Router.ShardManager.NumShards())
 		}
 
-		if err := c.UpdateStatus(status, "online"); err != nil {
+		if err := s.UpdateStatus(gateway.UpdateStatusData{
+			Status: gateway.OnlineStatus,
+			Activities: []discord.Activity{{
+				Name: status,
+				Type: discord.GameActivity,
+			}},
+		}); err != nil {
 			c.Sugar.Error("Error setting status:", err)
 		}
 
@@ -74,11 +85,19 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		}
 
 		status = fmt.Sprintf("%v | in %v servers", status, guilds)
-		if c.Config.Sharded && c.Config.Bot.ShowShard {
-			status = fmt.Sprintf("%v | shard %v", status, s.Gateway.Identifier.Shard.ShardID())
+
+		// if the bot is sharded, also add the shard number to the status
+		if c.Router.ShardManager.NumShards() > 1 && c.Config.Bot.ShowShard {
+			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID()+1, c.Router.ShardManager.NumShards())
 		}
 
-		if err := c.UpdateStatus(status, "online"); err != nil {
+		if err := s.UpdateStatus(gateway.UpdateStatusData{
+			Status: gateway.OnlineStatus,
+			Activities: []discord.Activity{{
+				Name: status,
+				Type: discord.GameActivity,
+			}},
+		}); err != nil {
 			c.Sugar.Error("Error setting status:", err)
 		}
 
@@ -101,7 +120,7 @@ func (c *Admin) guildCount(s *state.State, ch chan int) {
 			c.GuildCount = int64(len(g))
 
 			// post guild count if needed
-			if err = c.postGuildCount(len(g)); err != nil {
+			if err = c.postGuildCount(s, len(g)); err != nil {
 				c.Sugar.Errorf("Error posting guild count: %v", err)
 			}
 		}
@@ -111,8 +130,8 @@ func (c *Admin) guildCount(s *state.State, ch chan int) {
 	}
 }
 
-func (c *Admin) postGuildCount(count int) (err error) {
-	u, err := c.Router.State.Me()
+func (c *Admin) postGuildCount(s *state.State, count int) (err error) {
+	u, err := s.Me()
 	if err != nil {
 		return
 	}

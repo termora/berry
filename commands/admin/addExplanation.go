@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/diamondburned/arikawa/v2/bot/extras/shellwords"
+	"github.com/diamondburned/arikawa/v3/bot/extras/shellwords"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )

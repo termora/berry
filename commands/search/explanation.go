@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/diamondburned/arikawa/v2/api"
-	"github.com/diamondburned/arikawa/v2/discord"
-	"github.com/diamondburned/arikawa/v2/utils/json/option"
+	"github.com/diamondburned/arikawa/v3/api"
+	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -60,7 +60,7 @@ func (c *commands) explanation(ctx *bcr.Context) (err error) {
 		x = "No explanations."
 	}
 
-	_, err = m.Embed(&discord.Embed{
+	_, err = m.Embeds(discord.Embed{
 		Title:       "All explanations",
 		Description: x,
 		Color:       db.EmbedColour,

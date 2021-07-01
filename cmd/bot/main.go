@@ -8,8 +8,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/diamondburned/arikawa/v2/state/store"
-	"github.com/diamondburned/arikawa/v2/utils/wsutil"
+	"github.com/diamondburned/arikawa/v3/gateway/shard"
+	"github.com/diamondburned/arikawa/v3/state"
+	"github.com/diamondburned/arikawa/v3/state/store"
+	"github.com/diamondburned/arikawa/v3/utils/wsutil"
 	"github.com/getsentry/sentry-go"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -25,13 +27,9 @@ import (
 	"github.com/termora/berry/db"
 )
 
-var (
-	shard int
-	debug bool
-)
+var debug bool
 
 func init() {
-	pflag.IntVarP(&shard, "shard", "s", 0, "Shard number")
 	pflag.BoolVarP(&debug, "debug", "d", true, "Debug logging")
 	pflag.Parse()
 }
@@ -68,10 +66,6 @@ func main() {
 		db.Debug = sugar.Debugf
 	}
 
-	// command-line flags, mostly sharding
-	c.Shard = shard
-	c.Sharded = c.NumShards > 1
-
 	// create a Sentry config
 	if c.UseSentry {
 		err = sentry.Init(sentry.ClientOptions{
@@ -103,18 +97,16 @@ func main() {
 	if err != nil {
 		sugar.Fatalf("Error creating bot: %v", err)
 	}
-	b.Router.State.Cabinet.MessageStore = store.Noop
+	b.Router.ShardManager.ForEach(func(s shard.Shard) {
+		state := s.(*state.State)
 
-	b.Router.State.Gateway.ErrorLog = func(err error) {
-		sugar.Errorf("Gateway error: %v", err)
-	}
+		state.Cabinet.MessageStore = store.Noop
+		state.Gateway.ErrorLog = func(err error) {
+			sugar.Errorf("Gateway error: %v", err)
+		}
+	})
 
 	b.Owner(c.Bot.BotOwners...)
-
-	// if the bot is sharded, set the number and count
-	if c.Sharded {
-		b.Router.State.Gateway.Identifier.SetShard(c.Shard, c.NumShards)
-	}
 
 	// set the default embed colour and blacklist function
 	b.Router.EmbedColor = db.EmbedColour
@@ -135,13 +127,13 @@ func main() {
 	bot.Add(admin.Init)
 
 	// open a connection to Discord
-	if err = bot.Router.State.Open(); err != nil {
+	if err = bot.Start(context.Background()); err != nil {
 		sugar.Fatal("Failed to connect:", err)
 	}
 
 	// Defer this to make sure that things are always cleanly shutdown even in the event of a crash
 	defer func() {
-		bot.Router.State.Close()
+		bot.Router.ShardManager.Close()
 		sugar.Infof("Disconnected from Discord.")
 		d.Pool.Close()
 		sugar.Infof("Closed database connection.")
@@ -149,8 +141,9 @@ func main() {
 
 	sugar.Info("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
 
-	botUser, _ := bot.Router.State.Me()
-	sugar.Infof("User: %v#%v (%v)", botUser.Username, botUser.Discriminator, botUser.ID)
+	state, _ := bot.Router.StateFromGuildID(0)
+	botUser, _ := state.Me()
+	sugar.Infof("User: %v (%v)", botUser.Tag(), botUser.ID)
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	defer stop()

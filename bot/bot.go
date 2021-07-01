@@ -4,7 +4,9 @@ package bot
 import (
 	"sort"
 
-	"github.com/diamondburned/arikawa/v2/utils/handler"
+	"github.com/diamondburned/arikawa/v3/gateway/shard"
+	"github.com/diamondburned/arikawa/v3/state"
+	"github.com/diamondburned/arikawa/v3/utils/handler"
 	"github.com/getsentry/sentry-go"
 	"github.com/starshine-sys/bcr"
 	bcrbot "github.com/starshine-sys/bcr/bot"
@@ -48,17 +50,20 @@ func New(
 		UseSentry: hub != nil,
 	}
 
-	// create a pre-handler
-	b.Router.State.PreHandler = handler.New()
-	b.Router.State.PreHandler.Synchronous = true
-
 	// set the router's prefixer
 	b.Router.Prefixer = b.Prefixer
 
 	// add the required handlers
-	b.Router.State.AddHandler(b.MessageCreate)
-	b.Router.State.AddHandler(b.GuildCreate)
-	b.Router.State.PreHandler.AddHandler(b.GuildDelete)
+	b.Router.ShardManager.ForEach(func(s shard.Shard) {
+		state := s.(*state.State)
+
+		state.PreHandler = handler.New()
+		state.PreHandler.Synchronous = true
+		state.AddHandler(b.MessageCreate)
+		state.AddHandler(b.GuildCreate)
+		state.PreHandler.AddHandler(b.GuildDelete)
+	})
+
 	return b
 }
 

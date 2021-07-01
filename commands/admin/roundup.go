@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -91,7 +91,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 		msgs = append(msgs, buf)
 	}
 
-	m, err := ctx.State.SendMessage(ch.ID, c.Config.Bot.TermChangelogPing, &discord.Embed{
+	m, err := ctx.State.SendMessage(ch.ID, c.Config.Bot.TermChangelogPing, discord.Embed{
 		Title:       "Term changelog",
 		Description: s,
 
@@ -113,7 +113,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	if len(msgs) > 0 {
 		for _, m := range msgs {
 			time.Sleep(500 * time.Millisecond)
-			msg, err := ctx.State.SendMessage(ch.ID, "", &discord.Embed{
+			msg, err := ctx.State.SendMessage(ch.ID, "", discord.Embed{
 				Description: m,
 				Color:       db.EmbedColour,
 			})

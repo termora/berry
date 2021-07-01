@@ -3,7 +3,7 @@ package static
 import (
 	"fmt"
 
-	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -66,7 +66,7 @@ func (c *Commands) feedback(ctx *bcr.Context) (err error) {
 		e.Footer.Text = fmt.Sprintf("Guild: %v (%v)", ctx.Guild.Name, ctx.Guild.ID)
 	}
 
-	_, err = ctx.State.SendEmbed(c.Config.Bot.FeedbackChannel, e)
+	_, err = ctx.State.SendEmbeds(c.Config.Bot.FeedbackChannel, e)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -36,7 +36,7 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 	}
 
 	msg, err := ctx.NewMessage().Channel(c.Config.Bot.Support.PronounChannel).
-		Embed(&discord.Embed{
+		Embeds(discord.Embed{
 			Author: &discord.EmbedAuthor{
 				Name: fmt.Sprintf("%v#%v (%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
 				Icon: ctx.Author.AvatarURL(),

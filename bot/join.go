@@ -3,8 +3,9 @@ package bot
 import (
 	"fmt"
 
-	"github.com/diamondburned/arikawa/v2/api"
-	"github.com/diamondburned/arikawa/v2/gateway"
+	"github.com/diamondburned/arikawa/v3/api"
+	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/diamondburned/arikawa/v3/state"
 )
 
 // GuildCreate logs the bot joining a server, and creates a database entry if one doesn't exist
@@ -27,7 +28,9 @@ func (bot *Bot) GuildCreate(g *gateway.GuildCreateEvent) {
 		return
 	}
 
-	_, err = bot.Router.State.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
+	s, _ := bot.Router.StateFromGuildID(g.ID)
+
+	_, err = s.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
 		Content:         fmt.Sprintf("Joined new server **%v** (%v)", g.Name, g.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
@@ -50,10 +53,12 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 		bot.Sugar.Errorf("Error deleting database entry for %v: %v", g.ID, err)
 	}
 
-	guild, err := bot.Router.State.Guild(g.ID)
+	s, _ := bot.Router.StateFromGuildID(g.ID)
+
+	guild, err := s.Guild(g.ID)
 	if err != nil {
 		// didn't find the guild, so just run this normally
-		bot.guildDeleteNoState(g)
+		bot.guildDeleteNoState(s, g)
 		return
 	}
 
@@ -65,7 +70,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 		return
 	}
 
-	_, err = bot.Router.State.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
+	_, err = s.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
 		Content:         fmt.Sprintf("Left server **%v** (%v) :(", guild.Name, guild.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
@@ -77,7 +82,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 
 // this is run if the left guild isn't found in the state
 // which gives us almost no info, only the ID
-func (bot *Bot) guildDeleteNoState(g *gateway.GuildDeleteEvent) {
+func (bot *Bot) guildDeleteNoState(s *state.State, g *gateway.GuildDeleteEvent) {
 	bot.Sugar.Infof("Left server %v.", g.ID)
 
 	// if there's no channel to log joins/leaves to, return
@@ -85,7 +90,7 @@ func (bot *Bot) guildDeleteNoState(g *gateway.GuildDeleteEvent) {
 		return
 	}
 
-	_, err := bot.Router.State.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
+	_, err := s.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
 		Content:         fmt.Sprintf("Left server **%v** :(", g.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})

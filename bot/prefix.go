@@ -3,7 +3,7 @@ package bot
 import (
 	"strings"
 
-	"github.com/diamondburned/arikawa/v2/discord"
+	"github.com/diamondburned/arikawa/v3/discord"
 )
 
 // Prefixer ...

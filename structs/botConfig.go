@@ -1,6 +1,6 @@
 package structs
 
-import "github.com/diamondburned/arikawa/v2/discord"
+import "github.com/diamondburned/arikawa/v3/discord"
 
 // FallbackGitURL if there's no git url set in the config file fall back to this
 const FallbackGitURL = "https://github.com/termora/berry"
