@@ -123,7 +123,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 
 	// actually send the search results
-	msg, timer, err := ctx.PagedEmbedTimeout(embeds, false, 15*time.Minute)
+	msg, _, err := ctx.PagedEmbedTimeout(embeds, false, 15*time.Minute)
 	if err != nil {
 		c.Report(ctx, err)
 		return err
@@ -223,7 +223,6 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 
 	// delete the original message, then send the definition
-	timer.Stop()
 	ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID)
 	_, err = ctx.Send("", termSlices[page][n-1].TermEmbed(c.Config.TermBaseURL()))
 	return
