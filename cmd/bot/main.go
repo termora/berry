@@ -145,6 +145,8 @@ func main() {
 	botUser, _ := state.Me()
 	sugar.Infof("User: %v (%v)", botUser.Tag(), botUser.ID)
 
+	go timer(sugar)
+
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	defer stop()
 
@@ -153,4 +155,22 @@ func main() {
 	}
 
 	sugar.Infof("Interrupt signal received. Shutting down...")
+}
+
+func timer(sugar *zap.SugaredLogger) {
+	t := time.Now().UTC()
+	ch := time.Tick(10 * time.Minute)
+
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	defer stop()
+
+	for {
+		select {
+		case <-ch:
+			sugar.Debugf("Tick received, %s since last tick.", time.Since(t))
+			t = time.Now().UTC()
+		case <-ctx.Done():
+			return
+		}
+	}
 }
