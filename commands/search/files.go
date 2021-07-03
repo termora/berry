@@ -87,7 +87,7 @@ func (c *commands) file(ctx *bcr.Context) (err error) {
 			})
 		}
 
-		_, err = ctx.Send("", &e)
+		_, err = ctx.Send("", e)
 		return err
 	}
 
@@ -135,6 +135,6 @@ func (c *commands) file(ctx *bcr.Context) (err error) {
 		})
 	}
 
-	_, err = ctx.Send("", &e)
+	_, err = ctx.Send("", e)
 	return err
 }

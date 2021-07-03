@@ -10,19 +10,19 @@ import (
 
 func (c *Commands) feedback(ctx *bcr.Context) (err error) {
 	if c.Config.Bot.FeedbackChannel == 0 {
-		_, err = ctx.Send("Sorry, but we're not currently accepting feedback through this command. Feel free to join the support server though!", nil)
+		_, err = ctx.Send("Sorry, but we're not currently accepting feedback through this command. Feel free to join the support server though!")
 		return
 	}
 
 	for _, u := range c.Config.Bot.FeedbackBlockedUsers {
 		if u == ctx.Author.ID {
-			_, err = ctx.Send("You are blocked from submitting feedback through this command. If you believe this is an error, please contact the developers.", nil)
+			_, err = ctx.Send("You are blocked from submitting feedback through this command. If you believe this is an error, please contact the developers.")
 			return
 		}
 	}
 
 	if ctx.RawArgs == "" {
-		_, err = ctx.Send("You need to actually give feedback to send!", nil)
+		_, err = ctx.Send("You need to actually give feedback to send!")
 		return
 	}
 
@@ -30,7 +30,7 @@ func (c *Commands) feedback(ctx *bcr.Context) (err error) {
 		ctx.State.DeleteMessage(ctx.Message.ChannelID, ctx.Message.ID)
 	}
 
-	msg, err := ctx.Send("React with ✅ to send, or with ❌ to cancel.", &discord.Embed{
+	msg, err := ctx.Send("React with ✅ to send, or with ❌ to cancel.", discord.Embed{
 		Description: ctx.RawArgs,
 		Color:       db.EmbedColour,
 	})
@@ -39,7 +39,7 @@ func (c *Commands) feedback(ctx *bcr.Context) (err error) {
 	}
 
 	if yes, timeout := ctx.YesNoHandler(*msg, ctx.Author.ID); !yes || timeout {
-		_, err = ctx.Send("Cancelled.", nil)
+		_, err = ctx.Send("Cancelled.")
 		return
 	}
 
@@ -75,7 +75,7 @@ func (c *Commands) feedback(ctx *bcr.Context) (err error) {
 		ctx.State.DeleteMessage(msg.ChannelID, msg.ID)
 		_, err = ctx.NewDM(ctx.Author.ID).Content("Thanks for submitting feedback!").Send()
 	} else {
-		_, err = ctx.Send("Thanks for submitting feedback!", nil)
+		_, err = ctx.Send("Thanks for submitting feedback!")
 	}
 	return
 }

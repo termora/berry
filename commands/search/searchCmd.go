@@ -36,7 +36,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	// we can't check for this normally because of the flags above
 	// so we do it here, also lets us give a custom error message
 	if err = ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("No search term provided.", nil)
+		_, err = ctx.Send("No search term provided.")
 		return err
 	}
 
@@ -81,7 +81,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 
 	if len(terms) == 0 {
-		_, err = ctx.Send("No results found.", nil)
+		_, err = ctx.Send("No results found.")
 		return err
 	}
 

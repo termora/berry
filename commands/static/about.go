@@ -37,7 +37,7 @@ type category struct {
 func (c *Commands) about(ctx *bcr.Context) (err error) {
 	t := time.Now()
 
-	msg, err := ctx.Send("...", nil)
+	msg, err := ctx.Send("...")
 	if err != nil {
 		return err
 	}
@@ -152,7 +152,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 		})
 	}
 
-	_, err = ctx.Edit(msg, "", &e)
+	_, err = ctx.Edit(msg, "", true, e)
 	return
 }
 

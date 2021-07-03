@@ -15,13 +15,13 @@ func (bot *commands) custom(ctx *bcr.Context) (err error) {
 	if len(set) != 5 {
 		set = strings.Split(ctx.RawArgs, "/")
 		if len(set) != 5 {
-			_, err = ctx.Send("You gave either too few or too many forms, please give exactly 5.", nil)
+			_, err = ctx.Send("You gave either too few or too many forms, please give exactly 5.")
 			return
 		}
 	}
 
 	if tmplCount == 0 {
-		_, err = ctx.Send("There are no examples available for pronouns! If you think this is in error, please join the bot support server and ask there.", nil)
+		_, err = ctx.Send("There are no examples available for pronouns! If you think this is in error, please join the bot support server and ask there.")
 		return err
 	}
 

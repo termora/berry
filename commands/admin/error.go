@@ -9,18 +9,18 @@ import (
 
 func (c *Admin) error(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("You didn't give an error ID.", nil)
+		_, err = ctx.Send("You didn't give an error ID.")
 		return err
 	}
 
 	e, err := c.DB.Error(ctx.RawArgs)
 	if err != nil {
 		c.Sugar.Errorf("Error when retrieving error with ID %v: %v", ctx.RawArgs, err)
-		_, err = ctx.Send("Error with that ID not found, or another error occurred.", nil)
+		_, err = ctx.Send("Error with that ID not found, or another error occurred.")
 		return err
 	}
 
-	_, err = ctx.Send("", &discord.Embed{
+	_, err = ctx.Send("", discord.Embed{
 		Title:       e.ID.String(),
 		Description: "```" + e.Error + "```",
 		Fields: []discord.EmbedField{{

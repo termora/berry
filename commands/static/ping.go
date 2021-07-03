@@ -13,13 +13,13 @@ func (c *Commands) ping(ctx *bcr.Context) (err error) {
 	// can't do much about that though
 	heartbeat := ctx.State.Gateway.PacerLoop.EchoBeat.Time().Sub(ctx.State.Gateway.PacerLoop.SentBeat.Time()).Round(time.Millisecond)
 
-	m, err := ctx.Send(fmt.Sprintf("🏓 **Pong!**\nHeartbeat: %v", heartbeat), nil)
+	m, err := ctx.Send(fmt.Sprintf("🏓 **Pong!**\nHeartbeat: %v", heartbeat))
 	if err != nil {
 		return err
 	}
 
 	latency := time.Since(t).Round(time.Millisecond)
 
-	_, err = ctx.Edit(m, fmt.Sprintf("%v\nMessage: %v", m.Content, latency), nil)
+	_, err = ctx.Edit(m, fmt.Sprintf("%v\nMessage: %v", m.Content, latency), false)
 	return err
 }

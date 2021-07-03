@@ -13,7 +13,7 @@ import (
 func (c *Admin) aio(ctx *bcr.Context) (err error) {
 	// this command requires 5 arguments exactly
 	if ctx.CheckRequiredArgs(5); err != nil {
-		_, err = ctx.Send("Too few or too many arguments supplied.", nil)
+		_, err = ctx.Send("Too few or too many arguments supplied.")
 		return err
 	}
 
@@ -40,7 +40,7 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 
 	category, err := c.DB.CategoryID(catName)
 	if err != nil {
-		_, err = ctx.Send("Could not find that category, cancelled.", nil)
+		_, err = ctx.Send("Could not find that category, cancelled.")
 		return
 	}
 	if category == 0 {
@@ -68,8 +68,6 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 
 	// if logging terms is enabled, log this
 	if c.WebhookClient != nil {
-		e := t.TermEmbed(c.Config.TermBaseURL())
-
 		c.WebhookClient.Execute(webhook.ExecuteData{
 			Username:  ctx.Bot.Username,
 			AvatarURL: ctx.Bot.AvatarURL(),
@@ -86,7 +84,7 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 					Color:     db.EmbedColour,
 					Timestamp: discord.NowTimestamp(),
 				},
-				*e,
+				t.TermEmbed(c.Config.TermBaseURL()),
 			},
 		})
 	}

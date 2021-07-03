@@ -37,7 +37,7 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
 		c.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
-		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?", nil)
+		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
 		return
 	}
 
@@ -80,7 +80,7 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	_, err = ctx.Send("✅ Check your DMs!", nil)
+	_, err = ctx.Send("✅ Check your DMs!")
 	return err
 }
 

@@ -31,7 +31,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 
 	info, err := ctx.Send(
 		"Adding a new term; to cancel at any time, type `cancel`.\nPlease send the description.",
-		&embed,
+		embed,
 	)
 	if err != nil {
 		return
@@ -39,18 +39,18 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 
 	m, timeout := ctx.WaitForMessage(ctx.Channel.ID, ctx.Author.ID, 15*time.Minute, nil)
 	if timeout {
-		_, err = ctx.Send(":x: Timed out.", nil)
+		_, err = ctx.Send(":x: Timed out.")
 		return
 	}
 	if strings.EqualFold(m.Content, "cancel") {
-		_, err = ctx.Send(":x: Cancelled.", nil)
+		_, err = ctx.Send(":x: Cancelled.")
 		return
 	}
 
 	t.Description = m.Content
 	embed.Description = m.Content
 
-	_, err = ctx.Edit(info, "Adding a new term; to cancel at any time, type `cancel`.\nPlease send the source.", &embed)
+	_, err = ctx.Edit(info, "Adding a new term; to cancel at any time, type `cancel`.\nPlease send the source.", true, embed)
 	if err != nil {
 		return err
 	}
@@ -58,17 +58,17 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 
 	m, timeout = ctx.WaitForMessage(ctx.Channel.ID, ctx.Author.ID, 15*time.Minute, nil)
 	if timeout {
-		_, err = ctx.Send(":x: Timed out.", nil)
+		_, err = ctx.Send(":x: Timed out.")
 		return
 	}
 	if strings.EqualFold(m.Content, "cancel") {
-		_, err = ctx.Send(":x: Cancelled.", nil)
+		_, err = ctx.Send(":x: Cancelled.")
 		return
 	}
 
 	t.Source = m.Content
 
-	_, err = ctx.Edit(info, "Adding a new term; to cancel at any time, type `cancel`.\nPlease send a list of tags, separated by newlines.\n__Note that the first tag needs to be a valid category name__.", t.TermEmbed(""))
+	_, err = ctx.Edit(info, "Adding a new term; to cancel at any time, type `cancel`.\nPlease send a list of tags, separated by newlines.\n__Note that the first tag needs to be a valid category name__.", true, t.TermEmbed(""))
 	if err != nil {
 		return err
 	}
@@ -76,11 +76,11 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 
 	m, timeout = ctx.WaitForMessage(ctx.Channel.ID, ctx.Author.ID, 15*time.Minute, nil)
 	if timeout {
-		_, err = ctx.Send(":x: Timed out.", nil)
+		_, err = ctx.Send(":x: Timed out.")
 		return
 	}
 	if strings.EqualFold(m.Content, "cancel") {
-		_, err = ctx.Send(":x: Cancelled.", nil)
+		_, err = ctx.Send(":x: Cancelled.")
 		return
 	}
 
@@ -106,7 +106,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 		}
 	}
 
-	_, err = ctx.Edit(info, "Are you sure you want to add this term?", t.TermEmbed(""))
+	_, err = ctx.Edit(info, "Are you sure you want to add this term?", true, t.TermEmbed(""))
 	if err != nil {
 		return err
 	}
@@ -114,11 +114,11 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 
 	yes, timeout := ctx.YesNoHandler(*info, ctx.Author.ID)
 	if timeout {
-		_, err = ctx.Send(":x: Operation timed out.", nil)
+		_, err = ctx.Send(":x: Operation timed out.")
 		return
 	}
 	if !yes {
-		_, err = ctx.Send(":x: Cancelled.", nil)
+		_, err = ctx.Send(":x: Cancelled.")
 		return
 	}
 

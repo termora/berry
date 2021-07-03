@@ -10,14 +10,14 @@ import (
 
 func (c *commands) blacklistAdd(ctx *bcr.Context) (err error) {
 	if ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("You need to provide a channel.", nil)
+		_, err = ctx.Send("You need to provide a channel.")
 		return err
 	}
 
 	// parse all channels passed to the command
 	channels, n := ctx.GreedyChannelParser(ctx.Args)
 	if n == 0 {
-		_, err = ctx.Send("None of the channels you gave were found.", nil)
+		_, err = ctx.Send("None of the channels you gave were found.")
 	}
 
 	ch := make([]string, 0)
@@ -33,7 +33,7 @@ func (c *commands) blacklistAdd(ctx *bcr.Context) (err error) {
 	err = c.DB.AddToBlacklist(ctx.Message.GuildID.String(), ch)
 	if err != nil {
 		if err == db.ErrorAlreadyBlacklisted {
-			_, err = ctx.Send("One or more channels is already blacklisted.", nil)
+			_, err = ctx.Send("One or more channels is already blacklisted.")
 			return err
 		}
 
@@ -46,14 +46,14 @@ func (c *commands) blacklistAdd(ctx *bcr.Context) (err error) {
 
 func (c *commands) blacklistRemove(ctx *bcr.Context) (err error) {
 	if ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("You need to provide a channel.", nil)
+		_, err = ctx.Send("You need to provide a channel.")
 		return err
 	}
 
 	ch, err := ctx.ParseChannel(strings.Join(ctx.Args, " "))
 	if err != nil {
 		if err == bcr.ErrChannelNotFound {
-			_, err = ctx.Send("The channel you gave was not found.", nil)
+			_, err = ctx.Send("The channel you gave was not found.")
 			return err
 		}
 
@@ -67,7 +67,7 @@ func (c *commands) blacklistRemove(ctx *bcr.Context) (err error) {
 	err = c.DB.RemoveFromBlacklist(ctx.Message.GuildID.String(), ch.ID.String())
 	if err != nil {
 		if err == db.ErrorNotBlacklisted {
-			_, err = ctx.Send("That channel isn't blacklisted.", nil)
+			_, err = ctx.Send("That channel isn't blacklisted.")
 			return err
 		}
 

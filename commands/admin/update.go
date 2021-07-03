@@ -9,7 +9,7 @@ import (
 )
 
 func (c *Admin) update(ctx *bcr.Context) (err error) {
-	_, err = ctx.Send("Updating Git repository...", nil)
+	_, err = ctx.Send("Updating Git repository...")
 	if err != nil {
 		return err
 	}
@@ -17,7 +17,7 @@ func (c *Admin) update(ctx *bcr.Context) (err error) {
 	git := exec.Command("git", "pull")
 	pullOutput, err := git.Output()
 	if err != nil {
-		_, err = ctx.Send(fmt.Sprintf("Error pulling repository:\n```%v```", err), nil)
+		_, err = ctx.Send(fmt.Sprintf("Error pulling repository:\n```%v```", err))
 		return err
 	}
 
@@ -26,7 +26,7 @@ func (c *Admin) update(ctx *bcr.Context) (err error) {
 		output = "...\n" + output[:len(output)-1900]
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("Git:\n```%v```", output), nil)
+	_, err = ctx.Send(fmt.Sprintf("Git:\n```%v```", output))
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (c *Admin) update(ctx *bcr.Context) (err error) {
 	update := exec.Command("/usr/local/go/bin/go", "build", "-v")
 	updateOutput, err := update.CombinedOutput()
 	if err != nil {
-		_, err = ctx.Send(fmt.Sprintf("Error building:\n```%v```", err), nil)
+		_, err = ctx.Send(fmt.Sprintf("Error building:\n```%v```", err))
 		return err
 	}
 
@@ -48,6 +48,6 @@ func (c *Admin) update(ctx *bcr.Context) (err error) {
 	}
 
 	buildTime := time.Since(t).Round(time.Millisecond)
-	_, err = ctx.Send(fmt.Sprintf("`go build` (%v):\n```%v```", buildTime, output), nil)
+	_, err = ctx.Send(fmt.Sprintf("`go build` (%v):\n```%v```", buildTime, output))
 	return
 }

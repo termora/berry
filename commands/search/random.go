@@ -27,7 +27,7 @@ func (c *commands) random(ctx *bcr.Context) (err error) {
 	t, err := c.DB.RandomTerm(ignore)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
-			_, err = ctx.Send("No terms found! Are you sure you're not excluding every possible term?", nil)
+			_, err = ctx.Send("No terms found! Are you sure you're not excluding every possible term?")
 			return
 		}
 		return c.DB.InternalError(ctx, err)
@@ -48,7 +48,7 @@ func (c *commands) randomCategory(ctx *bcr.Context, ignore []string) (b bool, er
 	t, err := c.DB.RandomTermCategory(cat, ignore)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
-			_, err = ctx.Send("No terms found! Are you sure you're not excluding every possible term?", nil)
+			_, err = ctx.Send("No terms found! Are you sure you're not excluding every possible term?")
 			return true, nil
 		}
 		return true, c.DB.InternalError(ctx, err)

@@ -11,7 +11,7 @@ import (
 
 func (c *Admin) updateTags(ctx *bcr.Context) (err error) {
 	if len(ctx.Message.Attachments) == 0 {
-		_, err = ctx.Send("No attachments given.", nil)
+		_, err = ctx.Send("No attachments given.")
 		return
 	}
 
@@ -75,7 +75,7 @@ func (c *Admin) updateTags(ctx *bcr.Context) (err error) {
 	}
 	yes, timeout := ctx.YesNoHandler(*m, ctx.Author.ID)
 	if !yes || timeout {
-		_, err = ctx.Send("Cancelled.", nil)
+		_, err = ctx.Send("Cancelled.")
 		return
 	}
 

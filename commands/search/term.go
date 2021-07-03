@@ -12,7 +12,7 @@ import (
 
 func (c *commands) term(ctx *bcr.Context) (err error) {
 	if ctx.RawArgs == "" {
-		_, err = ctx.Send("You didn't give a term name or ID.", nil)
+		_, err = ctx.Send("You didn't give a term name or ID.")
 		return
 	}
 
@@ -69,6 +69,6 @@ found:
 
 	e := term.TermEmbed(c.Config.TermBaseURL())
 
-	_, err = m.Embeds(*e).Send()
+	_, err = m.Embeds(e).Send()
 	return
 }

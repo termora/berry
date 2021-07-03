@@ -107,7 +107,7 @@ func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 done:
 	// validate the term object
 	if t.Name == "" || t.Source == "" || t.Description == "" {
-		_, err = ctx.Send("One or more required fields (name, source, description) was empty!", nil)
+		_, err = ctx.Send("One or more required fields (name, source, description) was empty!")
 		return
 	}
 	if t.Aliases == nil {
@@ -119,7 +119,7 @@ done:
 
 	if t.Category == 0 {
 		if flag == "" {
-			_, err = ctx.Send("No category specified, and the submission didn't specify a category.", nil)
+			_, err = ctx.Send("No category specified, and the submission didn't specify a category.")
 			return
 		}
 
@@ -152,11 +152,11 @@ done:
 
 	yes, timeout := ctx.YesNoHandler(*termMsg, ctx.Author.ID)
 	if timeout {
-		_, err = ctx.Send(":x: Operation timed out.", nil)
+		_, err = ctx.Send(":x: Operation timed out.")
 		return
 	}
 	if !yes {
-		_, err = ctx.Send(":x: Cancelled.", nil)
+		_, err = ctx.Send(":x: Cancelled.")
 		return
 	}
 
@@ -212,7 +212,7 @@ done:
 					Color:       db.EmbedColour,
 					Timestamp:   discord.NowTimestamp(),
 				},
-				*e,
+				e,
 			},
 		})
 	}

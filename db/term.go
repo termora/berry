@@ -61,12 +61,12 @@ func (t *Term) Warning() bool {
 }
 
 // TermEmbed creates a Discord embed from a term object
-func (t *Term) TermEmbed(baseURL string) *discord.Embed {
+func (t *Term) TermEmbed(baseURL string) discord.Embed {
 	defer AddCount()
 
 	Debug("Creating term embed for %v", t.ID)
 
-	e := &discord.Embed{
+	e := discord.Embed{
 		Title:     t.Name,
 		Color:     EmbedColour,
 		Timestamp: discord.NewTimestamp(t.Created),

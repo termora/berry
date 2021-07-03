@@ -13,12 +13,12 @@ func (c *commands) addPrefix(ctx *bcr.Context) (err error) {
 	current := c.PrefixesFor(ctx.Message.GuildID)
 
 	if ctx.RawArgs == "" {
-		_, err = ctx.Send("You didn't give a prefix to add.", nil)
+		_, err = ctx.Send("You didn't give a prefix to add.")
 		return
 	}
 
 	if strings.Contains(prefix, c.Router.Bot.ID.String()) {
-		_, err = ctx.Send("Can't add mentioning the bot as a prefix.", nil)
+		_, err = ctx.Send("Can't add mentioning the bot as a prefix.")
 		return
 	}
 
@@ -39,7 +39,7 @@ func (c *commands) addPrefix(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	_, err = ctx.Send("", &discord.Embed{
+	_, err = ctx.Send("", discord.Embed{
 		Title: "New prefixes",
 		Description: strings.Join(
 			append([]string{fmt.Sprintf("<@%v>", c.Router.Bot.ID)}, prefixes...), "\n",
@@ -54,12 +54,12 @@ func (c *commands) removePrefix(ctx *bcr.Context) (err error) {
 	current := c.PrefixesFor(ctx.Message.GuildID)
 
 	if ctx.RawArgs == "" {
-		_, err = ctx.Send("You didn't give a prefix to remove.", nil)
+		_, err = ctx.Send("You didn't give a prefix to remove.")
 		return
 	}
 
 	if strings.Contains(prefix, c.Router.Bot.ID.String()) {
-		_, err = ctx.Send("Can't remove mentioning the bot as a prefix.", nil)
+		_, err = ctx.Send("Can't remove mentioning the bot as a prefix.")
 		return
 	}
 
@@ -90,7 +90,7 @@ func (c *commands) removePrefix(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	_, err = ctx.Send("", &discord.Embed{
+	_, err = ctx.Send("", discord.Embed{
 		Title: "New prefixes",
 		Description: strings.Join(
 			append([]string{fmt.Sprintf("<@%v>", c.Router.Bot.ID)}, prefixes...), "\n",

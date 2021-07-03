@@ -12,7 +12,7 @@ import (
 
 func (c *Admin) addExplanation(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("Not enough arguments provided.", nil)
+		_, err = ctx.Send("Not enough arguments provided.")
 		return err
 	}
 	e := &db.Explanation{}
@@ -52,31 +52,31 @@ func (c *Admin) addExplanation(ctx *bcr.Context) (err error) {
 func (c *Admin) toggleExplanationCmd(ctx *bcr.Context) (err error) {
 	// we can't be bothered to check the *current* status, so just pass a value every time
 	if err = ctx.CheckMinArgs(2); err != nil {
-		_, err = ctx.Send("Not enough arguments provided.", nil)
+		_, err = ctx.Send("Not enough arguments provided.")
 		return err
 	}
 
 	// parse the ID
 	id, err := strconv.Atoi(ctx.Args[0])
 	if err != nil {
-		_, err = ctx.Send("Couldn't parse a numeric ID.", nil)
+		_, err = ctx.Send("Couldn't parse a numeric ID.")
 		return err
 	}
 
 	// parse the bool
 	b, err := strconv.ParseBool(ctx.Args[1])
 	if err != nil {
-		_, err = ctx.Send("Couldn't parse a boolean.", nil)
+		_, err = ctx.Send("Couldn't parse a boolean.")
 		return err
 	}
 
 	// set it in the database
 	err = c.DB.SetAsCommand(id, b)
 	if err != nil {
-		_, err = ctx.Send(fmt.Sprintf("Internal error occurred: %v", bcr.AsCode(bcr.EscapeBackticks(err.Error()))), nil)
+		_, err = ctx.Send(fmt.Sprintf("Internal error occurred: %v", bcr.AsCode(bcr.EscapeBackticks(err.Error()))))
 		return err
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("Set command status for `%v` to `%v`.\n**:warning: Note:** the bot has to be restarted to see the changes.", id, b), nil)
+	_, err = ctx.Send(fmt.Sprintf("Set command status for `%v` to `%v`.\n**:warning: Note:** the bot has to be restarted to see the changes.", id, b))
 	return err
 }

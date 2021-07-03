@@ -26,7 +26,7 @@ func (c *Admin) cmdGuilds(ctx *bcr.Context) (err error) {
 	// if the whole thing fits in a Discord message, send it as that
 	// used to be formatted as ini but quotation marks break that
 	if len(s) <= 2000 {
-		_, err = ctx.Send("", &discord.Embed{
+		_, err = ctx.Send("", discord.Embed{
 			Title:       fmt.Sprintf("Guilds (%v)", len(c.guilds)),
 			Description: "```\n" + s + "\n```",
 			Color:       db.EmbedColour,

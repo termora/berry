@@ -9,7 +9,7 @@ import (
 )
 
 func (c *Commands) perms(ctx *bcr.Context) (err error) {
-	_, err = ctx.Send("", &discord.Embed{
+	_, err = ctx.Send("", discord.Embed{
 		Title: "Required permissions",
 		Description: fmt.Sprintf(`%v requires the following permissions to function correctly:
 - **Read Messages** & **Send Messages**: to respond to commands
@@ -24,7 +24,7 @@ func (c *Commands) perms(ctx *bcr.Context) (err error) {
 }
 
 func (c *Commands) privacy(ctx *bcr.Context) (err error) {
-	_, err = ctx.Send("", &discord.Embed{
+	_, err = ctx.Send("", discord.Embed{
 		Title: "Privacy",
 		Description: fmt.Sprintf(`We're not lawyers, we don't want to write a document that no one will (or even can) read.
 
@@ -60,7 +60,7 @@ To delete server information from the database, simply have the bot leave the se
 }
 
 func (c *Commands) autopost(ctx *bcr.Context) (err error) {
-	_, err = ctx.Send("", &discord.Embed{
+	_, err = ctx.Send("", discord.Embed{
 		Title:       "Autopost",
 		Description: fmt.Sprintf("To automatically post terms at a set interval, you can use the following custom command for [YAGPDB.xyz](https://yagpdb.xyz/):\n```{{/* Recommended trigger: Minute/Hourly interval */}}\n\n%vrandom\n{{deleteResponse 1}}```\nOther bots may have similar functionality; if you need a bot whitelisted for commands, feel free to ask on the support server.", ctx.Prefix),
 		Color:       db.EmbedColour,
@@ -74,7 +74,7 @@ func (c *Commands) help(ctx *bcr.Context) (err error) {
 		return ctx.Help(ctx.Args)
 	}
 
-	e := &discord.Embed{
+	e := discord.Embed{
 		Color: db.EmbedColour,
 		Title: "Help",
 		Fields: []discord.EmbedField{

@@ -44,7 +44,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Hidden:            true,
 
 		Command: func(ctx *bcr.Context) (err error) {
-			_, err = ctx.Send("Nothing to see here, move along...\n(Hint: use `admin help` for a list of subcommands!)", nil)
+			_, err = ctx.Send("Nothing to see here, move along...\n(Hint: use `admin help` for a list of subcommands!)")
 			return err
 		},
 	})

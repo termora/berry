@@ -25,14 +25,14 @@ func (c *commands) tags(ctx *bcr.Context) (err error) {
 	terms, err := c.DB.TagTerms(ctx.RawArgs)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
-			_, err = ctx.Send("I couldn't find any terms with that tag.", nil)
+			_, err = ctx.Send("I couldn't find any terms with that tag.")
 			return
 		}
 		return c.DB.InternalError(ctx, err)
 	}
 
 	if len(terms) == 0 {
-		_, err = ctx.Send("I couldn't find any terms with that tag.", nil)
+		_, err = ctx.Send("I couldn't find any terms with that tag.")
 		return
 	}
 

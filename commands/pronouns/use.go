@@ -63,22 +63,22 @@ func (c *commands) use(ctx *bcr.Context) (err error) {
 		})
 
 		if v == nil {
-			_, err = ctx.Send("Timed out.", nil)
+			_, err = ctx.Send("Timed out.")
 			return err
 		}
 
 		num, err := strconv.Atoi(v.(*gateway.MessageCreateEvent).Content)
 		if err != nil {
-			_, err = ctx.Send("I couldn't parse your input as a number.", nil)
+			_, err = ctx.Send("I couldn't parse your input as a number.")
 			return err
 		}
 
 		if num > len(sets) {
-			_, err = ctx.Send("The number you gave is too high.", nil)
+			_, err = ctx.Send("The number you gave is too high.")
 			return err
 		}
 		if num < 1 {
-			_, err = ctx.Send("The number you gave is too low.", nil)
+			_, err = ctx.Send("The number you gave is too low.")
 			return err
 		}
 
@@ -88,7 +88,7 @@ func (c *commands) use(ctx *bcr.Context) (err error) {
 	set := sets[0]
 
 	if tmplCount == 0 {
-		_, err = ctx.Send("There are no examples available for pronouns! If you think this is in error, please join the bot support server and ask there.", nil)
+		_, err = ctx.Send("There are no examples available for pronouns! If you think this is in error, please join the bot support server and ask there.")
 		return err
 	}
 

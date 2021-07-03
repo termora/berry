@@ -12,27 +12,27 @@ import (
 
 func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
-		_, err = ctx.Send("You are missing the required arguments `channel` and/or `since`.", nil)
+		_, err = ctx.Send("You are missing the required arguments `channel` and/or `since`.")
 		return err
 	}
 
 	// parse channel
 	ch, err := ctx.ParseChannel(ctx.Args[0])
 	if err != nil {
-		_, err = ctx.Send("That channel could not be found.", nil)
+		_, err = ctx.Send("That channel could not be found.")
 		return
 	}
 
 	// make sure the channel's in the server the command is run in
 	if ch.GuildID != ctx.Message.GuildID {
-		_, err = ctx.Send("That channel is not in this server.", nil)
+		_, err = ctx.Send("That channel is not in this server.")
 		return
 	}
 
 	// parse date
 	date, err := time.Parse("2006-01-02", ctx.Args[1])
 	if err != nil {
-		_, err = ctx.Send("Please input the date as `yyyy-mm-dd`.", nil)
+		_, err = ctx.Send("Please input the date as `yyyy-mm-dd`.")
 		return err
 	}
 

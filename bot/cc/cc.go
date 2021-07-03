@@ -47,7 +47,12 @@ func (c Command) ToBcrCommand() *bcr.Command {
 		Hidden: c.Hidden,
 
 		Command: func(ctx *bcr.Context) (err error) {
-			_, err = ctx.Send(c.Response.Content, c.Response.Embed)
+			e := []discord.Embed{}
+			if c.Response.Embed != nil {
+				e = append(e, *c.Response.Embed)
+			}
+
+			_, err = ctx.Send(c.Response.Content, e...)
 			return err
 		},
 	}

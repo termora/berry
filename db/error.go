@@ -52,7 +52,7 @@ func (db *Db) InternalError(ctx *bcr.Context, e error) error {
 
 	_, err = ctx.Send(
 		fmt.Sprintf("Error code: ``%v``", bcr.EscapeBackticks(id.String())),
-		&discord.Embed{
+		discord.Embed{
 			Title:       "Internal error occurred",
 			Description: s,
 			Color:       0xE74C3C,
@@ -104,7 +104,7 @@ func (db *Db) sentryError(ctx *bcr.Context, e error) error {
 			// hacky as shit but it works :blobsilly:
 			s += "."
 		}
-		_, err := ctx.Send("", &discord.Embed{
+		_, err := ctx.Send("", discord.Embed{
 			Title:       "Internal error occurred",
 			Color:       EmbedColour,
 			Description: s,
@@ -127,7 +127,7 @@ func (db *Db) sentryError(ctx *bcr.Context, e error) error {
 
 	_, err := ctx.Send(
 		fmt.Sprintf("Error code: ``%v``", bcr.EscapeBackticks(string(*id))),
-		&discord.Embed{
+		discord.Embed{
 			Title:       "Internal error occurred",
 			Description: s,
 			Color:       0xE74C3C,

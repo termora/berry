@@ -14,7 +14,7 @@ func (c *Commands) credits(ctx *bcr.Context) (err error) {
 		return nil
 	}
 
-	_, err = ctx.Send("", &discord.Embed{
+	_, err = ctx.Send("", discord.Embed{
 		Color:       db.EmbedColour,
 		Title:       "Credits",
 		Description: fmt.Sprintf("These are the people who helped create %v!", ctx.Bot.Username),

@@ -15,7 +15,7 @@ import (
 
 func (c *Admin) editTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(3); err != nil {
-		e := &discord.Embed{
+		e := discord.Embed{
 			Title:       "Edit term",
 			Description: fmt.Sprintf("```%vadmin editterm <part> <ID> <new|-clear>```", ctx.Prefix),
 
@@ -68,7 +68,7 @@ For ` + "`aliases`" + ` and ` + "`tags`" + `, you can use "-clear", with no quot
 	t, err := c.DB.GetTerm(id)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
-			_, err = ctx.Send("No term with that ID found.", nil)
+			_, err = ctx.Send("No term with that ID found.")
 			return
 		}
 
@@ -91,7 +91,7 @@ For ` + "`aliases`" + ` and ` + "`tags`" + `, you can use "-clear", with no quot
 		return c.editTermAliases(ctx, t)
 	}
 
-	_, err = ctx.Send("Invalid subcommand supplied.\nValid subcommands are: `title`, `desc`, `source`, `aliases`, `image`.", nil)
+	_, err = ctx.Send("Invalid subcommand supplied.\nValid subcommands are: `title`, `desc`, `source`, `aliases`, `image`.")
 	return
 }
 
@@ -108,7 +108,7 @@ func (c *Admin) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
 		return
 	}
 
-	_, err = ctx.Send("Title updated!", nil)
+	_, err = ctx.Send("Title updated!")
 	if err != nil {
 		c.Report(ctx, err)
 	}
@@ -137,7 +137,7 @@ func (c *Admin) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
 					Color:       db.EmbedColour,
 					Timestamp:   discord.NowTimestamp(),
 				},
-				*e,
+				e,
 			},
 		})
 	}
@@ -157,7 +157,7 @@ func (c *Admin) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
 		return
 	}
 
-	_, err = ctx.Send("Description updated!", nil)
+	_, err = ctx.Send("Description updated!")
 	if err != nil {
 		c.Report(ctx, err)
 	}
@@ -186,7 +186,7 @@ func (c *Admin) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
 					Color:       db.EmbedColour,
 					Timestamp:   discord.NowTimestamp(),
 				},
-				*e,
+				e,
 			},
 		})
 	}
@@ -206,7 +206,7 @@ func (c *Admin) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 		return
 	}
 
-	_, err = ctx.Send("Source updated!", nil)
+	_, err = ctx.Send("Source updated!")
 	if err != nil {
 		c.Report(ctx, err)
 	}
@@ -235,7 +235,7 @@ func (c *Admin) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 					Color:       db.EmbedColour,
 					Timestamp:   discord.NowTimestamp(),
 				},
-				*e,
+				e,
 			},
 		})
 	}
@@ -259,7 +259,7 @@ func (c *Admin) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 		return
 	}
 
-	_, err = ctx.Send("Aliases updated!", nil)
+	_, err = ctx.Send("Aliases updated!")
 	if err != nil {
 		c.Report(ctx, err)
 	}
@@ -288,7 +288,7 @@ func (c *Admin) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 					Color:       db.EmbedColour,
 					Timestamp:   discord.NowTimestamp(),
 				},
-				*e,
+				e,
 			},
 		})
 	}
@@ -307,7 +307,7 @@ func (c *Admin) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
 		return
 	}
 
-	_, err = ctx.Send("Image updated!", nil)
+	_, err = ctx.Send("Image updated!")
 	if err != nil {
 		c.Report(ctx, err)
 	}
@@ -338,7 +338,7 @@ func (c *Admin) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
 					Color:     db.EmbedColour,
 					Timestamp: discord.NowTimestamp(),
 				},
-				*e,
+				e,
 			},
 		})
 	}
@@ -369,7 +369,7 @@ func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 		return
 	}
 
-	_, err = ctx.Send("Tags updated!", nil)
+	_, err = ctx.Send("Tags updated!")
 	if err != nil {
 		c.Report(ctx, err)
 	}
@@ -398,7 +398,7 @@ func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 					Color:       db.EmbedColour,
 					Timestamp:   discord.NowTimestamp(),
 				},
-				*e,
+				e,
 			},
 		})
 	}

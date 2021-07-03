@@ -11,27 +11,27 @@ import (
 
 func (c *commands) submit(ctx *bcr.Context) (err error) {
 	if c.Config.Bot.Support.PronounChannel == 0 {
-		_, err = ctx.Send("We aren't accepting new pronoun submissions through the bot. You might be able to ask in the bot support server.", nil)
+		_, err = ctx.Send("We aren't accepting new pronoun submissions through the bot. You might be able to ask in the bot support server.")
 		return err
 	}
 
 	if ctx.RawArgs == "" {
-		_, err = ctx.Send("You didn't give a pronoun set.", nil)
+		_, err = ctx.Send("You didn't give a pronoun set.")
 		return err
 	}
 	p := strings.Split(ctx.RawArgs, "/")
 	if len(p) < 5 {
-		_, err = ctx.Send("You didn't give enough forms. Make sure you separate the forms with forward slashes (/).", nil)
+		_, err = ctx.Send("You didn't give enough forms. Make sure you separate the forms with forward slashes (/).")
 		return
 	}
 	if len(p) > 5 {
-		_, err = ctx.Send("You gave too many forms. Make sure you have five forms, separated with forward slashes.", nil)
+		_, err = ctx.Send("You gave too many forms. Make sure you have five forms, separated with forward slashes.")
 		return
 	}
 
 	_, err = c.DB.GetPronoun(strings.Split(ctx.RawArgs, "/")...)
 	if err == nil {
-		_, err = ctx.Send("That pronoun set already exists!", nil)
+		_, err = ctx.Send("That pronoun set already exists!")
 		return
 	}
 

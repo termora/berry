@@ -7,7 +7,7 @@ import (
 func (c *Admin) addCategory(ctx *bcr.Context) (err error) {
 	// if there's no arguments return
 	if err = ctx.CheckMinArgs(1); err != nil {
-		_, err = ctx.Send("You need to give a category name.", nil)
+		_, err = ctx.Send("You need to give a category name.")
 		return err
 	}
 
@@ -24,7 +24,7 @@ func (c *Admin) addCategory(ctx *bcr.Context) (err error) {
 
 	// if so, return
 	if e {
-		_, err = ctx.Send(":x :A category with that name already exists.", nil)
+		_, err = ctx.Send(":x :A category with that name already exists.")
 		return err
 	}
 

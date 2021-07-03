@@ -12,7 +12,7 @@ import (
 
 func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckRequiredArgs(1); err != nil {
-		_, err = ctx.Send("No term ID provided.", nil)
+		_, err = ctx.Send("No term ID provided.")
 		return err
 	}
 
@@ -33,7 +33,7 @@ func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 
 	// confirm deleting the term
 	if yes, timeout := ctx.YesNoHandler(*m, ctx.Author.ID); !yes || timeout {
-		ctx.Send("Cancelled.", nil)
+		ctx.Send("Cancelled.")
 		return
 	}
 
@@ -43,15 +43,13 @@ func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 		c.DB.InternalError(ctx, err)
 		return
 	}
-	_, err = ctx.Send("✅ Term deleted.", nil)
+	_, err = ctx.Send("✅ Term deleted.")
 	if err != nil {
 		c.Sugar.Error("Error sending message:", err)
 	}
 
 	// if logging terms is enabled, log this
 	if c.WebhookClient != nil {
-		e := t.TermEmbed("")
-
 		c.WebhookClient.Execute(webhook.ExecuteData{
 			Username:  ctx.Bot.Username,
 			AvatarURL: ctx.Bot.AvatarURL(),
@@ -68,7 +66,7 @@ func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 					Color:     db.EmbedColour,
 					Timestamp: discord.NowTimestamp(),
 				},
-				*e,
+				t.TermEmbed(""),
 			},
 		})
 	}

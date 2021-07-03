@@ -23,7 +23,7 @@ func (c *commands) blacklist(ctx *bcr.Context) (err error) {
 	if len(b) == 0 {
 		x = "No channels are blacklisted."
 	}
-	_, err = ctx.Send("", &discord.Embed{
+	_, err = ctx.Send("", discord.Embed{
 		Title:       "Channel blacklist",
 		Description: x,
 		Color:       db.EmbedColour,

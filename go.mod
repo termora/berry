@@ -25,7 +25,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/pflag v1.0.5
-	github.com/starshine-sys/bcr v0.18.0
+	github.com/starshine-sys/bcr v0.19.0
 	github.com/starshine-sys/pkgo v0.3.2
 	github.com/starshine-sys/snowflake/v2 v2.0.0
 	go.uber.org/multierr v1.7.0 // indirect

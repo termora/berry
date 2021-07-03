@@ -9,7 +9,7 @@ import (
 
 func (c *Admin) setCW(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
-		_, err = ctx.Send("Not enough arguments provided: need ID and CW (or \"clear\")", nil)
+		_, err = ctx.Send("Not enough arguments provided: need ID and CW (or \"clear\")")
 		return err
 	}
 

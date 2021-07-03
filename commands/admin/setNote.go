@@ -20,7 +20,7 @@ func (c *Admin) setNote(ctx *bcr.Context) (err error) {
 			notes = "No quick notes."
 		}
 
-		_, err = ctx.Send("Not enough arguments provided: need ID and note (or \"clear\")", &discord.Embed{
+		_, err = ctx.Send("Not enough arguments provided: need ID and note (or \"clear\")", discord.Embed{
 			Title:       "List of quick notes",
 			Description: notes,
 			Color:       db.EmbedColour,
@@ -58,7 +58,7 @@ func (c *Admin) setNote(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("Updated note for %v.", id), &discord.Embed{
+	_, err = ctx.Send(fmt.Sprintf("Updated note for %v.", id), discord.Embed{
 		Description: note,
 		Color:       db.EmbedColour,
 	})
