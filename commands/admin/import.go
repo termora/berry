@@ -145,6 +145,9 @@ done:
 		t.Tags = append(t.Tags, cat.Name)
 	}
 
+	// these aren't used when inserting the term, just for TermEmbed below
+	t.DisplayTags = t.Tags
+
 	termMsg, err := ctx.Send("Do you want to add this term?", t.TermEmbed(c.Config.TermBaseURL()))
 	if err != nil {
 		return err

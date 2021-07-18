@@ -60,8 +60,10 @@ func (db *Db) File(id snowflake.ID) (f File, err error) {
 		return
 	}
 
-	if db.Config.Bot.Website != "" {
-		f.url = fmt.Sprintf("%vfile/%v/%v", db.Config.Bot.Website, f.ID, f.Filename)
+	if db.Config != nil {
+		if db.Config.Bot.Website != "" {
+			f.url = fmt.Sprintf("%vfile/%v/%v", db.Config.Bot.Website, f.ID, f.Filename)
+		}
 	}
 
 	return
