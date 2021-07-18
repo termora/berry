@@ -80,7 +80,10 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	_, err = ctx.Send("✅ Check your DMs!")
+	if ctx.Channel.ID != u.ID {
+		_, err = ctx.Send("✅ Check your DMs!")
+	}
+
 	return err
 }
 
