@@ -64,11 +64,6 @@ func main() {
 	e.GET("/v1/categories", r.categories)
 	e.GET("/v1/explanations", r.explanations)
 
-	// the POST /term route requires a token
-	e.POST("/v1/term", r.add, middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
-		return d.ValidateToken(key), nil
-	}))
-
 	// get port
 	port := c.Port
 	strings.TrimPrefix(port, ":")

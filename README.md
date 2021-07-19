@@ -5,7 +5,7 @@ Berry is a searchable glossary bot for Discord.
 ## Requirements
 
 - PostgreSQL (only 12.5 tested)
-- Go (only 1.16 tested)
+- Go 1.16 or later
 - For the site and API: a reverse proxy (such as Caddy or nginx)
 
 ## Configuration
