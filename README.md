@@ -35,7 +35,7 @@ All of these executables are standalone and can be run independently from each o
   - bot_owners: ([]int): bot owner IDs, these users can use all commands including admin commands
 ```
 
-All other prefixes are optional but strongly recommended.
+All other keys are optional but strongly recommended.
 
 ### API
 

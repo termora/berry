@@ -24,7 +24,7 @@ require (
 	github.com/rubenv/sql-migrate v0.0.0-20210614095031-55d5740dbbcc
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/pflag v1.0.5
-	github.com/starshine-sys/bcr v0.19.1
+	github.com/starshine-sys/bcr v0.19.2-0.20210720211600-a186a861dc29
 	github.com/starshine-sys/pkgo v0.3.2
 	github.com/starshine-sys/snowflake/v2 v2.0.0
 	github.com/ziutek/mymysql v1.5.4 // indirect
