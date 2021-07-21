@@ -97,7 +97,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	// if there's only one term, just show that one
 	if len(terms) == 1 {
-		_, err = ctx.Send("", terms[0].TermEmbed(c.Config.TermBaseURL()))
+		_, err = ctx.Send("", c.DB.TermEmbed(terms[0]))
 		return err
 	}
 
@@ -224,6 +224,6 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	// delete the original message, then send the definition
 	ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID)
-	_, err = ctx.Send("", termSlices[page][n-1].TermEmbed(c.Config.TermBaseURL()))
+	_, err = ctx.Send("", c.DB.TermEmbed(termSlices[page][n-1]))
 	return
 }

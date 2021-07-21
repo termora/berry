@@ -90,6 +90,7 @@ func main() {
 	}
 	d.SetSentry(hub)
 	d.Config = c
+	d.TermBaseURL = c.TermBaseURL()
 	sugar.Info("Connected to database.")
 
 	// create a new state

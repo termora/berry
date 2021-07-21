@@ -1,12 +1,15 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // TermFlag ...
@@ -61,7 +64,11 @@ func (t *Term) Warning() bool {
 }
 
 // TermEmbed creates a Discord embed from a term object
-func (t *Term) TermEmbed(baseURL string) discord.Embed {
+func (db *Db) TermEmbed(t *Term) discord.Embed {
+	if t == nil {
+		return discord.Embed{Color: EmbedColour}
+	}
+
 	Debug("Creating term embed for %v", t.ID)
 
 	e := discord.Embed{
@@ -79,10 +86,10 @@ func (t *Term) TermEmbed(baseURL string) discord.Embed {
 		note = t.Note
 	)
 
-	if baseURL != "" {
-		desc = strings.ReplaceAll(desc, "(##", "("+baseURL)
-		note = strings.ReplaceAll(note, "(##", "("+baseURL)
-		cw = strings.ReplaceAll(cw, "(##", "("+baseURL)
+	if db.TermBaseURL != "" {
+		desc = db.LinkTerms(desc)
+		note = db.LinkTerms(note)
+		cw = db.LinkTerms(cw)
 	}
 
 	if cw != "" {
@@ -152,8 +159,8 @@ func (t *Term) TermEmbed(baseURL string) discord.Embed {
 		})
 	}
 
-	if baseURL != "" {
-		e.URL = baseURL + url.PathEscape(strings.ToLower(t.Name))
+	if db.TermBaseURL != "" {
+		e.URL = db.TermBaseURL + url.PathEscape(strings.ToLower(t.Name))
 	}
 
 	if t.ImageURL != "" {
@@ -163,4 +170,72 @@ func (t *Term) TermEmbed(baseURL string) discord.Embed {
 	}
 
 	return e
+}
+
+var linkRegexp = regexp.MustCompile(`\[\[(.*?)(\|.*?)?\]\]`)
+
+// LinkTerms creates a strings.Replacer for all links in the page
+func (db *Db) LinkTerms(input string) string {
+	ctx, cancel := db.Context()
+	defer cancel()
+
+	// grab a single connection to use for the entire loop below
+	// might not be any more performant than what we do normally but it doesn't hurt either so
+	// ¯\_(ツ)_/¯
+	conn, err := db.Pool.Acquire(ctx)
+	if err != nil {
+		return input
+	}
+	defer conn.Release()
+
+	s := []string{}
+	matches := linkRegexp.FindAllStringSubmatch(input, -1)
+
+	for _, i := range matches {
+		if len(i) < 3 {
+			continue
+		}
+
+		input := i[1]
+
+		if i[2] != "" {
+			input = strings.TrimPrefix(i[2], "|")
+		}
+
+		id, name, err := db.findTerm(ctx, conn, input)
+		if err == nil && db.TermBaseURL != "" {
+			replace := fmt.Sprintf("[%v](%v%v)", name, db.TermBaseURL, id)
+			if len(i) > 2 && i[2] != "" {
+				replace = fmt.Sprintf("[%v](%v%v)", i[1], db.TermBaseURL, id)
+			}
+
+			s = append(s, i[0], replace)
+		} else {
+			fmt.Printf("Error fetching term with name or ID `%v`: %v\n", input, err)
+
+			if len(i) > 2 && i[2] != "" {
+				s = append(s, i[0], input)
+			} else {
+				s = append(s, i[0], i[1])
+			}
+		}
+	}
+
+	r := strings.NewReplacer(s...)
+	return r.Replace(input)
+}
+
+var numberRegex = regexp.MustCompile(`^\d+$`)
+
+func (db *Db) findTerm(ctx context.Context, conn *pgxpool.Conn, in string) (id int, name string, err error) {
+	sql := "select id, name from terms where "
+
+	if numberRegex.MatchString(in) {
+		sql += "id = $1::int"
+	} else {
+		sql += "lower(name) = lower($1::text)"
+	}
+
+	err = conn.QueryRow(ctx, sql, in).Scan(&id, &name)
+	return
 }

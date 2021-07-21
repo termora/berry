@@ -67,7 +67,7 @@ found:
 		m = m.Content("I couldn't find a term exactly matching that name, but here's the closest match:")
 	}
 
-	e := term.TermEmbed(c.Config.TermBaseURL())
+	e := c.DB.TermEmbed(term)
 
 	_, err = m.Embeds(e).Send()
 	return

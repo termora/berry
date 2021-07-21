@@ -34,7 +34,7 @@ func (c *commands) random(ctx *bcr.Context) (err error) {
 	}
 
 	// send the random term
-	_, err = ctx.Send("", t.TermEmbed(c.Config.TermBaseURL()))
+	_, err = ctx.Send("", c.DB.TermEmbed(t))
 	return
 }
 
@@ -54,6 +54,6 @@ func (c *commands) randomCategory(ctx *bcr.Context, ignore []string) (b bool, er
 		return true, c.DB.InternalError(ctx, err)
 	}
 
-	_, err = ctx.Send("", t.TermEmbed(c.Config.TermBaseURL()))
+	_, err = ctx.Send("", c.DB.TermEmbed(t))
 	return true, err
 }

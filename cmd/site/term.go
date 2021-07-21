@@ -3,29 +3,43 @@ package main
 import (
 	"net/http"
 	"net/url"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/termora/berry/db"
 )
 
+var numberRegex = regexp.MustCompile(`^\d+$`)
+
 func (s *site) term(c echo.Context) (err error) {
 	var t *db.Term
-
-	terms, err := s.db.GetTerms(0)
-	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
-	}
 
 	name := c.Param("term")
 	name, err = url.PathUnescape(name)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
-	for _, i := range terms {
-		if strings.EqualFold(i.Name, name) {
-			t = i
-			break
+
+	if numberRegex.MatchString(name) {
+		id, _ := strconv.Atoi(name)
+
+		t, err = s.db.GetTerm(id)
+		if err != nil {
+			return c.NoContent(http.StatusNotFound)
+		}
+	} else {
+		terms, err := s.db.GetTerms(0)
+		if err != nil {
+			return c.NoContent(http.StatusInternalServerError)
+		}
+
+		for _, i := range terms {
+			if strings.EqualFold(i.Name, name) {
+				t = i
+				break
+			}
 		}
 	}
 
@@ -33,9 +47,9 @@ func (s *site) term(c echo.Context) (err error) {
 		return c.NoContent(http.StatusNotFound)
 	}
 
-	t.Description = strings.ReplaceAll(t.Description, "(##", "(/term/")
-	t.Note = strings.ReplaceAll(t.Note, "(##", "(/term/")
-	t.ContentWarnings = strings.ReplaceAll(t.ContentWarnings, "(##", "(/term/")
+	t.Description = s.db.LinkTerms(t.Description)
+	t.Note = s.db.LinkTerms(t.Note)
+	t.ContentWarnings = s.db.LinkTerms(t.ContentWarnings)
 
 	return c.Render(http.StatusOK, "term.html", (&renderData{
 		Conf: s.conf,

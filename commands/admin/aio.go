@@ -61,7 +61,7 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
-	_, err = ctx.Send(fmt.Sprintf("Added term with ID %v.", t.ID), t.TermEmbed(c.Config.TermBaseURL()))
+	_, err = ctx.Send(fmt.Sprintf("Added term with ID %v.", t.ID), c.DB.TermEmbed(t))
 	if err != nil {
 		c.Report(ctx, err)
 	}
@@ -84,7 +84,7 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 					Color:     db.EmbedColour,
 					Timestamp: discord.NowTimestamp(),
 				},
-				t.TermEmbed(c.Config.TermBaseURL()),
+				c.DB.TermEmbed(t),
 			},
 		})
 	}

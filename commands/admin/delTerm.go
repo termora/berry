@@ -26,7 +26,7 @@ func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	m, err := ctx.Send("Are you sure you want to delete this term? React with ✅ to delete it, or with ❌ to cancel.", t.TermEmbed(""))
+	m, err := ctx.Send("Are you sure you want to delete this term? React with ✅ to delete it, or with ❌ to cancel.", c.DB.TermEmbed(t))
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 					Color:     db.EmbedColour,
 					Timestamp: discord.NowTimestamp(),
 				},
-				t.TermEmbed(""),
+				c.DB.TermEmbed(t),
 			},
 		})
 	}

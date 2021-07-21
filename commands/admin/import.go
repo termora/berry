@@ -148,7 +148,7 @@ done:
 	// these aren't used when inserting the term, just for TermEmbed below
 	t.DisplayTags = t.Tags
 
-	termMsg, err := ctx.Send("Do you want to add this term?", t.TermEmbed(c.Config.TermBaseURL()))
+	termMsg, err := ctx.Send("Do you want to add this term?", c.DB.TermEmbed(t))
 	if err != nil {
 		return err
 	}
@@ -197,7 +197,7 @@ done:
 
 	// if logging terms is enabled, log this
 	if c.WebhookClient != nil {
-		e := t.TermEmbed(c.Config.TermBaseURL())
+		e := c.DB.TermEmbed(t)
 
 		c.WebhookClient.Execute(webhook.ExecuteData{
 			Username:  ctx.Bot.Username,

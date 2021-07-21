@@ -114,7 +114,7 @@ func (c *Admin) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	if c.WebhookClient != nil {
-		e := t.TermEmbed(c.Config.TermBaseURL())
+		e := c.DB.TermEmbed(t)
 
 		e.Author = &discord.EmbedAuthor{
 			Name: "Previous version",
@@ -163,7 +163,7 @@ func (c *Admin) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	if c.WebhookClient != nil {
-		e := t.TermEmbed(c.Config.TermBaseURL())
+		e := c.DB.TermEmbed(t)
 
 		e.Author = &discord.EmbedAuthor{
 			Name: "Previous version",
@@ -212,7 +212,7 @@ func (c *Admin) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	if c.WebhookClient != nil {
-		e := t.TermEmbed(c.Config.TermBaseURL())
+		e := c.DB.TermEmbed(t)
 
 		e.Author = &discord.EmbedAuthor{
 			Name: "Previous version",
@@ -265,7 +265,7 @@ func (c *Admin) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	if c.WebhookClient != nil {
-		e := t.TermEmbed(c.Config.TermBaseURL())
+		e := c.DB.TermEmbed(t)
 
 		e.Author = &discord.EmbedAuthor{
 			Name: "Previous version",
@@ -313,7 +313,7 @@ func (c *Admin) editTermImage(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	if c.WebhookClient != nil {
-		e := t.TermEmbed(c.Config.TermBaseURL())
+		e := c.DB.TermEmbed(t)
 
 		e.Author = &discord.EmbedAuthor{
 			Name: "Previous version",
@@ -375,7 +375,7 @@ func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 	}
 
 	if c.WebhookClient != nil {
-		e := t.TermEmbed(c.Config.TermBaseURL())
+		e := c.DB.TermEmbed(t)
 
 		e.Author = &discord.EmbedAuthor{
 			Name: "Previous version",

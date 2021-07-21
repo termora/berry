@@ -101,6 +101,7 @@ func main() {
 	if err != nil {
 		sugar.Fatalf("Error connecting to database: %v", err)
 	}
+	d.TermBaseURL = "/term/"
 	sugar.Info("Connected to database.")
 
 	s := site{db: d, conf: c, sugar: sugar}

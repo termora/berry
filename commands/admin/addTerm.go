@@ -68,7 +68,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 
 	t.Source = m.Content
 
-	_, err = ctx.Edit(info, "Adding a new term; to cancel at any time, type `cancel`.\nPlease send a list of tags, separated by newlines.\n__Note that the first tag needs to be a valid category name__.", true, t.TermEmbed(""))
+	_, err = ctx.Edit(info, "Adding a new term; to cancel at any time, type `cancel`.\nPlease send a list of tags, separated by newlines.\n__Note that the first tag needs to be a valid category name__.", true, c.DB.TermEmbed(t))
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 		}
 	}
 
-	_, err = ctx.Edit(info, "Are you sure you want to add this term?", true, t.TermEmbed(""))
+	_, err = ctx.Edit(info, "Are you sure you want to add this term?", true, c.DB.TermEmbed(t))
 	if err != nil {
 		return err
 	}

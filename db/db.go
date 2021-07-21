@@ -38,6 +38,8 @@ type Db struct {
 
 	sentry    *sentry.Hub
 	useSentry bool
+
+	TermBaseURL string
 }
 
 // Init ...
