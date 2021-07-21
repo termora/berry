@@ -173,6 +173,7 @@ func (db *Db) TermEmbed(t *Term) discord.Embed {
 }
 
 var linkRegexp = regexp.MustCompile(`\[\[(.*?)(\|.*?)?\]\]`)
+var lowercaseRegexp = regexp.MustCompile(`[a-z]`)
 
 // LinkTerms creates a strings.Replacer for all links in the page
 func (db *Db) LinkTerms(input string) string {
@@ -204,6 +205,11 @@ func (db *Db) LinkTerms(input string) string {
 
 		id, name, err := db.findTerm(ctx, conn, input)
 		if err == nil && db.TermBaseURL != "" {
+			// hacky way to make links lowercase if the input was lowercase
+			if lowercaseRegexp.Match([]byte{i[1][0]}) {
+				name = strings.ToLower(name)
+			}
+
 			replace := fmt.Sprintf("[%v](%v%v)", name, db.TermBaseURL, id)
 			if len(i) > 2 && i[2] != "" {
 				replace = fmt.Sprintf("[%v](%v%v)", i[1], db.TermBaseURL, id)
