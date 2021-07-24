@@ -108,7 +108,9 @@ func (db *Db) AddPronoun(p PronounSet) (id int, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
-	err = db.Pool.QueryRow(ctx, "insert into pronouns (subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5) returning id", p.Subjective, p.Objective, p.PossDet, p.PossPro, p.Reflexive).Scan(&id)
+	err = db.Pool.QueryRow(ctx, "insert into pronouns (subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5) returning id",
+		strings.TrimSpace(p.Subjective), strings.TrimSpace(p.Objective), strings.TrimSpace(p.PossDet), strings.TrimSpace(p.PossPro), strings.TrimSpace(p.Reflexive),
+	).Scan(&id)
 	return id, err
 }
 
