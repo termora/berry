@@ -82,5 +82,17 @@ func (db *Db) GetBlacklist(guildID string) (b []string, err error) {
 
 // CtxInBlacklist is a wrapper around IsBlacklisted for bcr
 func (db *Db) CtxInBlacklist(ctx *bcr.Context) bool {
-	return db.IsBlacklisted(ctx.Message.GuildID.String(), ctx.Channel.ID.String())
+	if ctx.Guild == nil {
+		return false
+	}
+
+	if db.IsBlacklisted(ctx.Message.GuildID.String(), ctx.Channel.ID.String()) {
+		return true
+	}
+
+	if !ctx.Thread() {
+		return false
+	}
+
+	return db.IsBlacklisted(ctx.Message.GuildID.String(), ctx.ParentChannel.ID.String())
 }

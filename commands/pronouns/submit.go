@@ -29,9 +29,28 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	_, err = c.DB.GetPronoun(strings.Split(ctx.RawArgs, "/")...)
+	// normalize pronouns
+	for i := range p {
+		p[i] = strings.ToLower(strings.TrimSpace(p[i]))
+	}
+
+	_, err = c.DB.GetPronoun(p...)
 	if err == nil {
 		_, err = ctx.Send("That pronoun set already exists!")
+		return
+	}
+
+	con, cancel := c.DB.Context()
+	defer cancel()
+
+	found := false
+	err = c.DB.Pool.QueryRow(con, "select exists(select * from pronoun_msgs where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 and reflexive = $5)", p[0], p[1], p[2], p[3], p[4]).Scan(&found)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+
+	if found {
+		_, err = ctx.Send("That pronoun set has already been submitted!")
 		return
 	}
 
@@ -43,7 +62,7 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 			},
 			Color:       db.EmbedColour,
 			Title:       "Pronoun submission",
-			Description: strings.Join(p[:5], "/"),
+			Description: strings.Join(p, "/"),
 			Fields: []discord.EmbedField{{
 				Name:  "Submitted by",
 				Value: ctx.Author.Mention(),
@@ -54,7 +73,7 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	con, cancel := c.DB.Context()
+	con, cancel = c.DB.Context()
 	defer cancel()
 
 	_, err = c.DB.Pool.Exec(con, "insert into pronoun_msgs (message_id, subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5, $6)", msg.ID, p[0], p[1], p[2], p[3], p[4])
