@@ -5,9 +5,11 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"reflect"
 	"syscall"
 	"time"
 
+	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/gateway/shard"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/state/store"
@@ -27,10 +29,12 @@ import (
 	"github.com/termora/berry/db"
 )
 
-var debug bool
+var debug, disableEventLoop, moreDebug bool
 
 func init() {
 	pflag.BoolVarP(&debug, "debug", "d", true, "Debug logging")
+	pflag.BoolVarP(&disableEventLoop, "noloop", "N", false, "Disable event loop that will kill bot after 5 minutes of no events")
+	pflag.BoolVarP(&moreDebug, "more-debug", "", false, "Even MORE debug logs (very spammy)")
 	pflag.Parse()
 }
 
@@ -151,8 +155,18 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	defer stop()
 
+	exitCh := make(chan struct{})
+	if !disableEventLoop {
+		eventCh := make(chan gateway.Event, 100)
+
+		go eventThing(sugar, eventCh, exitCh)
+
+		bot.Router.AddHandler(eventCh)
+	}
+
 	select {
 	case <-ctx.Done():
+	case <-exitCh:
 	}
 
 	sugar.Infof("Interrupt signal received. Shutting down...")
@@ -172,6 +186,31 @@ func timer(sugar *zap.SugaredLogger) {
 			t = time.Now().UTC()
 		case <-ctx.Done():
 			return
+		}
+	}
+}
+
+func eventThing(s *zap.SugaredLogger, ch <-chan gateway.Event, out chan<- struct{}) {
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	defer stop()
+
+	t := time.AfterFunc(5*time.Minute, func() {
+		out <- struct{}{}
+	})
+
+	for {
+		select {
+		case ev := <-ch:
+			if moreDebug {
+				s.Debugf("Received event %s", reflect.ValueOf(ev).Elem().Type().Name())
+			}
+			t.Stop()
+			t = time.AfterFunc(5*time.Minute, func() {
+				out <- struct{}{}
+			})
+		case <-ctx.Done():
+			// break if we're shutting down
+			break
 		}
 	}
 }
