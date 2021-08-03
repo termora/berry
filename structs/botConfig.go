@@ -5,6 +5,12 @@ import "github.com/diamondburned/arikawa/v3/discord"
 // FallbackGitURL if there's no git url set in the config file fall back to this
 const FallbackGitURL = "https://github.com/termora/berry"
 
+// Webhook ...
+type Webhook struct {
+	ID    discord.WebhookID `json:"id"`
+	Token string            `json:"token"`
+}
+
 // BotConfig ...
 type BotConfig struct {
 	// Fields used for sharding
@@ -32,10 +38,9 @@ type BotConfig struct {
 			PronounChannel discord.ChannelID `json:"pronoun_channel"`
 		}
 
-		TermLog struct {
-			ID    discord.WebhookID
-			Token string
-		} `json:"term_log"`
+		TermLog Webhook `json:"term_log"`
+		// mostly for debugging, send a webhook message when the bot shuts down
+		StartStopLog Webhook `json:"start_log"`
 
 		Website string
 		Git     string
