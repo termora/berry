@@ -6,62 +6,14 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/termora/berry/db/search"
 )
 
-// TermFlag ...
-type TermFlag int
-
-// Constants for term flags
-const (
-	FlagSearchHidden TermFlag = 1 << iota
-	FlagRandomHidden
-	FlagShowWarning
-	FlagListHidden
-)
-
-// Term holds info on a single term
-type Term struct {
-	ID              int       `json:"id"`
-	Category        int       `json:"category_id"`
-	CategoryName    string    `json:"category"`
-	Name            string    `json:"name"`
-	Aliases         []string  `json:"aliases"`
-	Description     string    `json:"description"`
-	Note            string    `json:"note,omitempty"`
-	Source          string    `json:"source"`
-	Created         time.Time `json:"created"`
-	LastModified    time.Time `json:"last_modified"`
-	Tags            []string  `json:"-"`
-	DisplayTags     []string  `json:"tags,omitempty"`
-	ContentWarnings string    `json:"content_warnings,omitempty"`
-	ImageURL        string    `json:"image_url,omitempty"`
-
-	Flags TermFlag `json:"flags"`
-
-	// Rank is only populated with db.Search()
-	Rank float64 `json:"rank,omitempty"`
-	// Headline is only populated with db.Search()
-	Headline string `json:"headline,omitempty"`
-}
-
-// SearchHidden returns true if the term is hidden from search results
-func (t *Term) SearchHidden() bool {
-	return t.Flags&FlagSearchHidden == FlagSearchHidden
-}
-
-// RandomHidden returns true if the term is hidden from the random command
-func (t *Term) RandomHidden() bool {
-	return t.Flags&FlagRandomHidden == FlagRandomHidden
-}
-
-// Warning returns true if the term has a warning on its term card
-func (t *Term) Warning() bool {
-	return t.Flags&FlagShowWarning == FlagShowWarning
-}
+// Term is an alias to search.Term
+type Term = search.Term
 
 // TermEmbed creates a Discord embed from a term object
 func (db *Db) TermEmbed(t *Term) discord.Embed {

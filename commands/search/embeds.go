@@ -25,12 +25,13 @@ func searchResultEmbed(search string, page, total, totalTerms int, s []*db.Term)
 	// this isn't 100% accurate but it's close enough
 	for i, t := range s {
 		h := t.Headline
-		if !strings.HasPrefix(t.Description, h[:10]) {
+		if !strings.HasPrefix(t.Description, h[:10]) && !strings.HasPrefix(t.Headline, "...") {
 			h = "..." + h
 		}
-		if !strings.HasSuffix(t.Description, h[len(h)-10:]) {
+		if !strings.HasSuffix(t.Description, h[len(h)-10:]) && !strings.HasSuffix(t.Headline, "...") {
 			h = h + "..."
 		}
+
 		name := t.Name
 		if len(t.Aliases) > 0 {
 			name += fmt.Sprintf(" (%v)", strings.Join(t.Aliases, ", "))
@@ -38,7 +39,7 @@ func searchResultEmbed(search string, page, total, totalTerms int, s []*db.Term)
 
 		fields = append(fields, discord.EmbedField{
 			Name:  "​",
-			Value: fmt.Sprintf("%v **%v**\n%v\n\n", emoji[i], name, h),
+			Value: fmt.Sprintf("%v **%v**\n%v\n\n", emoji[i], name, t.Headline),
 		})
 	}
 

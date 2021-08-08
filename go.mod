@@ -3,6 +3,7 @@ module github.com/termora/berry
 go 1.16
 
 require (
+	emperror.dev/errors v0.8.0
 	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
@@ -11,9 +12,8 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/georgysavva/scany v0.2.8
 	github.com/getsentry/sentry-go v0.11.0
-	github.com/google/uuid v1.2.0
+	github.com/google/uuid v1.3.0
 	github.com/imdario/mergo v0.3.12 // indirect
-	github.com/jackc/pgconn v1.8.1
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/labstack/echo/v4 v4.3.0
@@ -27,6 +27,7 @@ require (
 	github.com/starshine-sys/bcr v0.19.2-0.20210720211600-a186a861dc29
 	github.com/starshine-sys/pkgo v0.3.2
 	github.com/starshine-sys/snowflake/v2 v2.0.0
+	github.com/typesense/typesense-go v0.3.0
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.17.0

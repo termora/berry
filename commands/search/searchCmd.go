@@ -18,7 +18,6 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	fs := flag.NewFlagSet("", flag.ContinueOnError)
 
 	var (
-		showHidden bool
 		noCW       bool
 		cat        string
 		ignore     string
@@ -26,7 +25,6 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	)
 
 	fs.BoolVar(&noCW, "no-cw", false, "")
-	fs.BoolVar(&showHidden, "h", false, "")
 	fs.StringVar(&cat, "c", "", "")
 	fs.StringVar(&ignore, "i", "", "")
 
@@ -50,7 +48,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	search := strings.Join(ctx.Args, " ")
 
-	limit := 0
+	limit := 50
 	// if the query starts with !, only show the first result
 	if strings.HasPrefix(search, "!") {
 		limit = 1
@@ -74,7 +72,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 			return err
 		}
 
-		terms, err = c.DB.SearchCat(search, category, limit, showHidden, ignoreTags)
+		terms, err = c.DB.SearchCat(search, category, limit, ignoreTags)
 		if err != nil {
 			return c.DB.InternalError(ctx, err)
 		}

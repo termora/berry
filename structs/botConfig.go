@@ -23,6 +23,9 @@ type BotConfig struct {
 		Token       string
 		DatabaseURL string `json:"database_url"`
 		SentryURL   string `json:"sentry_url"`
+
+		TypesenseURL string `json:"typesense_url"`
+		TypesenseKey string `json:"typesense_key"`
 	}
 	Bot struct {
 		Prefixes []string
@@ -41,6 +44,11 @@ type BotConfig struct {
 		TermLog Webhook `json:"term_log"`
 		// mostly for debugging, send a webhook message when the bot shuts down
 		StartStopLog Webhook `json:"start_log"`
+
+		AuditLog struct {
+			Public  discord.ChannelID `json:"public"`
+			Private discord.ChannelID `json:"private"`
+		} `json:"audit_log"`
 
 		Website string
 		Git     string

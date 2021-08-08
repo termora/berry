@@ -14,6 +14,8 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/starshine-sys/snowflake/v2"
+	"github.com/termora/berry/db/search"
+	"github.com/termora/berry/db/search/pg"
 	"github.com/termora/berry/structs"
 	"go.uber.org/zap"
 
@@ -26,6 +28,9 @@ var Debug = func(template string, args ...interface{}) {}
 
 // Db ...
 type Db struct {
+	// Embedded search methods
+	search.Searcher
+
 	Pool       *pgxpool.Pool
 	Sugar      *zap.SugaredLogger
 	GuildCache *ttlcache.Cache
@@ -74,6 +79,7 @@ func Init(url string, sugar *zap.SugaredLogger) (db *Db, err error) {
 		Sugar:      sugar,
 		GuildCache: guildCache,
 		Timeout:    10 * time.Second,
+		Searcher:   pg.New(pool, Debug),
 	}
 
 	return

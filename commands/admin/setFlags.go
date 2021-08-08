@@ -6,6 +6,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
+	"github.com/termora/berry/db/search"
 )
 
 func (c *Admin) setFlags(ctx *bcr.Context) (err error) {
@@ -36,7 +37,7 @@ func (c *Admin) setFlags(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	err = c.DB.SetFlags(id, db.TermFlag(flags))
+	err = c.DB.SetFlags(id, search.TermFlag(flags))
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/termora/berry/db"
+	"github.com/termora/berry/db/search"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
@@ -12,10 +12,10 @@ import (
 )
 
 func (a *api) list(c echo.Context) (err error) {
-	flags := db.FlagListHidden
+	flags := search.FlagListHidden
 	if c.QueryParam("flags") != "" {
 		f, _ := strconv.Atoi(c.QueryParam("flags"))
-		flags = db.TermFlag(f)
+		flags = search.TermFlag(f)
 	}
 
 	terms, err := a.db.GetTerms(flags)
@@ -43,7 +43,7 @@ func (a *api) listCategory(c echo.Context) (err error) {
 	}
 
 	// get all terms from that category
-	terms, err := a.db.GetCategoryTerms(id, db.FlagListHidden)
+	terms, err := a.db.GetCategoryTerms(id, search.FlagListHidden)
 	if err != nil {
 		// if no rows were returned, return no content
 		if errors.Cause(err) == pgx.ErrNoRows {

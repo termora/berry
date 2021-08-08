@@ -29,6 +29,8 @@ import (
 	"github.com/termora/berry/commands/server"
 	"github.com/termora/berry/commands/static"
 	"github.com/termora/berry/db"
+	dbsearch "github.com/termora/berry/db/search"
+	"github.com/termora/berry/db/search/typesense"
 )
 
 var debug, disableEventLoop, moreDebug bool
@@ -97,6 +99,30 @@ func main() {
 	d.SetSentry(hub)
 	d.Config = c
 	d.TermBaseURL = c.TermBaseURL()
+	defer func() {
+		d.Pool.Close()
+		sugar.Infof("Closed database connection.")
+	}()
+
+	if c.Auth.TypesenseURL != "" && c.Auth.TypesenseKey != "" {
+		d.Searcher, err = typesense.New(c.Auth.TypesenseURL, c.Auth.TypesenseKey, d.Pool, db.Debug)
+		if err != nil {
+			sugar.Fatalf("Error connecting to Typesense: %v", err)
+		}
+	}
+
+	// sync terms
+	terms, err := d.GetTerms(dbsearch.FlagSearchHidden)
+	if err != nil {
+		sugar.Fatalf("Couldn't fetch all terms: %v", err)
+	}
+
+	err = d.SyncTerms(terms)
+	if err != nil {
+		sugar.Fatalf("Couldn't synchronize terms: %v", err)
+	}
+	sugar.Info("Synchronized terms with search instance!")
+
 	sugar.Info("Connected to database.")
 
 	// create a new state
@@ -142,8 +168,6 @@ func main() {
 	defer func() {
 		bot.Router.ShardManager.Close()
 		sugar.Infof("Disconnected from Discord.")
-		d.Pool.Close()
-		sugar.Infof("Closed database connection.")
 	}()
 
 	sugar.Info("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
