@@ -45,6 +45,7 @@ func (c *Client) SearchCat(input string, cat, limit int, ignore []string) (terms
 	if err != nil {
 		return
 	}
+	defer conn.Release()
 
 	for _, hit := range resp.Hits {
 		id, _ := strconv.Atoi(hit.Document["id"].(string))
