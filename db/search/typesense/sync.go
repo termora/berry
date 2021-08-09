@@ -4,51 +4,45 @@ import (
 	"fmt"
 
 	"github.com/termora/berry/db/search"
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/termora/tsclient"
 )
 
 // SyncTerms synchronizes the given terms with the Typesense server.
 func (c *Client) SyncTerms(terms []*search.Term) error {
-	// delete the existing collection, if any
-	existing := c.ts.Collection("terms")
-	if existing != nil {
-		existing.Delete()
+	_, err := c.ts.DeleteCollection("terms")
+	if err != nil && err != tsclient.ErrNotFound {
+		return err
 	}
 
-	schema := &api.CollectionSchema{
-		Name: "terms",
-		Fields: []api.Field{
-			{
-				Name: "names",
-				Type: "string[]",
-			},
-			{
-				Name: "description",
-				Type: "string",
-			},
-			{
-				Name: "source",
-				Type: "string",
-			},
-			{
-				Name:  "tags",
-				Type:  "string[]",
-				Facet: true,
-			},
-			{
-				Name:  "category",
-				Type:  "string",
-				Facet: true,
-			},
+	_, err = c.ts.CreateCollection("terms", "", []tsclient.CreateFieldData{
+		{
+			Name: "names",
+			Type: "string[]",
 		},
-	}
-
-	_, err := c.ts.Collections().Create(schema)
+		{
+			Name: "description",
+			Type: "string",
+		},
+		{
+			Name: "source",
+			Type: "string",
+		},
+		{
+			Name:  "tags",
+			Type:  "string[]",
+			Facet: true,
+		},
+		{
+			Name:  "category",
+			Type:  "string",
+			Facet: true,
+		},
+	})
 	if err != nil {
 		return err
 	}
 
-	docs := []interface{}{}
+	docs := []tsTerm{}
 
 	for _, t := range terms {
 		docs = append(docs, tsTerm{
@@ -61,7 +55,7 @@ func (c *Client) SyncTerms(terms []*search.Term) error {
 		})
 	}
 
-	_, err = c.ts.Collection("terms").Documents().Import(docs, &api.ImportDocumentsParams{Action: "upsert"})
+	_, err = c.ts.Import("terms", "upsert", docs)
 	return err
 }
 
@@ -85,18 +79,12 @@ func (c *Client) SyncTerm(t *search.Term) error {
 		Tags:        t.Tags,
 	}
 
-	_, err := c.ts.Collection("terms").Documents().Upsert(doc)
-	return err
+	return c.ts.Upsert("terms", doc, nil)
 }
 
 // SyncDelete deletes a single term.
 func (c *Client) SyncDelete(id int) error {
-	doc := c.ts.Collection("terms").Document(fmt.Sprint(id))
-	if doc != nil {
-		_, err := doc.Delete()
-		return err
-	}
-	return nil
+	return c.ts.DeleteDocument("terms", fmt.Sprint(id), nil)
 }
 
 func boolPointer(b bool) *bool { return &b }

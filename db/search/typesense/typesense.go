@@ -2,11 +2,9 @@
 package typesense
 
 import (
-	"time"
-
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/termora/berry/db/search"
-	"github.com/typesense/typesense-go/typesense"
+	"github.com/termora/tsclient"
 )
 
 // New returns a new Searcher
@@ -17,13 +15,7 @@ func New(dsn, apiKey string, pg *pgxpool.Pool, debugFunc func(string, ...interfa
 		}
 	}
 
-	c := typesense.NewClient(
-		typesense.WithServer(dsn),
-		typesense.WithAPIKey(apiKey),
-		typesense.WithConnectionTimeout(10*time.Second),
-	)
-
-	_, err := c.Health(10 * time.Second)
+	c, err := tsclient.New(dsn, apiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +31,7 @@ var _ search.Searcher = (*Client)(nil)
 
 // Client ...
 type Client struct {
-	ts *typesense.Client
+	ts *tsclient.Client
 	pg *pgxpool.Pool
 
 	Debug func(string, ...interface{})

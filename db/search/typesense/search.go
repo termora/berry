@@ -8,29 +8,27 @@ import (
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/termora/berry/db/search"
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/termora/tsclient"
+	"github.com/termora/tsclient/utils/jsonutil"
 )
 
 // SearchCat searches a specific category for a term.
 func (c *Client) SearchCat(input string, cat, limit int, ignore []string) (terms []*search.Term, err error) {
-	var filterBy *string
+	var filterBy string
 	if cat != 0 {
-		filterBy = stringPointer("category:" + strconv.Itoa(cat))
+		filterBy = "category:" + strconv.Itoa(cat)
 	}
 
 	c.Debug("Searching for \"%v\"", input)
 
-	maxHits := interface{}(limit)
-
-	resp, err := c.ts.Collection("terms").Documents().Search(&api.SearchCollectionParams{
-		Q:                       input,
+	resp, err := c.ts.Search("terms", tsclient.SearchData{
+		Query:                   input,
 		QueryBy:                 []string{"names", "description", "source"},
-		SortBy:                  &[]string{"_text_match:desc"},
-		MaxHits:                 &maxHits,
-		PerPage:                 &limit,
-		HighlightStartTag:       stringPointer("**"),
-		HighlightEndTag:         stringPointer("**"),
-		HighlightAffixNumTokens: intPointer(10),
+		SortBy:                  []string{"_text_match:desc"},
+		PerPage:                 limit,
+		HighlightStartTag:       jsonutil.StringPointer("**"),
+		HighlightEndTag:         jsonutil.StringPointer("**"),
+		HighlightAffixNumTokens: 10,
 		FilterBy:                filterBy,
 	})
 	if err != nil {
@@ -47,11 +45,17 @@ func (c *Client) SearchCat(input string, cat, limit int, ignore []string) (terms
 	}
 	defer conn.Release()
 
-	for _, hit := range resp.Hits {
-		id, _ := strconv.Atoi(hit.Document["id"].(string))
-		t, err := c.getTerm(ctx, conn, id)
+	for i, hit := range resp.Hits {
+		var doc tsTerm
+		err = hit.UnmarshalTo(&doc)
 		if err != nil {
-			c.Debug("Error getting term ID %v: %v", id, err)
+			c.Debug("Error getting term index %v: %v", i, err)
+			continue
+		}
+
+		t, err := c.getTerm(ctx, conn, doc.ID)
+		if err != nil {
+			c.Debug("Error getting term ID %v: %v", doc.ID, err)
 			return nil, err
 		}
 
