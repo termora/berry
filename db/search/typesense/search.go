@@ -105,6 +105,3 @@ func (c *Client) getTerm(ctx context.Context, conn *pgxpool.Conn, id int) (t *se
 	from public.terms as t, public.categories as c where t.id = $1 and t.category = c.id`, id)
 	return t, err
 }
-
-func stringPointer(s string) *string { return &s }
-func intPointer(i int) *int          { return &i }

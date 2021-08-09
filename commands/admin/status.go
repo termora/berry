@@ -51,7 +51,7 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		}
 
 		if err := s.UpdateStatus(gateway.UpdateStatusData{
-			Status: gateway.OnlineStatus,
+			Status: discord.OnlineStatus,
 			Activities: []discord.Activity{{
 				Name: status,
 				Type: discord.GameActivity,
@@ -92,7 +92,7 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		}
 
 		if err := s.UpdateStatus(gateway.UpdateStatusData{
-			Status: gateway.OnlineStatus,
+			Status: discord.OnlineStatus,
 			Activities: []discord.Activity{{
 				Name: status,
 				Type: discord.GameActivity,
