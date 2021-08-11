@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
 	"github.com/termora/berry/bot/cc"
@@ -26,17 +27,19 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.ping,
+		SlashCommand:  c.ping,
 	}))
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
-		Name: "about",
+		Name:    "stats",
+		Aliases: []string{"about"},
 
-		Summary:  "Some info about the bot",
+		Summary:  "Show some statistics about the bot!",
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.about,
+		SlashCommand:  c.about,
+		Options:       &[]discord.CommandOption{},
 	}))
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
@@ -80,7 +83,8 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown:    1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.help,
+		SlashCommand:  c.help,
+		Options:       &[]discord.CommandOption{},
 	})
 
 	help.AddSubcommand(&bcr.Command{
@@ -91,7 +95,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.perms,
+		SlashCommand:  c.perms,
 	})
 
 	help.AddSubcommand(&bcr.Command{
@@ -102,7 +106,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.privacy,
+		SlashCommand:  c.privacy,
 	})
 
 	help.AddSubcommand(&bcr.Command{
@@ -112,7 +116,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.autopost,
+		SlashCommand:  c.autopost,
 	})
 
 	help.AddSubcommand(&bcr.Command{
@@ -133,7 +137,8 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.cmdInvite,
+		SlashCommand:  c.cmdInvite,
+		Options:       &[]discord.CommandOption{},
 	}))
 
 	export := bot.Router.AddCommand(&bcr.Command{

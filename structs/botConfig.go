@@ -36,6 +36,11 @@ type BotConfig struct {
 			Directors []discord.RoleID `json:"directors"`
 		} `json:"permissions"`
 
+		SlashCommands struct {
+			Enabled bool              `json:"enabled"`
+			Guilds  []discord.GuildID `json:"guilds"` // empty to sync all guilds
+		} `json:"slash_commands"`
+
 		Support struct {
 			Invite         string
 			PronounChannel discord.ChannelID `json:"pronoun_channel"`

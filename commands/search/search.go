@@ -3,6 +3,7 @@ package search
 import (
 	"time"
 
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
@@ -22,11 +23,39 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Summary:     "Search for a term",
 		Description: "Search for a term. Prefix your search with `!` to show the first result.\nUse the `-c` flag to limit search results to a specific category, and use `-i` to ignore specific tags. Use `-no-cw` to hide all terms with a CW.",
-		Usage:       "[-c <category>] [-h] [-i tags] [-no-cw] <search term>",
+		Usage:       "[-c <category>] [-i tags] [-no-cw] <search term>",
 
 		Blacklistable: true,
 
 		Command: c.search,
+
+		SlashCommand: c.searchSlash,
+		Options: &[]discord.CommandOption{
+			{
+				Name:        "query",
+				Description: "The term to search for",
+				Required:    true,
+				Type:        discord.StringOption,
+			},
+			{
+				Name:        "category",
+				Description: "The category to limit your search to",
+				Required:    false,
+				Type:        discord.StringOption,
+			},
+			{
+				Name:        "ignore-tags",
+				Description: "Tags to ignore (comma-separated)",
+				Required:    false,
+				Type:        discord.StringOption,
+			},
+			{
+				Name:        "no-cw",
+				Description: "Whether to hide terms with content warnings",
+				Required:    false,
+				Type:        discord.BooleanOption,
+			},
+		},
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
@@ -36,28 +65,41 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Summary: "Show a random term (optionally filtering by category)",
 		Usage:   "[category]",
 
-		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
-			fs.StringSliceP("ignore-tags", "i", []string{}, "Specific tags (comma-separated) to ignore")
-			return fs
-		},
-
 		Cooldown:      time.Second,
 		Blacklistable: true,
 
-		Command: c.random,
+		SlashCommand: c.random,
+		Options: &[]discord.CommandOption{
+			{
+				Name:        "category",
+				Description: "The category to find a random term in",
+				Type:        discord.StringOption,
+			},
+			{
+				Name:        "ignore",
+				Description: "The tags to ignore (comma-separated)",
+				Type:        discord.StringOption,
+			},
+		},
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "explain",
 		Aliases: []string{"e", "ex"},
 
-		Summary: "Show a single explanation, or a list of all explanations",
+		Summary: "Explain a topic",
 		Usage:   "[explanation]",
 
 		Cooldown:      time.Second,
 		Blacklistable: false,
 
-		Command: c.explanation,
+		SlashCommand: c.explanation,
+		Options: &[]discord.CommandOption{{
+			Name:        "explanation",
+			Description: "Which explanation to show",
+			Required:    true,
+			Type:        discord.StringOption,
+		}},
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
@@ -78,14 +120,21 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
-		Name:    "post",
-		Aliases: []string{"term", "define", "d"},
-		Summary: "Post a single term",
+		Name:    "define",
+		Aliases: []string{"term", "post", "d"},
+		Summary: "Post a term's definition",
 		Usage:   "<term ID/name>",
 
 		Cooldown:      time.Second,
 		Blacklistable: true,
 		Command:       c.term,
+		SlashCommand:  c.termSlash,
+		Options: &[]discord.CommandOption{{
+			Name:        "query",
+			Description: "The term to define",
+			Type:        discord.StringOption,
+			Required:    true,
+		}},
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{

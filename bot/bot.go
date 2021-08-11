@@ -60,6 +60,7 @@ func New(
 		state.PreHandler = handler.New()
 		state.PreHandler.Synchronous = true
 		state.AddHandler(b.MessageCreate)
+		state.AddHandler(b.InteractionCreate)
 		state.AddHandler(b.GuildCreate)
 		state.PreHandler.AddHandler(b.GuildDelete)
 	})

@@ -148,12 +148,12 @@ done:
 	// these aren't used when inserting the term, just for TermEmbed below
 	t.DisplayTags = t.Tags
 
-	termMsg, err := ctx.Send("Do you want to add this term?", c.DB.TermEmbed(t))
-	if err != nil {
-		return err
-	}
-
-	yes, timeout := ctx.YesNoHandler(*termMsg, ctx.Author.ID)
+	yes, timeout := ctx.ConfirmButton(ctx.Author.ID, bcr.ConfirmData{
+		Message:   "Do you want to add this term?",
+		Embeds:    []discord.Embed{c.DB.TermEmbed(t)},
+		YesPrompt: "Add term",
+		YesStyle:  discord.SuccessButton,
+	})
 	if timeout {
 		_, err = ctx.Send(":x: Operation timed out.")
 		return

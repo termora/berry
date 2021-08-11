@@ -175,6 +175,21 @@ func main() {
 	state, _ := bot.Router.StateFromGuildID(0)
 	botUser, _ := state.Me()
 	sugar.Infof("User: %v (%v)", botUser.Tag(), botUser.ID)
+	bot.Router.Bot = botUser
+
+	if c.Bot.SlashCommands.Enabled {
+		if len(c.Bot.SlashCommands.Guilds) > 0 {
+			sugar.Infof("Syncing commands in %v...", c.Bot.SlashCommands.Guilds)
+		} else {
+			sugar.Info("Syncing slash commands...")
+		}
+		err = bot.Router.SyncCommands(c.Bot.SlashCommands.Guilds...)
+		if err != nil {
+			sugar.Errorf("Couldn't sync commands: %v", err)
+		} else {
+			sugar.Info("Synced commands!")
+		}
+	}
 
 	go timer(sugar)
 

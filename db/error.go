@@ -24,66 +24,62 @@ type Error struct {
 }
 
 // InternalError sends an error message and logs the error to the database
-func (db *Db) InternalError(ctx *bcr.Context, e error) error {
+func (db *Db) InternalError(ctx bcr.Contexter, e error) error {
 	if db.useSentry {
 		return db.sentryError(ctx, e)
 	}
 	// log to console
 	db.Sugar.Error(e)
 
-	con, cancel := db.Context()
-	defer cancel()
-
-	id := uuid.New()
-
-	_, err := db.Pool.Exec(con, "insert into public.errors (id, command, user_id, channel, error) values ($1, $2, $3, $4, $5)", id, ctx.Command, ctx.Author.ID, ctx.Channel.ID, e.Error())
-	if err != nil {
-		// if there's a non-nil error, panic, which should bring us back to the router
-		// if the write to the database failed chances are something is *very* wrong anyway
-		panic(err)
-	}
-
-	s := "An internal error has occurred. If this issue persists, please contact the bot developer with the error code above."
+	s := "An internal error has occurred. If this issue persists, please contact the bot developer."
 	if db.Config != nil {
 		if db.Config.Bot.Support.Invite != "" {
-			s = fmt.Sprintf("An internal error has occurred. If this issue persists, please contact the bot developer in the [support server](%v) with the error code above.", db.Config.Bot.Support.Invite)
+			s = fmt.Sprintf("An internal error has occurred. If this issue persists, please contact the bot developer in the [support server](%v).", db.Config.Bot.Support.Invite)
 		}
 	}
 
-	_, err = ctx.Send(
-		fmt.Sprintf("Error code: ``%v``", bcr.EscapeBackticks(id.String())),
+	_, err := ctx.Send(
+		"",
 		discord.Embed{
 			Title:       "Internal error occurred",
 			Description: s,
 			Color:       0xE74C3C,
-
-			Footer: &discord.EmbedFooter{
-				Text: id.String(),
-			},
-			Timestamp: discord.NowTimestamp(),
+			Timestamp:   discord.NowTimestamp(),
 		},
 	)
 	return err
 }
 
 // CaptureError captures an error with additional context
-func (db *Db) CaptureError(ctx *bcr.Context, e error) *sentry.EventID {
+func (db *Db) CaptureError(ctx bcr.Contexter, e error) *sentry.EventID {
 	// clone the hub
 	hub := db.sentry.Clone()
 
 	// add the user's ID
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetUser(sentry.User{ID: ctx.Author.ID.String()})
+		scope.SetUser(sentry.User{ID: ctx.User().ID.String()})
 	})
+
+	guildID := discord.GuildID(0)
+	if ctx.GetGuild() != nil {
+		guildID = ctx.GetGuild().ID
+	}
+
+	cmd := ""
+	if v, ok := ctx.(*bcr.Context); ok {
+		cmd = v.Command
+	} else if v, ok := ctx.(*bcr.SlashContext); ok {
+		cmd = v.CommandName
+	}
 
 	// add some more info
 	hub.AddBreadcrumb(&sentry.Breadcrumb{
 		Category: "cmd",
 		Data: map[string]interface{}{
-			"user":    ctx.Author.ID,
-			"channel": ctx.Channel.ID,
-			"guild":   ctx.Message.GuildID,
-			"command": ctx.Command,
+			"user":    ctx.User().ID,
+			"channel": ctx.GetChannel().ID,
+			"guild":   guildID,
+			"command": cmd,
 		},
 		Level:     sentry.LevelError,
 		Timestamp: time.Now().UTC(),
@@ -92,7 +88,7 @@ func (db *Db) CaptureError(ctx *bcr.Context, e error) *sentry.EventID {
 	return hub.CaptureException(e)
 }
 
-func (db *Db) sentryError(ctx *bcr.Context, e error) error {
+func (db *Db) sentryError(ctx bcr.Contexter, e error) error {
 	db.Sugar.Error(e)
 
 	// check if it's a problem on our end, to avoid blowing through Sentry's limits
@@ -108,10 +104,6 @@ func (db *Db) sentryError(ctx *bcr.Context, e error) error {
 			Title:       "Internal error occurred",
 			Color:       EmbedColour,
 			Description: s,
-			Fields: []discord.EmbedField{{
-				Name:  "Usage",
-				Value: fmt.Sprintf("```%v %v```", ctx.Cmd.Name, ctx.Cmd.Usage),
-			}},
 		})
 		return err
 	}

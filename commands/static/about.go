@@ -8,7 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/dustin/go-humanize"
 	"github.com/dustin/go-humanize/english"
 	"github.com/georgysavva/scany/pgxscan"
@@ -34,10 +36,10 @@ type category struct {
 	Count int
 }
 
-func (c *Commands) about(ctx *bcr.Context) (err error) {
+func (c *Commands) about(ctx bcr.Contexter) (err error) {
 	t := time.Now()
 
-	msg, err := ctx.Send("...")
+	err = ctx.SendX("...")
 	if err != nil {
 		return err
 	}
@@ -46,15 +48,15 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 
 	// this will return 0ms in the first minute after the bot is restarted
 	// can't do much about that though
-	heartbeat := ctx.State.Gateway.PacerLoop.EchoBeat.Time().Sub(ctx.State.Gateway.PacerLoop.SentBeat.Time()).Round(time.Millisecond)
+	heartbeat := ctx.Session().Gateway.PacerLoop.EchoBeat.Time().Sub(ctx.Session().Gateway.PacerLoop.SentBeat.Time()).Round(time.Millisecond)
 
 	stats := runtime.MemStats{}
 	runtime.ReadMemStats(&stats)
 
 	e := discord.Embed{
 		Author: &discord.EmbedAuthor{
-			Icon: ctx.Bot.AvatarURL(),
-			Name: "About " + ctx.Bot.Username,
+			Icon: c.Router.Bot.AvatarURL(),
+			Name: "About " + c.Router.Bot.Username,
 		},
 		Color: db.EmbedColour,
 		Fields: []discord.EmbedField{
@@ -80,8 +82,8 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 		Value: fmt.Sprintf(
 			"%v\nShard %v of %v",
 			humanize.Comma(c.GuildCount),
-			ctx.State.Gateway.Identifier.Shard.ShardID()+1,
-			ctx.Router.ShardManager.NumShards(),
+			ctx.Session().Gateway.Identifier.Shard.ShardID()+1,
+			c.Router.ShardManager.NumShards(),
 		),
 		Inline: true,
 	}, discord.EmbedField{
@@ -143,7 +145,7 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 			),
 		}, discord.EmbedField{
 			Name:   "Invite",
-			Value:  c.invite(ctx),
+			Value:  c.invite(),
 			Inline: true,
 		}, discord.EmbedField{
 			Name:   "Source code",
@@ -152,11 +154,14 @@ func (c *Commands) about(ctx *bcr.Context) (err error) {
 		})
 	}
 
-	_, err = ctx.Edit(msg, "", true, e)
+	_, err = ctx.EditOriginal(api.EditInteractionResponseData{
+		Content: option.NewNullableString(""),
+		Embeds:  &[]discord.Embed{e},
+	})
 	return
 }
 
-func (c *Commands) invite(ctx *bcr.Context) string {
+func (c *Commands) invite() string {
 	if c.Config.Bot.CustomInvite != "" {
 		return c.Config.Bot.CustomInvite
 	}
@@ -171,7 +176,7 @@ func (c *Commands) invite(ctx *bcr.Context) string {
 		discord.PermissionUseExternalEmojis +
 		discord.PermissionAddReactions
 
-	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&scope=applications.commands%%20bot", ctx.Bot.ID, perms)
+	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&scope=applications.commands%%20bot", c.Router.Bot.ID, perms)
 }
 
 func urlParse(s string) string {

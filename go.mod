@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/ReneKroon/ttlcache/v2 v2.7.0
-	github.com/diamondburned/arikawa/v3 v3.0.0-20210808205324-b1cae780962f
+	github.com/diamondburned/arikawa/v3 v3.0.0-20210810210230-f7880b91ee2f
 	github.com/dustin/go-humanize v1.0.0
 	github.com/georgysavva/scany v0.2.8
 	github.com/getsentry/sentry-go v0.11.0
@@ -27,7 +27,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sirupsen/logrus v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5
-	github.com/starshine-sys/bcr v0.19.2-0.20210809191802-5740bbf36c7a
+	github.com/starshine-sys/bcr v0.20.1-0.20210811141110-a116c8041fef
 	github.com/starshine-sys/pkgo v0.3.2
 	github.com/starshine-sys/snowflake/v2 v2.0.0
 	github.com/termora/tsclient v0.1.0

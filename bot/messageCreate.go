@@ -5,6 +5,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/getsentry/sentry-go"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
@@ -12,19 +13,46 @@ import (
 // MessageCreate is run when a message is created and handles commands
 func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	var err error
+	var ctx *bcr.Context
 
 	// defer panic handling
 	defer func() {
 		r := recover()
 		if r != nil {
-			bot.Sugar.Errorf("Caught panic in channel ID %v (user %v, guild %v): %v", m.ChannelID, m.Author.ID, m.GuildID, err)
+			bot.Sugar.Errorf("Caught panic in channel ID %v (user %v, guild %v): %v", m.ChannelID, m.Author.ID, m.GuildID, r)
 			bot.Sugar.Infof("Panic message content:\n```\n%v\n```", m.Content)
 
 			// if something causes a panic, it's our problem, because *it shouldn't panic*
 			// so skip checking the error and just immediately report it
+			var eventID *sentry.EventID
 			if bot.UseSentry {
-				bot.Sentry.Recover(r)
+				eventID = bot.Sentry.Recover(r)
 			}
+
+			if ctx == nil || eventID == nil {
+				return
+			}
+
+			s := "An internal error has occurred. If this issue persists, please contact the bot developer with the error code above."
+			if bot.Config != nil {
+				if bot.Config.Bot.Support.Invite != "" {
+					s = fmt.Sprintf("An internal error has occurred. If this issue persists, please contact the bot developer in the [support server](%v) with the error code above.", bot.Config.Bot.Support.Invite)
+				}
+			}
+
+			ctx.Send(
+				fmt.Sprintf("Error code: `%v`", string(*eventID)),
+				discord.Embed{
+					Title:       "Internal error occurred",
+					Description: s,
+					Color:       bcr.ColourRed,
+
+					Footer: &discord.EmbedFooter{
+						Text: string(*eventID),
+					},
+					Timestamp: discord.NowTimestamp(),
+				},
+			)
 		}
 	}()
 
@@ -49,7 +77,7 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	}
 
 	// get context
-	ctx, err := bot.Router.NewContext(m)
+	ctx, err = bot.Router.NewContext(m)
 	if err != nil && err != bcr.ErrEmptyMessage {
 		bot.Sugar.Error("Error creating context:", err)
 		return

@@ -72,3 +72,64 @@ found:
 	_, err = m.Embeds(e).Send()
 	return
 }
+
+func (c *commands) termSlash(ctx bcr.Contexter) (err error) {
+	query := ctx.GetStringFlag("query")
+
+	if query == "" {
+		return ctx.SendEphemeral("You didn't give a term name or ID.")
+	}
+
+	var (
+		exact bool
+		term  *db.Term
+	)
+
+	id, err := strconv.Atoi(query)
+	if err == nil {
+		term, err = c.DB.GetTerm(id)
+		if err != nil {
+			if errors.Cause(err) == pgx.ErrNoRows {
+				return ctx.SendEphemeral("No term with that ID found.")
+			}
+			return c.DB.InternalError(ctx, err)
+		}
+		exact = true
+	} else {
+		terms, err := c.DB.TermName(query)
+		if err != nil {
+			return c.DB.InternalError(ctx, err)
+		} else if err == nil && len(terms) > 0 {
+			if len(terms) > 1 {
+				return c.searchSlash(ctx)
+			}
+
+			exact = true
+			term = terms[0]
+			goto found
+		}
+
+		{
+			terms, err := c.DB.Search(query, 1, nil)
+			if err != nil {
+				return c.DB.InternalError(ctx, err)
+			}
+			if len(terms) == 0 {
+				return ctx.SendEphemeral("No term found.")
+			}
+
+			term = terms[0]
+		}
+	}
+
+found:
+	s := ""
+
+	if !exact {
+		s = "I couldn't find a term exactly matching that name, but here's the closest match:"
+	}
+
+	e := c.DB.TermEmbed(term)
+
+	return ctx.SendX(s, e)
+}

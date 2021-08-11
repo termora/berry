@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 )
 
@@ -81,18 +82,19 @@ func (db *Db) GetBlacklist(guildID string) (b []string, err error) {
 }
 
 // CtxInBlacklist is a wrapper around IsBlacklisted for bcr
-func (db *Db) CtxInBlacklist(ctx *bcr.Context) bool {
-	if ctx.Guild == nil {
+func (db *Db) CtxInBlacklist(ctx bcr.Contexter) bool {
+	if ctx.GetGuild() == nil {
 		return false
 	}
 
-	if db.IsBlacklisted(ctx.Message.GuildID.String(), ctx.Channel.ID.String()) {
+	if db.IsBlacklisted(ctx.GetGuild().ID.String(), ctx.GetChannel().ID.String()) {
 		return true
 	}
 
-	if !ctx.Thread() {
+	t := ctx.GetChannel().Type
+	if t != discord.GuildNewsThread && t != discord.GuildPublicThread && t != discord.GuildPrivateThread {
 		return false
 	}
 
-	return db.IsBlacklisted(ctx.Message.GuildID.String(), ctx.ParentChannel.ID.String())
+	return db.IsBlacklisted(ctx.GetGuild().ID.String(), ctx.GetParentChannel().ID.String())
 }
