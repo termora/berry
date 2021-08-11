@@ -230,9 +230,6 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 }
 
 func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
-	// test panic please remove
-	panic("oh no")
-
 	query := ctx.GetStringFlag("query")
 	cat := ctx.GetStringFlag("category")
 	noCW := ctx.GetBoolFlag("no-cw")
