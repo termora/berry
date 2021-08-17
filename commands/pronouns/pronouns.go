@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
 )
@@ -77,7 +78,21 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Blacklistable: true,
 		Cooldown:      time.Second,
-		Command:       c.use,
+		SlashCommand:  c.use,
+		Options: &[]discord.CommandOption{
+			{
+				Type:        discord.StringOption,
+				Name:        "pronouns",
+				Description: "The pronouns to show",
+				Required:    true,
+			},
+			{
+				Type:        discord.StringOption,
+				Name:        "name",
+				Description: "The name to use",
+				Required:    false,
+			},
+		},
 	})
 
 	pronouns.AddSubcommand(&bcr.Command{

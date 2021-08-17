@@ -3,11 +3,11 @@ package pronouns
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/jackc/pgx/v4"
@@ -16,86 +16,64 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *commands) use(ctx *bcr.Context) (err error) {
-	if err = ctx.CheckMinArgs(1); err != nil {
-		return c.list(ctx)
+func (c *commands) use(ctx bcr.Contexter) (err error) {
+	pronouns := ctx.GetStringFlag("pronouns")
+	name := ctx.GetStringFlag("name")
+	if v, ok := ctx.(*bcr.Context); ok {
+		pronouns = v.Args[0]
+		if len(v.Args) > 1 {
+			name = v.Args[1]
+		}
 	}
 
-	sets, err := c.DB.GetPronoun(strings.Split(ctx.Args[0], "/")...)
+	sets, err := c.DB.GetPronoun(strings.Split(pronouns, "/")...)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
-			_, err = ctx.Sendf("Couldn't find any pronoun sets from your input. Try `%vlist-pronouns` for a list of all pronouns; if it's not on there, feel free to submit it with `%vsubmit-pronouns`!", ctx.Prefix, ctx.Prefix)
-			return
+			return ctx.SendEphemeral(
+				fmt.Sprintf("Couldn't find any pronoun sets from your input. Try `%vlist-pronouns` for a list of all pronouns; if it's not on there, feel free to submit it with `%vsubmit-pronouns`!", c.Config.Bot.Prefixes[0], c.Config.Bot.Prefixes[0]))
 		}
 		if err == db.ErrTooManyForms {
-			_, err = ctx.Sendf("You gave too many forms! Input up to five forms, separated with a slash (`/`).")
-			return err
+			return ctx.SendEphemeral("You gave too many forms! Input up to five forms, separated with a slash (`/`).")
 		}
 		return c.DB.InternalError(ctx, err)
 	}
 
 	if len(sets) > 1 {
-		s := fmt.Sprintf("Found more than one set matching your input! Please type in the number matching the set you want to use:\n")
-		for i, p := range sets {
-			s += fmt.Sprintf("%d: %s\n", i+1, p)
+		if len(sets) > 25 {
+			return ctx.SendEphemeral("Found more than 25 sets matching your input! Please try again.")
 		}
-		_, err = ctx.NewMessage().Content(s).BlockMentions().Send()
-		if err != nil {
-			return err
-		}
-
-		// get which pronouns to use
-		c, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		defer cancel()
-
-		v := ctx.State.WaitFor(c, func(i interface{}) bool {
-			v, ok := i.(*gateway.MessageCreateEvent)
-			if !ok {
-				return false
-			}
-
-			if v.Author.ID != ctx.Author.ID || v.ChannelID != ctx.Message.ChannelID {
-				return false
-			}
-
-			isNumber, _ := regexp.MatchString(`^\d+$`, v.Content)
-			return isNumber
-		})
-
-		if v == nil {
-			_, err = ctx.Send("Timed out.")
-			return err
-		}
-
-		num, err := strconv.Atoi(v.(*gateway.MessageCreateEvent).Content)
-		if err != nil {
-			_, err = ctx.Send("I couldn't parse your input as a number.")
-			return err
-		}
-
-		if num > len(sets) {
-			_, err = ctx.Send("The number you gave is too high.")
-			return err
-		}
-		if num < 1 {
-			_, err = ctx.Send("The number you gave is too low.")
-			return err
-		}
-
-		sets = []*db.PronounSet{sets[num-1]}
+		return c.pronounList(ctx, sets, name)
 	}
 	// use the first set
 	set := sets[0]
 
 	if tmplCount == 0 {
-		_, err = ctx.Send("There are no examples available for pronouns! If you think this is in error, please join the bot support server and ask there.")
-		return err
+		return ctx.SendEphemeral("There are no examples available for pronouns! If you think this is in error, please join the bot support server and ask there.")
 	}
 
-	var (
-		b strings.Builder
-		e = make([]discord.Embed, 0)
-	)
+	useSet := &db.PronounSet{
+		Subjective: set.Subjective,
+		Objective:  set.Objective,
+		PossDet:    set.PossDet,
+		PossPro:    set.PossPro,
+		Reflexive:  set.Reflexive,
+	}
+	if name != "" {
+		useSet.Subjective = name
+	}
+
+	e, err := c.pronounEmbeds(set, useSet)
+
+	if v, ok := ctx.(*bcr.Context); ok {
+		_, err = v.PagedEmbed(e, false)
+	} else {
+		_, _, err = ctx.ButtonPages(e, 15*time.Minute)
+	}
+	return
+}
+
+func (c *commands) pronounEmbeds(set, useSet *db.PronounSet) (e []discord.Embed, err error) {
+	var b strings.Builder
 
 	e = append(e, discord.Embed{
 		Title:       fmt.Sprintf("%v/%v pronouns", set.Subjective, set.Objective),
@@ -106,21 +84,10 @@ func (c *commands) use(ctx *bcr.Context) (err error) {
 		},
 	})
 
-	useSet := &db.PronounSet{
-		Subjective: set.Subjective,
-		Objective:  set.Objective,
-		PossDet:    set.PossDet,
-		PossPro:    set.PossPro,
-		Reflexive:  set.Reflexive,
-	}
-	if len(ctx.Args) > 1 {
-		useSet.Subjective = ctx.Args[1]
-	}
-
 	for i := 0; i < tmplCount; i++ {
 		err = templates.ExecuteTemplate(&b, strconv.Itoa(i), useSet)
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return
 		}
 		e = append(e, discord.Embed{
 			Title:       fmt.Sprintf("%v/%v pronouns", set.Subjective, set.Objective),
@@ -133,6 +100,146 @@ func (c *commands) use(ctx *bcr.Context) (err error) {
 		b.Reset()
 	}
 
-	_, err = ctx.PagedEmbed(e, false)
-	return
+	return e, err
+}
+
+func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name string) (err error) {
+	s := fmt.Sprintf("Found more than one set matching your input! Please select the set you want to use:")
+
+	options := []discord.SelectComponentOption{}
+
+	for i, set := range sets {
+		options = append(options, discord.SelectComponentOption{
+			Label: set.String(),
+			Value: fmt.Sprint(i),
+		})
+	}
+
+	comp := []discord.Component{discord.ActionRowComponent{Components: []discord.Component{discord.SelectComponent{
+		CustomID:    "pronouns",
+		Options:     options,
+		Placeholder: "Select a pronoun set...",
+	}}}}
+
+	msg, err := ctx.SendComponents(comp, s)
+	if err != nil {
+		return
+	}
+
+	con, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
+	ignoreFn := func(ev *gateway.InteractionCreateEvent) bool {
+		components := discord.UnwrapComponents(ev.Message.Components)
+
+		err := ctx.Session().RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
+			Type: api.UpdateMessage,
+			Data: &api.InteractionResponseData{
+				Components: &components,
+			},
+		})
+		if err != nil {
+			c.Sugar.Errorf("Error responding to interaction: %v", err)
+		}
+
+		return false
+	}
+
+	var ind int
+	v := ctx.Session().WaitFor(con, func(v interface{}) bool {
+		ev, ok := v.(*gateway.InteractionCreateEvent)
+		if !ok {
+			return false
+		}
+
+		if ev.Data == nil || ev.Message == nil {
+			return false
+		}
+
+		if ev.Data.ComponentType != discord.SelectComponentType || ev.Message.ID != msg.ID {
+			return false
+		}
+
+		u := ev.User
+		if ev.User == nil {
+			u = &ev.Member.User
+		}
+
+		if u.ID != ctx.User().ID {
+			return ignoreFn(ev)
+		}
+
+		ind, err = strconv.Atoi(ev.Data.Values[0])
+		if err != nil {
+			return ignoreFn(ev)
+		}
+
+		return true
+	})
+
+	comp = []discord.Component{discord.ActionRowComponent{Components: []discord.Component{discord.SelectComponent{
+		CustomID:    "pronouns",
+		Options:     options,
+		Placeholder: "Select a pronoun set...",
+		Disabled:    true,
+	}}}}
+
+	ctx.EditOriginal(api.EditInteractionResponseData{
+		Components: &comp,
+	})
+
+	if v == nil {
+		return
+	}
+
+	set := sets[ind]
+	useSet := &db.PronounSet{
+		Subjective: set.Subjective,
+		Objective:  set.Objective,
+		PossDet:    set.PossDet,
+		PossPro:    set.PossPro,
+		Reflexive:  set.Reflexive,
+	}
+	if name != "" {
+		useSet.Subjective = name
+	}
+
+	e, err := c.pronounEmbeds(set, useSet)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+
+	ev := v.(*gateway.InteractionCreateEvent)
+
+	// replace interaction ID/token with new one
+	if v, ok := ctx.(*bcr.SlashContext); ok {
+		v.InteractionID = ev.ID
+		v.InteractionToken = ev.Token
+
+		_, _, err = v.ButtonPages(e, 15*time.Minute)
+		if err != nil {
+			return err
+		}
+	} else {
+		err := ctx.Session().RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
+			Type: api.UpdateMessage,
+			Data: &api.InteractionResponseData{
+				Components: &comp,
+			},
+		})
+		if err != nil {
+			c.Sugar.Errorf("Error responding to interaction: %v", err)
+		}
+
+		_, _, err = ctx.ButtonPages(e, 15*time.Minute)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = ctx.Session().DeleteMessage(msg.ChannelID, msg.ID)
+	if err != nil {
+		c.Sugar.Errorf("Error deleting message: %v", err)
+	}
+	return nil
 }
