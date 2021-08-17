@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -63,6 +64,11 @@ func main() {
 	e.GET("/v1/list/:id", r.listCategory)
 	e.GET("/v1/categories", r.categories)
 	e.GET("/v1/explanations", r.explanations)
+
+	e.GET("/robots.txt", func(c echo.Context) error {
+		return c.String(http.StatusOK, `User-agent: *
+Disallow: /`)
+	})
 
 	// get port
 	port := c.Port

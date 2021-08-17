@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -121,6 +122,13 @@ func main() {
 	e.GET("/search", s.search)
 	e.GET("/file/:id/:filename", s.file)
 	e.GET("/about/:page", s.staticPage)
+
+	e.GET("/robots.txt", func(c echo.Context) error {
+		return c.String(http.StatusOK, `User-agent: *
+Disallow: /file
+Disallow: /search
+Disallow: /static`)
+	})
 
 	// get port
 	port := c.Port
