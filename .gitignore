@@ -5,6 +5,7 @@
 # config files
 config.json
 config.yaml
+cmd/site/static/pages/*.md
 
 # binaries
 cmd/api/api

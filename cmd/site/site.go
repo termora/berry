@@ -59,6 +59,8 @@ type renderData struct {
 	Term  *db.Term
 	Terms []*db.Term
 	Query template.HTML
+	// Parsed markdown text for about pages
+	MD template.HTML
 }
 
 func (r *renderData) parse(c echo.Context) renderData {
@@ -118,6 +120,7 @@ func main() {
 	e.GET("/tag/:tag", s.tag)
 	e.GET("/search", s.search)
 	e.GET("/file/:id/:filename", s.file)
+	e.GET("/about/:page", s.staticPage)
 
 	// get port
 	port := c.Port
