@@ -11,6 +11,9 @@ import (
 	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
+	"github.com/diamondburned/arikawa/v3/api"
+	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/commands/static/export"
@@ -70,14 +73,27 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 		buf = bytes.NewBuffer(b)
 	}
 
-	_, err = ctx.NewMessage().Channel(u.ID).TogglePermCheck().Content(
-		fmt.Sprintf(
+	data := api.SendMessageData{
+		Content: fmt.Sprintf(
 			"> Done! Archive of %v terms, %v explanations, and %v pronoun sets.",
 			len(export.Terms), len(export.Explanations), len(export.Pronouns),
 		),
-	).AddFile(fn, buf).Send()
+		Files: []sendpart.File{{
+			Name:   fn,
+			Reader: buf,
+		}},
+	}
+
+	if c.Config.Bot.LicenseLink != "" {
+		data.Embeds = append(data.Embeds, discord.Embed{
+			Description: fmt.Sprintf("Make sure to follow the [license](%v).", c.Config.Bot.LicenseLink),
+			Color:       db.EmbedColour,
+		})
+	}
+
+	_, err = ctx.State.SendMessageComplex(u.ID, data)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return err
 	}
 
 	if ctx.Channel.ID != u.ID {
@@ -91,6 +107,13 @@ func (c *Commands) exportCSV(ctx *bcr.Context) (err error) {
 	terms, err := c.DB.GetTerms(0)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
+	}
+
+	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
+	if err != nil {
+		c.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
+		return
 	}
 
 	var b bytes.Buffer
@@ -114,14 +137,44 @@ func (c *Commands) exportCSV(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	_, err = ctx.NewMessage().Content("Here you go!").AddFile("terms.csv", &b).Send()
-	return
+	data := api.SendMessageData{
+		Content: "Here you go!",
+		Files: []sendpart.File{{
+			Name:   "terms.csv",
+			Reader: &b,
+		}},
+	}
+
+	if c.Config.Bot.LicenseLink != "" {
+		data.Embeds = append(data.Embeds, discord.Embed{
+			Description: fmt.Sprintf("Make sure to follow the [license](%v).", c.Config.Bot.LicenseLink),
+			Color:       db.EmbedColour,
+		})
+	}
+
+	_, err = ctx.State.SendMessageComplex(u.ID, data)
+	if err != nil {
+		return err
+	}
+
+	if ctx.Channel.ID != u.ID {
+		_, err = ctx.Send("✅ Check your DMs!")
+	}
+
+	return err
 }
 
 func (c *Commands) exportXLSX(ctx *bcr.Context) (err error) {
 	terms, err := c.DB.GetTerms(0)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
+	}
+
+	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
+	if err != nil {
+		c.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
+		return
 	}
 
 	f := excelize.NewFile()
@@ -158,6 +211,29 @@ func (c *Commands) exportXLSX(ctx *bcr.Context) (err error) {
 		return c.DB.InternalError(ctx, err)
 	}
 
-	_, err = ctx.NewMessage().Content("Here you go!").AddFile("terms.xlsx", buf).Send()
-	return
+	data := api.SendMessageData{
+		Content: "Here you go!",
+		Files: []sendpart.File{{
+			Name:   "terms.xlsx",
+			Reader: buf,
+		}},
+	}
+
+	if c.Config.Bot.LicenseLink != "" {
+		data.Embeds = append(data.Embeds, discord.Embed{
+			Description: fmt.Sprintf("Make sure to follow the [license](%v).", c.Config.Bot.LicenseLink),
+			Color:       db.EmbedColour,
+		})
+	}
+
+	_, err = ctx.State.SendMessageComplex(u.ID, data)
+	if err != nil {
+		return err
+	}
+
+	if ctx.Channel.ID != u.ID {
+		_, err = ctx.Send("✅ Check your DMs!")
+	}
+
+	return err
 }

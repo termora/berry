@@ -28,6 +28,8 @@ type BotConfig struct {
 		TypesenseKey string `json:"typesense_key"`
 	}
 	Bot struct {
+		LicenseLink string `json:"license_link"`
+
 		Prefixes []string
 
 		BotOwners   []discord.UserID `json:"bot_owners"`
