@@ -19,6 +19,7 @@
 
     <meta property="og:title" content="{{.Term.Name}}">
     <meta property="og:url" content="{{.Conf.BaseURL}}/term/{{.Term.Name | lower | urlEncode}}">
+    <meta property="og:description" content="{{.Term.Description | headline}}">
     {{else}}
     <title>{{.Conf.SiteName}}</title>
 

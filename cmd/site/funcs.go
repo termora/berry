@@ -48,5 +48,18 @@ func funcMap() template.FuncMap {
 				return template.CSS(`@media (prefers-color-scheme: dark) { body { color: #dcddde; background-color: #36393f; } }`)
 			}
 		},
+		"headline": func(in string) template.HTML {
+			slice := strings.Split(in, " ")
+			buf := slice[0]
+			for _, s := range slice[1:] {
+				if len(buf) > 100 {
+					buf += "..."
+					break
+				}
+				buf += " " + s
+			}
+			return template.HTML(
+				strings.TrimSpace(buf))
+		},
 	}
 }
