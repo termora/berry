@@ -15,6 +15,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/termora/berry/db"
+	"github.com/termora/berry/db/search/typesense"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
@@ -48,6 +49,11 @@ type conf struct {
 	Plausible struct {
 		Domain string
 		URL    string
+	}
+
+	Typesense struct {
+		URL string
+		Key string
 	}
 }
 
@@ -106,6 +112,15 @@ func main() {
 	}
 	d.TermBaseURL = "/term/"
 	sugar.Info("Connected to database.")
+
+	// Typesense requires a bot running to sync terms
+	if c.Typesense.URL != "" && c.Typesense.Key != "" {
+		d.Searcher, err = typesense.New(c.Typesense.URL, c.Typesense.Key, d.Pool, sugar.Debugf)
+		if err != nil {
+			sugar.Fatalf("Couldn't connect to Typesense: %v", err)
+		}
+		sugar.Info("Connected to Typesense server")
+	}
 
 	s := site{db: d, conf: c, sugar: sugar}
 

@@ -21,7 +21,7 @@
     font-style: normal;
     font-weight: 700;
     font-display: swap;
-    src: url("/static/fonts/Atkinson-Hyperlegible-Bold-102.woff2") format("woff2"),
+    src: url("/static/fonts/Atkinson-Hyperlegible-Bold-102a.woff2") format("woff2"),
     url("/static/fonts/Atkinson-Hyperlegible-Bold-102.woff") format("woff");
 }
 
@@ -30,7 +30,7 @@
     font-style: italic;
     font-weight: 700;
     font-display: swap;
-    src: url("/static/fonts/Atkinson-Hyperlegible-BoldItalic-102.woff2") format("woff2"),
+    src: url("/static/fonts/Atkinson-Hyperlegible-BoldItalic-102a.woff2") format("woff2"),
     url("/static/fonts/Atkinson-Hyperlegible-BoldItalic-102.woff") format("woff");
 }
 

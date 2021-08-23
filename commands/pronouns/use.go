@@ -20,10 +20,20 @@ func (c *commands) use(ctx bcr.Contexter) (err error) {
 	pronouns := ctx.GetStringFlag("pronouns")
 	name := ctx.GetStringFlag("name")
 	if v, ok := ctx.(*bcr.Context); ok {
+		if len(v.Args) == 0 {
+			return ctx.SendEphemeral(
+				fmt.Sprintf("You didn't give any pronouns to show! Try ``%vlist-pronouns`` for a list of all pronouns.", c.Config.Bot.Prefixes[0]))
+		}
+
 		pronouns = v.Args[0]
 		if len(v.Args) > 1 {
 			name = v.Args[1]
 		}
+	}
+
+	if pronouns == "" {
+		return ctx.SendEphemeral(
+			fmt.Sprintf("You didn't give any pronouns to show! Try ``%vlist-pronouns`` for a list of all pronouns.", c.Config.Bot.Prefixes[0]))
 	}
 
 	sets, err := c.DB.GetPronoun(strings.Split(pronouns, "/")...)
