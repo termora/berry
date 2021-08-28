@@ -6,6 +6,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/commands/admin/auditlog"
 	"github.com/termora/berry/db"
 )
 
@@ -123,6 +124,11 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 	}
 
 	t, err = c.DB.AddTerm(t)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+
+	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.CreateAction, nil, t, ctx.Author.ID, nil)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}

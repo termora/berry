@@ -5,9 +5,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/commands/admin/auditlog"
 	"github.com/termora/berry/db"
 )
 
@@ -196,28 +196,9 @@ done:
 	ctx.State.React(msg.ChannelID, msg.ID, "yes:822929172669136966")
 
 	// if logging terms is enabled, log this
-	if c.WebhookClient != nil {
-		e := c.DB.TermEmbed(t)
-
-		c.WebhookClient.Execute(webhook.ExecuteData{
-			Username:  ctx.Bot.Username,
-			AvatarURL: ctx.Bot.AvatarURL(),
-
-			Content: "​",
-
-			Embeds: []discord.Embed{
-				{
-					Author: &discord.EmbedAuthor{
-						Icon: ctx.Author.AvatarURL(),
-						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
-					},
-					Description: fmt.Sprintf("Term imported from\n%v", ctx.Args[0]),
-					Color:       db.EmbedColour,
-					Timestamp:   discord.NowTimestamp(),
-				},
-				e,
-			},
-		})
+	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.CreateAction, nil, t, ctx.Author.ID, nil)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
 	}
 	return err
 }

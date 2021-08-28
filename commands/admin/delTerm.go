@@ -1,13 +1,10 @@
 package admin
 
 import (
-	"fmt"
 	"strconv"
 
-	"github.com/diamondburned/arikawa/v3/api/webhook"
-	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
-	"github.com/termora/berry/db"
+	"github.com/termora/berry/commands/admin/auditlog"
 )
 
 func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
@@ -43,32 +40,15 @@ func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 		c.DB.InternalError(ctx, err)
 		return
 	}
+
+	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.DeleteAction, t, nil, ctx.Author.ID, nil)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+
 	_, err = ctx.Send("✅ Term deleted.")
 	if err != nil {
 		c.Sugar.Error("Error sending message:", err)
-	}
-
-	// if logging terms is enabled, log this
-	if c.WebhookClient != nil {
-		c.WebhookClient.Execute(webhook.ExecuteData{
-			Username:  ctx.Bot.Username,
-			AvatarURL: ctx.Bot.AvatarURL(),
-
-			Content: "​",
-
-			Embeds: []discord.Embed{
-				{
-					Author: &discord.EmbedAuthor{
-						Icon: ctx.Author.AvatarURL(),
-						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
-					},
-					Title:     "Term deleted",
-					Color:     db.EmbedColour,
-					Timestamp: discord.NowTimestamp(),
-				},
-				c.DB.TermEmbed(t),
-			},
-		})
 	}
 	return nil
 }

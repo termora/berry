@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/diamondburned/arikawa/v3/api/webhook"
-	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/commands/admin/auditlog"
 	"github.com/termora/berry/db"
 )
 
@@ -61,32 +60,15 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
+
+	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.CreateAction, nil, t, ctx.Author.ID, nil)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+
 	_, err = ctx.Send(fmt.Sprintf("Added term with ID %v.", t.ID), c.DB.TermEmbed(t))
 	if err != nil {
 		c.Report(ctx, err)
-	}
-
-	// if logging terms is enabled, log this
-	if c.WebhookClient != nil {
-		c.WebhookClient.Execute(webhook.ExecuteData{
-			Username:  ctx.Bot.Username,
-			AvatarURL: ctx.Bot.AvatarURL(),
-
-			Content: "​",
-
-			Embeds: []discord.Embed{
-				{
-					Author: &discord.EmbedAuthor{
-						Icon: ctx.Author.AvatarURL(),
-						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
-					},
-					Title:     "Term added",
-					Color:     db.EmbedColour,
-					Timestamp: discord.NowTimestamp(),
-				},
-				c.DB.TermEmbed(t),
-			},
-		})
 	}
 	return err
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/bot/extras/shellwords"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/commands/admin/auditlog"
 	"github.com/termora/berry/db"
 )
 
@@ -43,6 +44,11 @@ func (c *Admin) addExplanation(ctx *bcr.Context) (err error) {
 	e, err = c.DB.AddExplanation(e)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
+	}
+
+	_, err = c.AuditLog.SendLog(e.ID, auditlog.ExplanationEntry, auditlog.CreateAction, nil, e, ctx.Author.ID, nil)
+	if err != nil {
+		return
 	}
 
 	_, err = ctx.Sendf("Added explanation with ID %v.\nName: `%v`\nAliases: `%v`\n**:warning: Warning:** to have me respond to this explanation as a base command, please restart the bot.", e.ID, e.Name, strings.Join(e.Aliases, ", "))

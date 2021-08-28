@@ -30,8 +30,8 @@ var Debug = func(template string, args ...interface{}) {}
 type Db struct {
 	// Embedded search methods
 	search.Searcher
+	*pgxpool.Pool
 
-	Pool       *pgxpool.Pool
 	Sugar      *zap.SugaredLogger
 	GuildCache *ttlcache.Cache
 

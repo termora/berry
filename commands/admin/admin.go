@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
+	"github.com/termora/berry/commands/admin/auditlog"
 )
 
 // Admin ...
@@ -22,12 +23,15 @@ type Admin struct {
 	stopStatus chan bool
 
 	WebhookClient *webhook.Client
+
+	AuditLog *auditlog.AuditLog
 }
 
 // Init ...
 func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	c := &Admin{Bot: bot}
 	c.stopStatus = make(chan bool, 1)
+	c.AuditLog = auditlog.New(bot)
 
 	if c.Config.Bot.TermLog.ID.IsValid() {
 		c.WebhookClient = webhook.New(c.Config.Bot.TermLog.ID, c.Config.Bot.TermLog.Token)
@@ -238,6 +242,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		})
 	})
 
+	auditlog.Init(bot, directors)
 	out = append(out, a)
 	return "Bot admin commands", out
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/commands/admin/auditlog"
 	"github.com/termora/berry/db"
 )
 
@@ -113,33 +114,12 @@ func (c *Admin) editTermTitle(ctx *bcr.Context, t *db.Term) (err error) {
 		c.Report(ctx, err)
 	}
 
-	if c.WebhookClient != nil {
-		e := c.DB.TermEmbed(t)
+	new := *t
+	new.Name = title
 
-		e.Author = &discord.EmbedAuthor{
-			Name: "Previous version",
-		}
-
-		c.WebhookClient.Execute(webhook.ExecuteData{
-			Username:  ctx.Bot.Username,
-			AvatarURL: ctx.Bot.AvatarURL(),
-
-			Content: "​",
-
-			Embeds: []discord.Embed{
-				{
-					Author: &discord.EmbedAuthor{
-						Icon: ctx.Author.AvatarURL(),
-						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
-					},
-					Title:       "Title updated",
-					Description: title,
-					Color:       db.EmbedColour,
-					Timestamp:   discord.NowTimestamp(),
-				},
-				e,
-			},
-		})
+	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.UpdateAction, t, new, ctx.Author.ID, nil)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
 	}
 	return
 }
@@ -162,33 +142,12 @@ func (c *Admin) editTermDesc(ctx *bcr.Context, t *db.Term) (err error) {
 		c.Report(ctx, err)
 	}
 
-	if c.WebhookClient != nil {
-		e := c.DB.TermEmbed(t)
+	new := *t
+	new.Description = desc
 
-		e.Author = &discord.EmbedAuthor{
-			Name: "Previous version",
-		}
-
-		c.WebhookClient.Execute(webhook.ExecuteData{
-			Username:  ctx.Bot.Username,
-			AvatarURL: ctx.Bot.AvatarURL(),
-
-			Content: "​",
-
-			Embeds: []discord.Embed{
-				{
-					Author: &discord.EmbedAuthor{
-						Icon: ctx.Author.AvatarURL(),
-						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
-					},
-					Title:       "Description updated",
-					Description: desc,
-					Color:       db.EmbedColour,
-					Timestamp:   discord.NowTimestamp(),
-				},
-				e,
-			},
-		})
+	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.UpdateAction, t, new, ctx.Author.ID, nil)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
 	}
 	return
 }
@@ -211,33 +170,12 @@ func (c *Admin) editTermSource(ctx *bcr.Context, t *db.Term) (err error) {
 		c.Report(ctx, err)
 	}
 
-	if c.WebhookClient != nil {
-		e := c.DB.TermEmbed(t)
+	new := *t
+	new.Source = source
 
-		e.Author = &discord.EmbedAuthor{
-			Name: "Previous version",
-		}
-
-		c.WebhookClient.Execute(webhook.ExecuteData{
-			Username:  ctx.Bot.Username,
-			AvatarURL: ctx.Bot.AvatarURL(),
-
-			Content: "​",
-
-			Embeds: []discord.Embed{
-				{
-					Author: &discord.EmbedAuthor{
-						Icon: ctx.Author.AvatarURL(),
-						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
-					},
-					Title:       "Source updated",
-					Description: source,
-					Color:       db.EmbedColour,
-					Timestamp:   discord.NowTimestamp(),
-				},
-				e,
-			},
-		})
+	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.UpdateAction, t, new, ctx.Author.ID, nil)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
 	}
 	return
 }
@@ -264,33 +202,12 @@ func (c *Admin) editTermAliases(ctx *bcr.Context, t *db.Term) (err error) {
 		c.Report(ctx, err)
 	}
 
-	if c.WebhookClient != nil {
-		e := c.DB.TermEmbed(t)
+	new := *t
+	new.Aliases = aliases
 
-		e.Author = &discord.EmbedAuthor{
-			Name: "Previous version",
-		}
-
-		c.WebhookClient.Execute(webhook.ExecuteData{
-			Username:  ctx.Bot.Username,
-			AvatarURL: ctx.Bot.AvatarURL(),
-
-			Content: "​",
-
-			Embeds: []discord.Embed{
-				{
-					Author: &discord.EmbedAuthor{
-						Icon: ctx.Author.AvatarURL(),
-						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
-					},
-					Title:       "Aliases updated",
-					Description: strings.Join(aliases, ", "),
-					Color:       db.EmbedColour,
-					Timestamp:   discord.NowTimestamp(),
-				},
-				e,
-			},
-		})
+	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.UpdateAction, t, new, ctx.Author.ID, nil)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
 	}
 	return
 }
@@ -374,33 +291,12 @@ func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 		c.Report(ctx, err)
 	}
 
-	if c.WebhookClient != nil {
-		e := c.DB.TermEmbed(t)
+	new := *t
+	new.Tags = tags
 
-		e.Author = &discord.EmbedAuthor{
-			Name: "Previous version",
-		}
-
-		c.WebhookClient.Execute(webhook.ExecuteData{
-			Username:  ctx.Bot.Username,
-			AvatarURL: ctx.Bot.AvatarURL(),
-
-			Content: "​",
-
-			Embeds: []discord.Embed{
-				{
-					Author: &discord.EmbedAuthor{
-						Icon: ctx.Author.AvatarURL(),
-						Name: fmt.Sprintf("%v#%v\n(%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
-					},
-					Title:       "Tags updated",
-					Description: strings.Join(tags, ", "),
-					Color:       db.EmbedColour,
-					Timestamp:   discord.NowTimestamp(),
-				},
-				e,
-			},
-		})
+	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.UpdateAction, t, new, ctx.Author.ID, nil)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
 	}
 	return
 }
