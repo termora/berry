@@ -159,6 +159,10 @@ func main() {
 	// add admin commands
 	bot.Add(admin.Init)
 
+	state, _ := bot.Router.StateFromGuildID(0)
+	botUser, _ := state.Me()
+	bot.Router.Bot = botUser
+
 	// open a connection to Discord
 	if err = bot.Start(context.Background()); err != nil {
 		sugar.Fatal("Failed to connect:", err)
@@ -171,11 +175,7 @@ func main() {
 	}()
 
 	sugar.Info("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
-
-	state, _ := bot.Router.StateFromGuildID(0)
-	botUser, _ := state.Me()
 	sugar.Infof("User: %v (%v)", botUser.Tag(), botUser.ID)
-	bot.Router.Bot = botUser
 
 	if c.Bot.SlashCommands.Enabled {
 		if len(c.Bot.SlashCommands.Guilds) > 0 {

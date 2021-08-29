@@ -3,6 +3,7 @@ module github.com/termora/berry
 go 1.16
 
 require (
+	codeberg.org/eviedelta/detctime v0.0.0-20201201223733-52d0e0a1ba3d
 	emperror.dev/errors v0.8.0
 	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
 	github.com/Masterminds/goutils v1.1.1 // indirect

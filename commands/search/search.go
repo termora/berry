@@ -1,9 +1,11 @@
 package search
 
 import (
+	"sync"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
@@ -169,6 +171,54 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Command:       c.file,
 	}))
 
+	ap := bot.Router.AddCommand(&bcr.Command{
+		Name:             "autopost",
+		Summary:          "Configure the bot automatically posting terms in a channel",
+		Usage:            "<channel> <interval|reset>",
+		Args:             bcr.MinArgs(2),
+		GuildOnly:        true,
+		GuildPermissions: discord.PermissionManageGuild,
+
+		SlashCommand: c.autopost,
+		Options: &[]discord.CommandOption{
+			{
+				Type:        discord.ChannelOption,
+				Name:        "channel",
+				Description: "The channel to post to",
+				Required:    true,
+			},
+			{
+				Type:        discord.StringOption,
+				Name:        "interval",
+				Description: "How often to post a term (\"reset\" or \"off\" to disable posting in the channel)",
+				Required:    true,
+			},
+			{
+				Type:        discord.StringOption,
+				Name:        "category",
+				Description: "The category to post terms from",
+				Required:    false,
+			},
+		},
+	})
+
+	ap.AddSubcommand(&bcr.Command{
+		Name:             "list",
+		Summary:          "List this server's current autopost configuration",
+		GuildPermissions: discord.PermissionManageGuild,
+		GuildOnly:        true,
+		Command:          c.autopostList,
+	})
+
+	state, _ := bot.Router.StateFromGuildID(0)
+
+	var o sync.Once
+	state.AddHandler(func(_ *gateway.ReadyEvent) {
+		o.Do(func() {
+			go c.autopostLoop()
+		})
+	})
+
 	// aliases
 	ps := bot.Router.AddCommand(bot.Router.AliasMust(
 		"plural", nil,
@@ -191,6 +241,6 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	ls.Usage = "<search term>"
 
 	list = append(list, c.initExplanations(bot.Router)...)
-	list = append(list, ps, ls)
+	list = append(list, ps, ls, ap)
 	return "Search commands", list
 }

@@ -71,6 +71,6 @@ func (bot *Bot) InteractionCreate(ic *gateway.InteractionCreateEvent) {
 
 	err = bot.Router.ExecuteSlash(ctx)
 	if err != nil {
-		bot.Sugar.Errorf("Couldn't create slash context: %v", err)
+		bot.Sugar.Errorf("Couldn't execute slash command: %v", err)
 	}
 }
