@@ -78,7 +78,7 @@ func (c *Commands) autopost(ctx bcr.Contexter) (err error) {
 }
 
 func (c *Commands) autopostText(ctx bcr.Contexter) string {
-	return fmt.Sprintf("To automatically post terms at a set interval, you can use the following custom command for [YAGPDB.xyz](https://yagpdb.xyz/):\n```{{/* Recommended trigger: Minute/Hourly interval */}}\n\n%vrandom\n{{deleteResponse 1}}```\nOther bots may have similar functionality; if you need a bot whitelisted for commands, feel free to ask on the support server.", c.Config.Bot.Prefixes[0])
+	return fmt.Sprintf("To automatically post terms at a set interval, you can use the `/autopost` (or `%vautopost`) command. Check out `%vautopost help` for how to use it.\n\nNote: this command previously recommended using a bot such as YAGPDB.xyz to automatically post terms. This still works for now, but please switch over to the built-in command.", c.Config.Bot.Prefixes[0], c.Config.Bot.Prefixes[0])
 }
 
 func (c *Commands) help(ctx bcr.Contexter) (err error) {

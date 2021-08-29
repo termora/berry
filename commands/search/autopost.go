@@ -149,6 +149,8 @@ func (c *commands) autopostLoop() {
 					c.Sugar.Errorf("Error running autopost in %v: %v", ap.ChannelID, err)
 				}
 			}
+
+			time.Sleep(time.Second)
 		}
 	}
 }
