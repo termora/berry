@@ -201,7 +201,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		o = append(o, bot.Router.AddCommand(c))
 	}
 
-	go c.newRPCServer()
+	c.newRPCServer()
 
 	return "Bot info commands", o
 }
@@ -222,7 +222,6 @@ func (c *Commands) newRPCServer() {
 	rpc.RegisterGuildMemberServiceServer(rpcs, c)
 
 	c.Sugar.Infof("RPC server listening at %v", lis.Addr())
-
 	go func() {
 		for {
 			err := rpcs.Serve(lis)
