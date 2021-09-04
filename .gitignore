@@ -5,6 +5,7 @@
 # config files
 config.json
 config.yaml
+config.toml
 cmd/site/static/pages/*.md
 .env
 

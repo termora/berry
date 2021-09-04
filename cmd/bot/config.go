@@ -5,38 +5,40 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/BurntSushi/toml"
 	"github.com/termora/berry/structs"
 	"go.uber.org/zap"
 )
 
-func getConfig(sugar *zap.SugaredLogger) (config *structs.BotConfig) {
-	config = &structs.BotConfig{}
-	fn := "config.json"
+func getConfig(sugar *zap.SugaredLogger) structs.BotConfig {
+	var config structs.BotConfig
+
+	fn := "config"
 	if os.Getenv("TERMBOT_CONFIG") != "" {
 		fn = os.Getenv("TERMBOT_CONFIG")
 	}
 
-	if fn == "config.json" {
-		if _, err := os.Stat("config.json"); os.IsNotExist(err) {
-			sampleConf, err := ioutil.ReadFile("config.sample.json")
-			if err != nil {
-				panic(err)
-			}
-			err = ioutil.WriteFile("config.json", sampleConf, 0644)
-			if err != nil {
-				panic(err)
-			}
-			sugar.Errorf("config.json was not found, created sample configuration.")
-			os.Exit(1)
-			return nil
-		}
+	fullName := fn + ".toml"
+	format := "toml"
+	if _, err := os.Stat(fn + ".toml"); os.IsNotExist(err) {
+		fullName = fn + ".json"
+		format = "json"
 	}
-	configFile, err := ioutil.ReadFile("config.json")
+	configFile, err := ioutil.ReadFile(fullName)
 	if err != nil {
-		panic(err)
+		sugar.Fatalf("Couldn't find or open file: %v", err)
 	}
-	err = json.Unmarshal(configFile, &config)
-	sugar.Infof("Loaded configuration file.")
+	switch format {
+	case "toml":
+		err = toml.Unmarshal(configFile, &config)
+	case "json":
+		err = json.Unmarshal(configFile, &config)
+	}
+	if err != nil {
+		sugar.Fatalf("Couldn't unmarshal config file: %v", err)
+	}
+
+	sugar.Infof("Loaded configuration file \"%v\".", fullName)
 
 	if os.Getenv("TERMBOT_DB_URL") != "" {
 		config.Auth.DatabaseURL = os.Getenv("TERMBOT_DB_URL")

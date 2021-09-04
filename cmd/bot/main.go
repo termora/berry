@@ -97,7 +97,7 @@ func main() {
 		sugar.Fatalf("Error connecting to database: %v", err)
 	}
 	d.SetSentry(hub)
-	d.Config = c
+	d.Config = &c
 	d.TermBaseURL = c.TermBaseURL()
 	defer func() {
 		d.Pool.Close()
@@ -147,7 +147,7 @@ func main() {
 
 	// create the bot instance
 	bot := bot.New(
-		b, sugar, c, d, hub)
+		b, sugar, &c, d, hub)
 	// add search commands
 	bot.Add(search.Init)
 	// add pronoun commands

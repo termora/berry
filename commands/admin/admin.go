@@ -33,10 +33,6 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	c.stopStatus = make(chan bool, 1)
 	c.AuditLog = auditlog.New(bot)
 
-	if c.Config.Bot.TermLog.ID.IsValid() {
-		c.WebhookClient = webhook.New(c.Config.Bot.TermLog.ID, c.Config.Bot.TermLog.Token)
-	}
-
 	admins := bot.Router.RequireRole("Bot Admin", c.Config.Bot.Permissions.Admins...)
 	directors := bot.Router.RequireRole("Director", append(c.Config.Bot.Permissions.Admins, c.Config.Bot.Permissions.Directors...)...)
 

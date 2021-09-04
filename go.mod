@@ -6,6 +6,7 @@ require (
 	codeberg.org/eviedelta/detctime v0.0.0-20201201223733-52d0e0a1ba3d
 	emperror.dev/errors v0.8.0
 	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
+	github.com/BurntSushi/toml v0.4.1
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/ReneKroon/ttlcache/v2 v2.7.0
@@ -32,6 +33,7 @@ require (
 	github.com/starshine-sys/bcr v0.20.1-0.20210811141110-a116c8041fef
 	github.com/starshine-sys/pkgo v0.3.2
 	github.com/starshine-sys/snowflake/v2 v2.0.0
+	github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942 // indirect
 	github.com/termora/tsclient v0.1.0
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
