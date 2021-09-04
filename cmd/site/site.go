@@ -45,6 +45,8 @@ type conf struct {
 	Invite   string `yaml:"invite_url"`
 	Git      string
 	Contact  bool
+	// Optional description shown in embeds, when not linking to a term page
+	Description string
 
 	Plausible struct {
 		Domain string

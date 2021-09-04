@@ -12,19 +12,24 @@
     <script async defer data-domain="{{.Conf.Plausible.Domain}}" src="{{.Conf.Plausible.URL}}"></script>
     {{end}}
 
-    <meta property="og:site_name" content="{{.Conf.SiteName}}">
     <meta property="og:type" content="website">
+    <meta name="theme-color" content="#d14171">
     {{if .Term}}
+    <meta property="og:site_name" content="{{.Conf.SiteName}} - {{.Term.CategoryName}}">
     <title>{{.Term.Name}} | {{.Conf.SiteName}}</title>
 
     <meta property="og:title" content="{{.Term.Name}}">
-    <meta property="og:url" content="{{.Conf.BaseURL}}/term/{{.Term.Name | lower | urlEncode}}">
+    <meta property="og:url" content="{{.Conf.BaseURL}}/term/{{.Term.ID}}">
     <meta property="og:description" content="{{.Term.Description | headline}}">
     {{else}}
+    <meta property="og:site_name" content="{{.Conf.SiteName}}">
     <title>{{.Conf.SiteName}}</title>
 
     <meta property="og:title" content="{{.Conf.SiteName}}">
     <meta property="og:url" content="{{.Conf.BaseURL}}">
+    {{if .Conf.Description}}
+    <meta property="og:description" content="{{.Conf.Description}}">
+    {{end}}
     {{end}}
 </head>
 

@@ -11,6 +11,9 @@ import (
 	"github.com/termora/berry/db"
 )
 
+// HeadlineLen is the length of a headline (used in embeds)
+const HeadlineLen = 250
+
 func funcMap() template.FuncMap {
 	return map[string]interface{}{
 		"urlEncode": func(s string) string {
@@ -52,7 +55,7 @@ func funcMap() template.FuncMap {
 			slice := strings.Split(in, " ")
 			buf := slice[0]
 			for _, s := range slice[1:] {
-				if len(buf) > 100 {
+				if len(buf) > HeadlineLen {
 					buf += "..."
 					break
 				}
