@@ -6,7 +6,7 @@
     <div class="results">
         {{range .Terms}}
         <p>
-            <b><a href="/term/{{.Name | lower | urlEncode}}">{{.Name}}</a></b>
+            <b><a href="/term/{{.ID}}">{{.Name}}</a></b>
             <br />
             {{$headline := .Headline}}
             {{if (not (hasPrefix (trunc 5 .Description) .Headline))}}

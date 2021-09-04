@@ -3,8 +3,8 @@ package db
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/diamondburned/arikawa/v3/discord"
@@ -112,7 +112,7 @@ func (db *Db) TermEmbed(t *Term) discord.Embed {
 	}
 
 	if db.TermBaseURL != "" {
-		e.URL = db.TermBaseURL + url.PathEscape(strings.ToLower(t.Name))
+		e.URL = db.TermBaseURL + strconv.Itoa(t.ID)
 	}
 
 	if t.ImageURL != "" {

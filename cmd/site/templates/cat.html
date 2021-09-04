@@ -3,7 +3,7 @@
     <h3>List of {{.Category.Name}} terms</h3>
     <ul>
         {{range .Terms}}
-        <li><a href="/term/{{.Name | lower | urlEncode}}">{{.Name}}</a> ({{if .Aliases}}{{.Aliases | join ", "}}{{else}}no aliases{{end}})</li>
+        <li><a href="/term/{{.ID}}">{{.Name}}</a> ({{if .Aliases}}{{.Aliases | join ", "}}{{else}}no aliases{{end}})</li>
         {{end}}
     </ul>
 </div>

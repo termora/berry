@@ -8,7 +8,7 @@
     <ul>
         {{if .Terms}}
         {{range .Terms}}
-        <li><a href="/term/{{.Name | lower | urlEncode}}">{{.Name}}</a> ({{if .Aliases}}{{.Aliases | join ", "}}{{else}}no aliases{{end}})</li>
+        <li><a href="/term/{{.ID}}">{{.Name}}{{if .Aliases}}, {{.Aliases | join ", "}}{{end}}</a></li>
         {{end}}
         {{else}}
         No terms found.
