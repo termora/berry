@@ -182,6 +182,8 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 
 	o = append(o, help, export)
 
+	c.newRPCServer()
+
 	// thing
 	if _, err := os.Stat("custom_commands.json"); err != nil {
 		return "Bot info commands", o
@@ -200,8 +202,6 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 	for _, c := range cmds {
 		o = append(o, bot.Router.AddCommand(c))
 	}
-
-	c.newRPCServer()
 
 	return "Bot info commands", o
 }
