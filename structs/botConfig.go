@@ -92,8 +92,17 @@ type BotConfig struct {
 	// QuickNotes is a map of notes that can quickly be set with `t;admin setnote`
 	QuickNotes map[string]string `json:"quick_notes"`
 
+	RPCPort          string            `json:"rpc_port"`
+	ContributorRoles []ContributorRole `json:"contributor_roles"`
+
 	// UseSentry: when false, don't use Sentry for logging errors
 	UseSentry bool `json:"-"`
+}
+
+// ContributorRole ...
+type ContributorRole struct {
+	Name string         `json:"name"`
+	ID   discord.RoleID `json:"id"`
 }
 
 // TermBaseURL returns the base URL for terms

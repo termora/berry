@@ -1,13 +1,18 @@
 package static
 
 import (
+	"net"
 	"os"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
 	"github.com/termora/berry/bot/cc"
+	"github.com/termora/berry/commands/static/rpc"
+	"google.golang.org/grpc"
 )
 
 // Commands ...
@@ -15,11 +20,23 @@ type Commands struct {
 	*bot.Bot
 
 	start time.Time
+
+	memberMu             sync.RWMutex
+	SupportServerMembers map[discord.UserID]discord.Member
+	// is set to true once we receive the first GuildMembersChunk event
+	guildMembersChunked bool
+
+	rpc.UnimplementedGuildMemberServiceServer
 }
 
 // Init ...
 func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
-	c := &Commands{Bot: bot, start: time.Now().UTC()}
+	c := &Commands{
+		Bot:                  bot,
+		start:                time.Now().UTC(),
+		SupportServerMembers: map[discord.UserID]discord.Member{},
+	}
+
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name: "ping",
 
@@ -184,5 +201,35 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		o = append(o, bot.Router.AddCommand(c))
 	}
 
+	go c.newRPCServer()
+
 	return "Bot info commands", o
+}
+
+func (c *Commands) newRPCServer() {
+	port := strings.TrimPrefix(c.Config.RPCPort, ":")
+	if port == "" {
+		port = "58952"
+	}
+
+	lis, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		c.Sugar.Errorf("failed to listen: %v", err)
+		return
+	}
+
+	rpcs := grpc.NewServer()
+	rpc.RegisterGuildMemberServiceServer(rpcs, c)
+
+	c.Sugar.Infof("RPC server listening at %v", lis.Addr())
+
+	go func() {
+		for {
+			err := rpcs.Serve(lis)
+			if err != nil {
+				c.Sugar.Errorf("Failed to serve RPC: %v", err)
+			}
+			time.Sleep(30 * time.Second)
+		}
+	}()
 }

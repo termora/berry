@@ -6,6 +6,7 @@
 config.json
 config.yaml
 cmd/site/static/pages/*.md
+.env
 
 # binaries
 cmd/api/api
