@@ -49,6 +49,10 @@ func (s *site) term(c echo.Context) (err error) {
 
 	t.Description = s.db.LinkTerms(t.Description)
 	t.Note = s.db.LinkTerms(t.Note)
+	if t.Disputed() {
+		t.Note = strings.TrimSpace(t.Note + "\n\n" + db.DisputedText)
+	}
+
 	t.ContentWarnings = s.db.LinkTerms(t.ContentWarnings)
 
 	return c.Render(http.StatusOK, "term.html", (&renderData{

@@ -19,6 +19,7 @@ func (c *Admin) setFlags(ctx *bcr.Context) (err error) {
 		- 2: hidden from random
 		- 4: show a warning
 		- 8: hide from lists (including the website)
+		- 16: show a disputed note
 		These can be combined by adding the numbers together.`,
 			Color: db.EmbedColour,
 		})

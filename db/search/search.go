@@ -25,6 +25,7 @@ const (
 	FlagRandomHidden
 	FlagShowWarning
 	FlagListHidden
+	FlagDisputed
 )
 
 // Term holds info on a single term
@@ -65,4 +66,9 @@ func (t *Term) RandomHidden() bool {
 // Warning returns true if the term has a warning on its term card
 func (t *Term) Warning() bool {
 	return t.Flags&FlagShowWarning == FlagShowWarning
+}
+
+// Disputed returns true if the term is disputed
+func (t *Term) Disputed() bool {
+	return t.Flags&FlagDisputed == FlagDisputed
 }

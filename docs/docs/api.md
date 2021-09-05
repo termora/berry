@@ -33,6 +33,16 @@ A `?` after the column type indicates an optional (nullable) parameter.
 | rank             | number?   | Only returned in searches.                                      |
 | headline         | string?   | Only returned in searches.                                      |
 
+#### Term flags
+
+| Flag     | Meaning                                            |
+| -------- | -------------------------------------------------- |
+| `1 << 0` | Hidden from search                                 |
+| `1 << 1` | Not shown in random results                        |
+| `1 << 2` | Shows a warning if looked up on the bot or website |
+| `1 << 3` | Hidden from lists (including the website)          |
+| `1 << 4` | Shows a "disputed" note                            |
+
 ### Category object
 
 | Key  | Type   | Notes                       |

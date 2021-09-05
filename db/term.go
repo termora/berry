@@ -12,6 +12,9 @@ import (
 	"github.com/termora/berry/db/search"
 )
 
+// DisputedText ...
+const DisputedText = "This term is **disputed**. This means for one reason or another, the definiton or term is contested. This definition, like any other on this bot, is not definitive nor does it endorse any particular discourse stance and should not be taken as such."
+
 // Term is an alias to search.Term
 type Term = search.Term
 
@@ -71,6 +74,11 @@ func (db *Db) TermEmbed(t *Term) discord.Embed {
 			Name:  "Synonyms",
 			Value: strings.Join(t.Aliases, ", "),
 		})
+	}
+
+	if t.Disputed() {
+		note += "\n\n" + DisputedText
+		note = strings.TrimSpace(note)
 	}
 
 	if note != "" {
