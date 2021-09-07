@@ -68,6 +68,8 @@ func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 
 	// otherwise we'll have to parse the content
 	if !msgRegex.MatchString(msg.Content) {
+		ctx.SendfX("⚠️ The message you gave didn't match the expected input. You might have to add it manually with ``%vadmin addterm``.", c.Config.Bot.Prefixes[0])
+
 		// the message didn't match, so don't bother parsing everything
 		goto done
 	}
@@ -107,8 +109,7 @@ func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 done:
 	// validate the term object
 	if t.Name == "" || t.Source == "" || t.Description == "" {
-		_, err = ctx.Send("One or more required fields (name, source, description) was empty!")
-		return
+		return ctx.SendfX("One or more required fields (name, source, description) was empty!\n(Debug: name length => %v, source length => %v, description length => %v)", len(t.Name), len(t.Source), len(t.Description))
 	}
 	if t.Aliases == nil {
 		t.Aliases = []string{}
