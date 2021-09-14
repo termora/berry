@@ -3,7 +3,9 @@ package bot
 
 import (
 	"sort"
+	"sync"
 
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway/shard"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/handler"
@@ -26,7 +28,8 @@ type Bot struct {
 	Sentry    *sentry.Hub
 	UseSentry bool
 
-	GuildCount int64
+	Guilds   map[discord.GuildID]discord.Guild
+	GuildsMu sync.Mutex
 }
 
 // Module is a single module/category of commands
@@ -48,6 +51,7 @@ func New(
 		DB:        db,
 		Sentry:    hub,
 		UseSentry: hub != nil,
+		Guilds:    map[discord.GuildID]discord.Guild{},
 	}
 
 	// set the router's prefixer

@@ -77,11 +77,15 @@ func (c *Commands) about(ctx bcr.Contexter) (err error) {
 		Timestamp: discord.NowTimestamp(),
 	}
 
+	c.GuildsMu.Lock()
+	guildCount := len(c.Guilds)
+	c.GuildsMu.Unlock()
+
 	e.Fields = append(e.Fields, discord.EmbedField{
 		Name: "Servers",
 		Value: fmt.Sprintf(
 			"%v\nShard %v of %v",
-			humanize.Comma(c.GuildCount),
+			humanize.Comma(int64(guildCount)),
 			ctx.Session().Gateway.Identifier.Shard.ShardID()+1,
 			c.Router.ShardManager.NumShards(),
 		),

@@ -15,14 +15,12 @@ import (
 // this is in admin to better integrate with the `guilds` admin command
 func (c *Admin) setStatusLoop(s *state.State) {
 	st := fmt.Sprintf("%vhelp", c.Config.Bot.Prefixes[0])
-	var guilds int
-	countChan := make(chan int, 1)
 
 	// spin off a function to fetch the guild count (well, actually fetch all guilds)
 	// it's also used by `t!admin guilds`, which is why we run this even if the server count isn't shown in the bot's status
 	if s.Gateway.Identifier.Shard.ShardID() == 0 {
 		c.Sugar.Debugf("Spawning guildCount function on shard %v", s.Gateway.Identifier.Shard.ShardID())
-		go c.guildCount(s, countChan)
+		go c.guildCount(s)
 	}
 
 	for {
@@ -41,9 +39,8 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		}
 
 		// add the website to the status, if it's not empty
-		status = fmt.Sprintf("%v | %v", status, urlParse(c.Config.Bot.Website))
-		if c.Config.Bot.Website == "" {
-			status = st
+		if c.Config.Bot.Website != "" {
+			status = fmt.Sprintf("%v | %v", status, urlParse(c.Config.Bot.Website))
 		}
 		// if the bot is sharded, also add the shard number to the status
 		if c.Router.ShardManager.NumShards() > 1 && c.Config.Bot.ShowShard {
@@ -73,8 +70,6 @@ func (c *Admin) setStatusLoop(s *state.State) {
 		case <-c.stopStatus:
 			c.Sugar.Infof("Status loop stopped.")
 			return
-		case g := <-countChan:
-			guilds = g
 		default:
 		}
 
@@ -84,7 +79,11 @@ func (c *Admin) setStatusLoop(s *state.State) {
 			status = fmt.Sprintf("%v | %v terms", st, c.DB.TermCount())
 		}
 
-		status = fmt.Sprintf("%v | in %v servers", status, guilds)
+		c.GuildsMu.Lock()
+		count := len(c.Guilds)
+		c.GuildsMu.Unlock()
+
+		status = fmt.Sprintf("%v | in %v servers", status, count)
 
 		// if the bot is sharded, also add the shard number to the status
 		if c.Router.ShardManager.NumShards() > 1 && c.Config.Bot.ShowShard {
@@ -106,23 +105,17 @@ func (c *Admin) setStatusLoop(s *state.State) {
 	}
 }
 
-func (c *Admin) guildCount(s *state.State, ch chan int) {
-	for {
-		// get number of guilds and send it over c
-		g, err := s.Session.Client.Guilds(0)
-		if err != nil {
-			c.Sugar.Error("Error getting guilds:", err)
-			ch <- 0
-		} else {
-			ch <- len(g)
-			// set the list of guilds in c, used for the `guilds` admin command
-			c.guilds = g
-			c.GuildCount = int64(len(g))
+func (c *Admin) guildCount(s *state.State) {
+	time.Sleep(5 * time.Minute)
 
-			// post guild count if needed
-			if err = c.postGuildCount(s, len(g)); err != nil {
-				c.Sugar.Errorf("Error posting guild count: %v", err)
-			}
+	for {
+		// post guild count if needed
+		c.GuildsMu.Lock()
+		count := len(c.Guilds)
+		c.GuildsMu.Unlock()
+
+		if err := c.postGuildCount(s, count); err != nil {
+			c.Sugar.Errorf("Error posting guild count: %v", err)
 		}
 
 		// only run this once every hour
@@ -172,6 +165,11 @@ func (c *Admin) postGuildCount(s *state.State, count int) (err error) {
 			return err
 		}
 
+		site := c.Config.Bot.Website
+		if site == "" {
+			site = c.Config.Bot.Git
+		}
+		req.Header["User-Agent"] = []string{fmt.Sprintf("%v-%v/v6 (Arikawa; +%v) DBots/%v", u.Username, u.Discriminator, site, u.ID)}
 		req.Header.Add("Content-Type", "application/json")
 		req.Header.Add("Authorization", c.Config.BotLists.BotsGG)
 

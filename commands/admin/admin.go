@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"github.com/diamondburned/arikawa/v3/api/webhook"
-	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/gateway/shard"
 	"github.com/diamondburned/arikawa/v3/state"
@@ -18,13 +17,24 @@ import (
 type Admin struct {
 	*bot.Bot
 
-	guilds []discord.Guild
-
 	stopStatus chan bool
 
 	WebhookClient *webhook.Client
 
 	AuditLog *auditlog.AuditLog
+}
+
+func (bot *Admin) guildCreate(ev *gateway.GuildCreateEvent) {
+	bot.GuildsMu.Lock()
+	bot.Guilds[ev.ID] = ev.Guild
+	bot.GuildsMu.Unlock()
+	return
+}
+
+func (bot *Admin) guildDelete(ev *gateway.GuildDeleteEvent) {
+	bot.GuildsMu.Lock()
+	delete(bot.Guilds, ev.ID)
+	bot.GuildsMu.Unlock()
 }
 
 // Init ...
@@ -176,14 +186,6 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 	})
 
 	a.AddSubcommand(&bcr.Command{
-		Name:    "guilds",
-		Summary: "Get a list of all guilds and their owners",
-
-		OwnerOnly: true,
-		Command:   c.cmdGuilds,
-	})
-
-	a.AddSubcommand(&bcr.Command{
 		Name:    "changelog",
 		Summary: "Show a list of terms added since `date`.\n`date` must be in `yyyy-mm-dd` format.",
 		Usage:   "<channel> <date>",
@@ -226,6 +228,9 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 
 	i := bot.Router.AddCommand(bot.Router.AliasMust("ai", nil, []string{"admin", "import"}, nil))
 	i.Args = bcr.MinArgs(1)
+
+	bot.Router.AddHandler(c.guildCreate)
+	bot.Router.AddHandler(c.guildDelete)
 
 	bot.Router.ShardManager.ForEach(func(s shard.Shard) {
 		state := s.(*state.State)
