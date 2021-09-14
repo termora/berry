@@ -59,6 +59,17 @@ func (c *commands) autopost(ctx bcr.Contexter) (err error) {
 		return ctx.SendEphemeral("You don't have permissions to set autoposts in " + ch.Mention() + ".")
 	}
 
+	var roleID *discord.RoleID
+	var mentionable bool
+	r, err := ctx.GetRoleFlag("role")
+	if err == nil {
+		if !r.Mentionable && !perms.Has(discord.PermissionMentionEveryone) {
+			return ctx.SendEphemeral("You can't mention the role @" + r.Name + " in " + ch.Mention() + ".")
+		}
+		roleID = &r.ID
+		mentionable = r.Mentionable
+	}
+
 	var count int
 	err = c.DB.QueryRow(context.Background(), "select count(*) from autopost where guild_id = $1", ctx.GetGuild().ID.String()).Scan(&count)
 	if err != nil {
@@ -76,7 +87,7 @@ func (c *commands) autopost(ctx bcr.Contexter) (err error) {
 		}
 	}
 
-	err = c.setAutopost(ctx.GetGuild().ID, ch.ID, catID, dur)
+	err = c.setAutopost(ctx.GetGuild().ID, ch.ID, catID, roleID, dur)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
@@ -85,16 +96,20 @@ func (c *commands) autopost(ctx bcr.Contexter) (err error) {
 		return ctx.SendfX("Disabled autoposting in %v!", ch.Mention())
 	}
 
-	s := fmt.Sprintf("Autopost interval set! A random term")
+	s := fmt.Sprintf("✅ Autopost interval set! A random term")
 	if ctx.GetStringFlag("category") != "" {
 		s += fmt.Sprintf(" from the %v category", ctx.GetStringFlag("category"))
 	}
 	s += fmt.Sprintf(" will be posted to %v every %v.", ch.Mention(), bcr.HumanizeDuration(bcr.DurationPrecisionMinutes, dur))
 
+	if roleID != nil && !mentionable {
+		s += fmt.Sprintf("\n📝 %v will mention %v for every posted term. Make sure that the bot has the `Mention @everyone, @here, and all roles` permission in %v.", c.Router.Bot.Username, roleID.Mention(), ch.Mention())
+	}
+
 	return ctx.SendX(s)
 }
 
-func (c *commands) setAutopost(guildID discord.GuildID, channelID discord.ChannelID, categoryID *int, duration time.Duration) (err error) {
+func (c *commands) setAutopost(guildID discord.GuildID, channelID discord.ChannelID, categoryID *int, roleID *discord.RoleID, duration time.Duration) (err error) {
 	if duration == 0 {
 		db.Debug("Removing autopost in %v", channelID)
 		_, err = c.DB.Exec(context.Background(), "delete from autopost where channel_id = $1", channelID)
@@ -102,10 +117,10 @@ func (c *commands) setAutopost(guildID discord.GuildID, channelID discord.Channe
 	}
 
 	db.Debug("Setting autopost in %v", channelID)
-	_, err = c.DB.Exec(context.Background(), `insert into autopost (guild_id, channel_id, category_id, next_post, interval)
-values ($1, $2, $3, $4, $5)
+	_, err = c.DB.Exec(context.Background(), `insert into autopost (guild_id, channel_id, category_id, next_post, interval, role_id)
+values ($1, $2, $3, $4, $5, $6)
 on conflict (channel_id) do update
-set category_id = $3, next_post = $4, interval = $5`, guildID.String(), channelID, categoryID, time.Now().UTC().Add(duration), duration)
+set category_id = $3, next_post = $4, interval = $5, role_id = $6`, guildID.String(), channelID, categoryID, time.Now().UTC().Add(duration), duration, roleID)
 	return
 }
 
@@ -123,6 +138,7 @@ type Autopost struct {
 	Interval  time.Duration
 
 	CategoryID *int
+	RoleID     *discord.RoleID
 }
 
 func (c *commands) autopostLoop() {
@@ -161,13 +177,13 @@ func (c *commands) doAutopost(ap Autopost) (err error) {
 
 	perms, err := s.Permissions(ap.ChannelID, c.Router.Bot.ID)
 	if err != nil {
-		c.setAutopost(0, ap.ChannelID, nil, 0)
+		c.setAutopost(0, ap.ChannelID, nil, nil, 0)
 		return errors.Wrap(err, "getting permissions")
 	}
 
 	if !perms.Has(discord.PermissionViewChannel | discord.PermissionSendMessages) {
 		c.Sugar.Errorf("Can't send messages in %v (guild %v), disabling autopost there.", ap.ChannelID, ap.GuildID)
-		return c.setAutopost(0, ap.ChannelID, nil, 0)
+		return c.setAutopost(0, ap.ChannelID, nil, nil, 0)
 	}
 
 	var t *search.Term
@@ -180,7 +196,12 @@ func (c *commands) doAutopost(ap Autopost) (err error) {
 		return errors.Wrap(err, "get random term")
 	}
 
-	_, err = s.SendEmbeds(ap.ChannelID, c.DB.TermEmbed(t))
+	str := ""
+	if ap.RoleID != nil {
+		str = ap.RoleID.Mention()
+	}
+
+	_, err = s.SendMessage(ap.ChannelID, str, c.DB.TermEmbed(t))
 	if err != nil {
 		return errors.Wrap(err, "send message")
 	}
@@ -219,6 +240,9 @@ func (c *commands) autopostList(ctx *bcr.Context) (err error) {
 			if cat := c.DB.CategoryFromID(*ap.CategoryID); cat != nil {
 				s += "\nPosting terms from the " + cat.Name + " category"
 			}
+		}
+		if ap.RoleID != nil {
+			s += "\nMentions role " + ap.RoleID.Mention()
 		}
 		s += "\n\n"
 	}

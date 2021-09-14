@@ -199,6 +199,12 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 				Description: "The category to post terms from",
 				Required:    false,
 			},
+			{
+				Type:        discord.RoleOption,
+				Name:        "role",
+				Description: "The role to mention when posting a term",
+				Required:    false,
+			},
 		},
 	})
 
