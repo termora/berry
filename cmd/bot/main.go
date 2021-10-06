@@ -7,10 +7,12 @@ import (
 	"os"
 	"os/signal"
 	"reflect"
+	"strconv"
 	"syscall"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api/webhook"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/gateway/shard"
 	"github.com/diamondburned/arikawa/v3/state"
@@ -98,6 +100,12 @@ func main() {
 	}
 	d.SetSentry(hub)
 	d.Config = &c
+	if c.Customization.Colour != "" {
+		clr, _ := strconv.ParseUint(c.Customization.Colour, 16, 32)
+		if clr != 0 {
+			db.EmbedColour = discord.Color(clr)
+		}
+	}
 	d.TermBaseURL = c.TermBaseURL()
 	defer func() {
 		d.Pool.Close()

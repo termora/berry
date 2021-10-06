@@ -101,19 +101,23 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 				Name:  "Terms",
 				Value: "`search`: search the database for a term! (alias: `s`)\n`random`: show a random term! (alias: `r`)\n`define`: show the term with the given name, or the closest match! (alias: `d`)",
 			},
-			{
-				Name:  "Pronouns",
-				Value: fmt.Sprintf("`pronouns`: see how pronouns are used in a sentence! (optionally with your name)\n`pronouns list`: list all pronouns known to %v!\n`pronouns submit`: submit a pronoun set to be added!", c.Router.Bot.Username),
-			},
-			{
-				Name:  "For staff",
-				Value: "You can blacklist most commands, with the exception of `explain`, using the `blacklist` command.\nYou can also change the prefixes the bot uses with the `prefix` command.",
-			},
 		},
 		Footer: &discord.EmbedFooter{
 			Text: "Use `help <command>` for more information on a specific command.",
 		},
 	}
+
+	if !c.Config.Customization.DisablePronouns {
+		e.Fields = append(e.Fields, discord.EmbedField{
+			Name:  "Pronouns",
+			Value: fmt.Sprintf("`pronouns`: see how pronouns are used in a sentence! (optionally with your name)\n`pronouns list`: list all pronouns known to %v!\n`pronouns submit`: submit a pronoun set to be added!", c.Router.Bot.Username),
+		})
+	}
+
+	e.Fields = append(e.Fields, discord.EmbedField{
+		Name:  "For staff",
+		Value: "You can blacklist most commands, with the exception of `explain`, using the `blacklist` command.\nYou can also change the prefixes the bot uses with the `prefix` command.",
+	})
 
 	// if custom help fields are defined, add those
 	if len(c.Config.Bot.HelpFields) != 0 {

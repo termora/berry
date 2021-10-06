@@ -87,6 +87,18 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	if bot.Router.MatchPrefix(m.Message) {
 		bot.Sugar.Debugf("Maybe executing command `%v`", ctx.Command)
 
+		if bot.Config.Customization.LimitCommands {
+			if ctx.ParentChannel != nil {
+				if !ctx.ParentChannel.NSFW {
+					return
+				}
+			} else {
+				if !ctx.Channel.NSFW {
+					return
+				}
+			}
+		}
+
 		err = bot.Router.Execute(ctx)
 		if err != nil {
 			if db.IsOurProblem(err) && bot.UseSentry {

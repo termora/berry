@@ -69,6 +69,20 @@ func (bot *Bot) InteractionCreate(ic *gateway.InteractionCreateEvent) {
 		return
 	}
 
+	if bot.Config.Customization.LimitCommands {
+		if ctx.ParentChannel != nil {
+			if !ctx.ParentChannel.NSFW {
+				ctx.SendEphemeral("This bot can only be used in NSFW channels.")
+				return
+			}
+		} else {
+			if !ctx.Channel.NSFW {
+				ctx.SendEphemeral("This bot can only be used in NSFW channels.")
+				return
+			}
+		}
+	}
+
 	err = bot.Router.ExecuteSlash(ctx)
 	if err != nil {
 		bot.Sugar.Errorf("Couldn't execute slash command: %v", err)

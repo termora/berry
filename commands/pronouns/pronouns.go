@@ -32,6 +32,10 @@ type commands struct {
 
 // Init ...
 func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
+	if bot.Config.Customization.DisablePronouns {
+		return
+	}
+
 	c := &commands{
 		Bot:            bot,
 		submitCooldown: ttlcache.NewCache(),

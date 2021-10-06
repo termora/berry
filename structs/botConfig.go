@@ -21,6 +21,12 @@ type BotConfig struct {
 		TypesenseURL string `json:"typesense_url" toml:"typesense_url"`
 		TypesenseKey string `json:"typesense_key" toml:"typesense_key"`
 	}
+	Customization struct {
+		DisablePronouns bool   `toml:"disable_pronouns"`
+		DisableAliases  bool   `toml:"disable_aliases"`
+		LimitCommands   bool   `toml:"limit_commands"` // Don't ask
+		Colour          string `toml:"colour"`
+	} `toml:"customization"`
 	Bot struct {
 		LicenseLink string `json:"license_link" toml:"license_link"`
 

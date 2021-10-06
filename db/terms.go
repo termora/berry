@@ -5,13 +5,17 @@ import (
 	"math/rand"
 	"strings"
 
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4"
 	"github.com/termora/berry/db/search"
 )
 
+// DefaultEmbedColour is the embed colour used throughout the bot
+const DefaultEmbedColour = 0xd14171
+
 // EmbedColour is the embed colour used throughout the bot
-const EmbedColour = 0xd14171
+var EmbedColour discord.Color = DefaultEmbedColour
 
 // Errors related to database operations
 var (

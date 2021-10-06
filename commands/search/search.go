@@ -17,6 +17,7 @@ type commands struct {
 
 // Init ...
 func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
+	m = "Search commands"
 	c := commands{Bot: bot}
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
@@ -224,6 +225,10 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 			go c.autopostLoop()
 		})
 	})
+
+	if c.Config.Customization.DisableAliases {
+		return
+	}
 
 	// aliases
 	ps := bot.Router.AddCommand(bot.Router.AliasMust(
