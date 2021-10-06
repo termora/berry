@@ -24,6 +24,7 @@ func (c *Client) SearchCat(input string, cat, limit int, ignore []string) (terms
 	resp, err := c.ts.Search("terms", tsclient.SearchData{
 		Query:                   input,
 		QueryBy:                 []string{"names", "description", "source"},
+		QueryByWeights:          []int{2, 1, 1},
 		SortBy:                  []string{"_text_match:desc"},
 		PerPage:                 limit,
 		HighlightStartTag:       jsonutil.StringPointer("**"),
