@@ -19,25 +19,101 @@ import (
 	"github.com/termora/berry/db/search"
 )
 
+func (c *commands) autopostText(ctx *bcr.Context) (err error) {
+	ch, err := ctx.ParseChannel(ctx.Args[0])
+	if err != nil || ch.GuildID != ctx.Channel.GuildID || (ch.Type != discord.GuildText && ch.Type != discord.GuildNews) {
+		return ctx.SendX(":x: Couldn't find that channel, or it's not in this server.")
+	}
+
+	perms := discord.CalcOverwrites(*ctx.Guild, *ch, *ctx.Member)
+	if !perms.Has(discord.PermissionViewChannel | discord.PermissionSendMessages | discord.PermissionManageRoles) {
+		return ctx.SendX(":x: Couldn't find that channel, or it's not in this server.")
+	}
+
+	dur, err := durationparser.Parse(ctx.Args[1])
+	if err != nil || (dur < 2*time.Hour && dur != 0) || dur > 7*24*time.Hour {
+		s := ctx.Args[1]
+		if s == "clear" || s == "0" || s == "disable" || s == "off" || s == "reset" {
+			dur = 0
+		} else {
+			return ctx.SendEphemeral(":x: Couldn't parse ``" + bcr.EscapeBackticks(ctx.Args[1]) + "`` as a valid duration (minimum 2 hours, maximum 1 week).")
+		}
+	}
+
+	var catID *int
+	if s, _ := ctx.Flags.GetString("category"); s != "" {
+		category, err := c.DB.CategoryID(s)
+		if err != nil {
+			return ctx.SendEphemeral("Couldn't find a category with the name ``" + bcr.EscapeBackticks(s) + "``.")
+		}
+		catID = &category
+	}
+
+	var roleID *discord.RoleID
+	var mentionable bool
+	rs, _ := ctx.Flags.GetString("role")
+	r, err := ctx.ParseRole(rs)
+	if err == nil {
+		if !r.Mentionable && !perms.Has(discord.PermissionMentionEveryone) {
+			return ctx.SendEphemeral("You can't mention the role @" + r.Name + " in " + ch.Mention() + ".")
+		}
+		roleID = &r.ID
+		mentionable = r.Mentionable
+	}
+
+	var count int
+	err = c.DB.QueryRow(context.Background(), "select count(*) from autopost where guild_id = $1", ctx.Guild.ID.String()).Scan(&count)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+
+	if count >= 10 {
+		var exists bool
+		err = c.DB.QueryRow(context.Background(), "select exists(select * from autopost where channel_id = $1)", ch.ID).Scan(&exists)
+		if err != nil {
+			return c.DB.InternalError(ctx, err)
+		}
+		if !exists {
+			return ctx.SendX("Only 10 channels can be autoposted to at the same time. Remove one to add a new channel.")
+		}
+	}
+
+	err = c.setAutopost(ctx.GetGuild().ID, ch.ID, catID, roleID, dur)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
+
+	if dur == 0 {
+		return ctx.SendfX("Disabled autoposting in %v!", ch.Mention())
+	}
+
+	s := fmt.Sprintf("✅ Autopost interval set! A random term")
+	if s, _ := ctx.Flags.GetString("category"); s != "" {
+		s += fmt.Sprintf(" from the %v category", s)
+	}
+	s += fmt.Sprintf(" will be posted to %v every %v.", ch.Mention(), bcr.HumanizeDuration(bcr.DurationPrecisionMinutes, dur))
+
+	if roleID != nil && !mentionable {
+		s += fmt.Sprintf("\n📝 %v will mention %v for every posted term. Make sure that the bot has the `Mention @everyone, @here, and all roles` permission in %v.", c.Router.Bot.Username, roleID.Mention(), ch.Mention())
+	}
+
+	return ctx.SendX(s)
+}
+
 func (c *commands) autopost(ctx bcr.Contexter) (err error) {
 	ch, err := ctx.GetChannelFlag("channel")
-	if v, ok := ctx.(*bcr.Context); ok {
-		ch, err = v.ParseChannel(v.Args[0])
-	}
 	if err != nil || ch.GuildID != ctx.GetChannel().GuildID || (ch.Type != discord.GuildText && ch.Type != discord.GuildNews) {
 		return ctx.SendEphemeral(":x: Couldn't find that channel, or it's not in this server.")
 	}
 
-	dur, err := durationparser.Parse(ctx.GetStringFlag("interval"))
-	if v, ok := ctx.(*bcr.Context); ok {
-		dur, err = durationparser.Parse(v.Args[1])
+	perms := discord.CalcOverwrites(*ctx.GetGuild(), *ch, *ctx.GetMember())
+	if !perms.Has(discord.PermissionViewChannel | discord.PermissionSendMessages | discord.PermissionManageRoles) {
+		return ctx.SendEphemeral(":x: Couldn't find that channel, or it's not in this server.")
 	}
 
+	dur, err := durationparser.Parse(ctx.GetStringFlag("interval"))
 	if err != nil || (dur < 2*time.Hour && dur != 0) || dur > 7*24*time.Hour {
 		s := ctx.GetStringFlag("interval")
-		if v, ok := ctx.(*bcr.Context); ok {
-			s = v.Args[1]
-		}
 		if s == "clear" || s == "0" || s == "disable" || s == "off" || s == "reset" {
 			dur = 0
 		} else {
@@ -52,11 +128,6 @@ func (c *commands) autopost(ctx bcr.Contexter) (err error) {
 			return ctx.SendEphemeral("Couldn't find a category with the name ``" + bcr.EscapeBackticks(s) + "``.")
 		}
 		catID = &category
-	}
-
-	perms := discord.CalcOverwrites(*ctx.GetGuild(), *ch, *ctx.GetMember())
-	if !perms.Has(discord.PermissionViewChannel | discord.PermissionSendMessages | discord.PermissionManageRoles) {
-		return ctx.SendEphemeral("You don't have permissions to set autoposts in " + ch.Mention() + ".")
 	}
 
 	var roleID *discord.RoleID

@@ -179,6 +179,13 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		GuildOnly:        true,
 		GuildPermissions: discord.PermissionManageGuild,
 
+		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
+			fs.StringP("category", "c", "", "The category to post terms from")
+			fs.StringP("role", "r", "", "The role to mention when posting a term")
+			return fs
+		},
+
+		Command:      c.autopostText,
 		SlashCommand: c.autopost,
 		Options: &[]discord.CommandOption{
 			{
