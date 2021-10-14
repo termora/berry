@@ -20,6 +20,13 @@ type BotConfig struct {
 
 		TypesenseURL string `json:"typesense_url" toml:"typesense_url"`
 		TypesenseKey string `json:"typesense_key" toml:"typesense_key"`
+
+		InfluxDB struct {
+			URL    string `toml:"url"`
+			Token  string `toml:"token"`
+			Org    string `toml:"org"`
+			Bucket string `toml:"bucket"`
+		} `toml:"influxdb"`
 	}
 	Bot struct {
 		LicenseLink string `json:"license_link" toml:"license_link"`

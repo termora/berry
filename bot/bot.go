@@ -9,7 +9,9 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway/shard"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/handler"
+	"github.com/diamondburned/arikawa/v3/utils/httputil/httpdriver"
 	"github.com/getsentry/sentry-go"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/starshine-sys/bcr"
 	bcrbot "github.com/starshine-sys/bcr/bot"
 	"github.com/termora/berry/db"
@@ -30,6 +32,8 @@ type Bot struct {
 
 	Guilds   map[discord.GuildID]discord.Guild
 	GuildsMu sync.Mutex
+
+	Stats *StatsClient
 }
 
 // Module is a single module/category of commands
@@ -69,6 +73,9 @@ func New(
 		state.PreHandler.AddHandler(b.GuildDelete)
 	})
 
+	// setup stats if metrics are enabled
+	b.setupStats()
+
 	return b
 }
 
@@ -92,4 +99,34 @@ func (bot *Bot) Report(ctx *bcr.Context, err error) *sentry.EventID {
 		return bot.DB.CaptureError(ctx, err)
 	}
 	return nil
+}
+
+func (bot *Bot) guildCount() int {
+	bot.GuildsMu.Lock()
+	count := len(bot.Guilds)
+	bot.GuildsMu.Unlock()
+	return count
+}
+
+func (bot *Bot) setupStats() {
+	if bot.Config.Auth.InfluxDB.URL != "" {
+		bot.Sugar.Infof("Setting up InfluxDB client")
+
+		bot.Stats = &StatsClient{
+			Client:     influxdb2.NewClient(bot.Config.Auth.InfluxDB.URL, bot.Config.Auth.InfluxDB.Token).WriteAPI(bot.Config.Auth.InfluxDB.Org, bot.Config.Auth.InfluxDB.Bucket),
+			guildCount: bot.guildCount,
+			log:        bot.Sugar,
+		}
+
+		bot.Router.ShardManager.ForEach(func(s shard.Shard) {
+			state := s.(*state.State)
+
+			state.Client.Client.OnResponse = append(state.Client.Client.OnResponse, func(httpdriver.Request, httpdriver.Response) error {
+				go bot.Stats.IncAPICall()
+				return nil
+			})
+		})
+
+		go bot.Stats.submit()
+	}
 }
