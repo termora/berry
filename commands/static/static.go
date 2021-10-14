@@ -127,16 +127,6 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 	})
 
 	help.AddSubcommand(&bcr.Command{
-		Name: "autopost",
-
-		Summary:  "Show how to set up automatically posting terms in a channel",
-		Cooldown: 1 * time.Second,
-
-		Blacklistable: true,
-		SlashCommand:  c.autopost,
-	})
-
-	help.AddSubcommand(&bcr.Command{
 		Name:    "commands",
 		Aliases: []string{"cmds"},
 
