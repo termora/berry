@@ -162,6 +162,7 @@ func main() {
 	state, _ := bot.Router.StateFromGuildID(0)
 	botUser, _ := state.Me()
 	bot.Router.Bot = botUser
+	bot.Router.Prefixes = append(bot.Router.Prefixes, fmt.Sprintf("<@%v>", bot.Router.Bot.ID), fmt.Sprintf("<@!%v>", bot.Router.Bot.ID))
 
 	// open a connection to Discord
 	if err = bot.Start(context.Background()); err != nil {

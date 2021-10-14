@@ -56,17 +56,6 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 		}
 	}()
 
-	// if the bot user isn't set yet, do that here
-	// we can't do it when initialising the router because the connection to Discord will error
-	if bot.Router.Bot == nil {
-		err = bot.Router.SetBotUser(m.GuildID)
-		if err != nil {
-			bot.Sugar.Error("Error setting bot user:", err)
-			return
-		}
-		bot.Router.Prefixes = append(bot.Router.Prefixes, fmt.Sprintf("<@%v>", bot.Router.Bot.ID), fmt.Sprintf("<@!%v>", bot.Router.Bot.ID))
-	}
-
 	// if message was sent by a bot return, unless it's in the list of allowed bots
 	if m.Author.Bot && !inSlice(bot.Config.Bot.AllowedBots, m.Author.ID) {
 		return
