@@ -83,7 +83,7 @@ func (c *Admin) updateTags(ctx *bcr.Context) (err error) {
 		con, cancel := c.DB.Context()
 		defer cancel()
 
-		_, err = c.DB.Pool.Exec(con, "update terms set tags = $1 where id = $2", t.Tags, t.ID)
+		_, err = c.DB.Exec(con, "update terms set tags = $1 where id = $2", t.Tags, t.ID)
 		if err != nil {
 			return c.DB.InternalError(ctx, err)
 		}
@@ -96,7 +96,7 @@ func (c *Admin) updateTags(ctx *bcr.Context) (err error) {
 		con, cancel := c.DB.Context()
 		defer cancel()
 
-		ct, err := c.DB.Pool.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
+		ct, err := c.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(t), t)
 		if err != nil {
 			c.Sugar.Errorf("Error adding tag: %v", err)

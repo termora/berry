@@ -44,7 +44,7 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 	defer cancel()
 
 	found := false
-	err = c.DB.Pool.QueryRow(con, "select exists(select * from pronoun_msgs where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 and reflexive = $5)", p[0], p[1], p[2], p[3], p[4]).Scan(&found)
+	err = c.DB.QueryRow(con, "select exists(select * from pronoun_msgs where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 and reflexive = $5)", p[0], p[1], p[2], p[3], p[4]).Scan(&found)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
@@ -76,7 +76,7 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 	con, cancel = c.DB.Context()
 	defer cancel()
 
-	_, err = c.DB.Pool.Exec(con, "insert into pronoun_msgs (message_id, subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5, $6)", msg.ID, p[0], p[1], p[2], p[3], p[4])
+	_, err = c.DB.Exec(con, "insert into pronoun_msgs (message_id, subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5, $6)", msg.ID, p[0], p[1], p[2], p[3], p[4])
 	if err == nil {
 		// if the error's non-nil, the message was still sent
 		// so don't just return immediately

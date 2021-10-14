@@ -26,7 +26,7 @@ func (bot *Bot) PrefixesFor(id discord.GuildID) (s []string) {
 	ctx, cancel := bot.DB.Context()
 	defer cancel()
 
-	err := bot.DB.Pool.QueryRow(ctx, "select prefixes from public.servers where id = $1", id.String()).Scan(&s)
+	err := bot.DB.QueryRow(ctx, "select prefixes from public.servers where id = $1", id.String()).Scan(&s)
 	if err != nil {
 		bot.Sugar.Errorf("Error getting prefixes for %v: %v", id, err)
 		// return the default prefixes

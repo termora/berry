@@ -127,7 +127,7 @@ func (c *Commands) about(ctx bcr.Contexter) (err error) {
 	con, cancel = c.DB.Context()
 	defer cancel()
 
-	err = c.DB.Pool.QueryRow(con, "select count(id) from pronouns").Scan(&pronouns)
+	err = c.DB.QueryRow(con, "select count(id) from pronouns").Scan(&pronouns)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}

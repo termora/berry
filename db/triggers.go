@@ -24,7 +24,7 @@ func (db *Db) AddExplanation(e *Explanation) (ex *Explanation, err error) {
 
 	Debug("Adding explanation %v with description %v", e.Name, e.Description)
 
-	err = db.Pool.QueryRow(ctx, "insert into public.explanations (name, aliases, description) values ($1, $2, $3) returning id, created", e.Name, e.Aliases, e.Description).Scan(&e.ID, &e.Created)
+	err = db.QueryRow(ctx, "insert into public.explanations (name, aliases, description) values ($1, $2, $3) returning id, created", e.Name, e.Aliases, e.Description).Scan(&e.ID, &e.Created)
 	return e, err
 }
 
@@ -70,7 +70,7 @@ func (db *Db) SetAsCommand(id int, b bool) (err error) {
 
 	Debug("Setting %v as command: %v", id, b)
 
-	commandTag, err := db.Pool.Exec(ctx, "update public.explanations set as_command = $1 where id = $2", b, id)
+	commandTag, err := db.Exec(ctx, "update public.explanations set as_command = $1 where id = $2", b, id)
 	if err != nil {
 		return
 	}

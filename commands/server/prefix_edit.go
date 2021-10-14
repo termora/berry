@@ -34,7 +34,7 @@ func (c *commands) addPrefix(ctx *bcr.Context) (err error) {
 	con, cancel := c.DB.Context()
 	defer cancel()
 
-	err = c.DB.Pool.QueryRow(con, "update public.servers set prefixes = $1 where id = $2 returning prefixes", prefixes, ctx.Message.GuildID.String()).Scan(&prefixes)
+	err = c.DB.QueryRow(con, "update public.servers set prefixes = $1 where id = $2 returning prefixes", prefixes, ctx.Message.GuildID.String()).Scan(&prefixes)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
@@ -85,7 +85,7 @@ func (c *commands) removePrefix(ctx *bcr.Context) (err error) {
 	con, cancel := c.DB.Context()
 	defer cancel()
 
-	err = c.DB.Pool.QueryRow(con, "update public.servers set prefixes = $1 where id = $2 returning prefixes", prefixes, ctx.Message.GuildID.String()).Scan(&prefixes)
+	err = c.DB.QueryRow(con, "update public.servers set prefixes = $1 where id = $2 returning prefixes", prefixes, ctx.Message.GuildID.String()).Scan(&prefixes)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}

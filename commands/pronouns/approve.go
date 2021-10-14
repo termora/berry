@@ -31,7 +31,7 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	con, cancel := bot.DB.Context()
 	defer cancel()
 
-	err := bot.DB.Pool.QueryRow(con, "select exists (select * from pronoun_msgs where message_id = $1)", m.MessageID).Scan(&exists)
+	err := bot.DB.QueryRow(con, "select exists (select * from pronoun_msgs where message_id = $1)", m.MessageID).Scan(&exists)
 	if err != nil {
 		bot.Sugar.Errorf("Error getting pronoun message: %v", err)
 		return
@@ -70,7 +70,7 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	con, cancel = bot.DB.Context()
 	defer cancel()
 
-	err = bot.DB.Pool.QueryRow(con, "select subjective, objective, poss_det, poss_pro, reflexive from pronoun_msgs where message_id = $1", m.MessageID).Scan(&p.Subjective, &p.Objective, &p.PossDet, &p.PossPro, &p.Reflexive)
+	err = bot.DB.QueryRow(con, "select subjective, objective, poss_det, poss_pro, reflexive from pronoun_msgs where message_id = $1", m.MessageID).Scan(&p.Subjective, &p.Objective, &p.PossDet, &p.PossPro, &p.Reflexive)
 	if err != nil {
 		bot.Sugar.Errorf("Error getting pronoun set: %v", err)
 		return
@@ -93,7 +93,7 @@ func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	con, cancel = bot.DB.Context()
 	defer cancel()
 
-	_, err = bot.DB.Pool.Exec(con, "delete from pronoun_msgs where message_id = $1", m.MessageID)
+	_, err = bot.DB.Exec(con, "delete from pronoun_msgs where message_id = $1", m.MessageID)
 	if err != nil {
 		bot.Sugar.Errorf("Error deleting message from database: %v", err)
 		return

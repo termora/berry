@@ -272,7 +272,7 @@ func (c *Admin) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 		con, cancel := c.DB.Context()
 		defer cancel()
 
-		_, err = c.DB.Pool.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
+		_, err = c.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(tags[i]), tags[i])
 		if err != nil {
 			c.Sugar.Errorf("Error adding tag: %v", err)

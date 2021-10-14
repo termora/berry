@@ -23,7 +23,7 @@ func (c *commands) explanation(ctx bcr.Contexter) (err error) {
 	}
 
 	var text string
-	err = c.DB.Pool.QueryRow(context.Background(), "select description from explanations where $1 ilike any(aliases) or $1 ilike name", name).Scan(&text)
+	err = c.DB.QueryRow(context.Background(), "select description from explanations where $1 ilike any(aliases) or $1 ilike name", name).Scan(&text)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
 			return c.listAllExplanations(ctx)

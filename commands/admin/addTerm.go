@@ -100,7 +100,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 		con, cancel := c.DB.Context()
 		defer cancel()
 
-		_, err = c.DB.Pool.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
+		_, err = c.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(strings.TrimSpace(tag)), tag)
 		if err != nil {
 			c.Sugar.Errorf("Error adding tag: %v", err)

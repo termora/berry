@@ -73,4 +73,6 @@ func (bot *Bot) InteractionCreate(ic *gateway.InteractionCreateEvent) {
 	if err != nil {
 		bot.Sugar.Errorf("Couldn't execute slash command: %v", err)
 	}
+
+	bot.Stats.IncCommand()
 }

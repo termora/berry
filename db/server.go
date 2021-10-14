@@ -5,7 +5,7 @@ func (db *Db) CreateServerIfNotExists(guildID string) (exists bool, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
-	err = db.Pool.QueryRow(ctx, "select exists (select from public.servers where id = $1)", guildID).Scan(&exists)
+	err = db.QueryRow(ctx, "select exists (select from public.servers where id = $1)", guildID).Scan(&exists)
 	if err != nil {
 		return exists, err
 	}
@@ -15,7 +15,7 @@ func (db *Db) CreateServerIfNotExists(guildID string) (exists bool, err error) {
 
 		Debug("Creating server %v", guildID)
 
-		commandTag, err := db.Pool.Exec(ctx, "insert into public.servers (id, prefixes) values ($1, $2)", guildID, db.Config.Bot.Prefixes)
+		commandTag, err := db.Exec(ctx, "insert into public.servers (id, prefixes) values ($1, $2)", guildID, db.Config.Bot.Prefixes)
 		if err != nil {
 			return exists, err
 		}
@@ -34,7 +34,7 @@ func (db *Db) DeleteServer(guildID string) (err error) {
 
 	Debug("Deleting server %v", guildID)
 
-	commandTag, err := db.Pool.Exec(ctx, "delete from public.servers where id = $1", guildID)
+	commandTag, err := db.Exec(ctx, "delete from public.servers where id = $1", guildID)
 	if err != nil {
 		return err
 	}

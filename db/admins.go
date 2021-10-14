@@ -7,7 +7,7 @@ func (db *Db) AddAdmin(id string) (err error) {
 
 	Debug("Adding admin %v", id)
 
-	commandTag, err := db.Pool.Exec(ctx, "insert into public.admins (user_id) values ($1)", id)
+	commandTag, err := db.Exec(ctx, "insert into public.admins (user_id) values ($1)", id)
 	if err != nil {
 		return err
 	}
@@ -27,7 +27,7 @@ func (db *Db) GetAdmins() (admins []string, err error) {
 
 	Debug("Fetching admins")
 
-	err = db.Pool.QueryRow(ctx, "select array(select user_id from public.admins)").Scan(&admins)
+	err = db.QueryRow(ctx, "select array(select user_id from public.admins)").Scan(&admins)
 
 	Debug("Fetched admins")
 	return

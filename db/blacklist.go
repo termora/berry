@@ -20,7 +20,7 @@ func (db *Db) IsBlacklisted(guildID, channelID string) (b bool) {
 
 	Debug("Checking if channel %v is blacklisted", channelID)
 
-	db.Pool.QueryRow(ctx, "select $1 = any(server.blacklist) from (select * from public.servers where id = $2) as server", channelID, guildID).Scan(&b)
+	db.QueryRow(ctx, "select $1 = any(server.blacklist) from (select * from public.servers where id = $2) as server", channelID, guildID).Scan(&b)
 	return b
 }
 
@@ -35,7 +35,7 @@ func (db *Db) AddToBlacklist(guildID string, channelIDs []string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
-	commandTag, err := db.Pool.Exec(ctx, "update public.servers set blacklist = array_cat(blacklist, $1) where id = $2", channelIDs, guildID)
+	commandTag, err := db.Exec(ctx, "update public.servers set blacklist = array_cat(blacklist, $1) where id = $2", channelIDs, guildID)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (db *Db) RemoveFromBlacklist(guildID, channelID string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
-	commandTag, err := db.Pool.Exec(ctx, "update public.servers set blacklist = array_remove(blacklist, $1) where id = $2", channelID, guildID)
+	commandTag, err := db.Exec(ctx, "update public.servers set blacklist = array_remove(blacklist, $1) where id = $2", channelID, guildID)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (db *Db) GetBlacklist(guildID string) (b []string, err error) {
 
 	Debug("Getting blacklist for %v", guildID)
 
-	err = db.Pool.QueryRow(ctx, "select blacklist from public.servers where id = $1", guildID).Scan(&b)
+	err = db.QueryRow(ctx, "select blacklist from public.servers where id = $1", guildID).Scan(&b)
 	return b, err
 }
 

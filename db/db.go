@@ -9,6 +9,7 @@ import (
 
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/getsentry/sentry-go"
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/log/zapadapter"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -45,6 +46,8 @@ type Db struct {
 	useSentry bool
 
 	TermBaseURL string
+
+	IncFunc func()
 }
 
 // Init ...
@@ -80,6 +83,7 @@ func Init(url string, sugar *zap.SugaredLogger) (db *Db, err error) {
 		GuildCache: guildCache,
 		Timeout:    10 * time.Second,
 		Searcher:   pg.New(pool, Debug),
+		IncFunc:    func() {},
 	}
 
 	return
@@ -126,4 +130,22 @@ func (db *Db) Time(s snowflake.ID) time.Time {
 // Context is a convenience method to get a context.Context with the database's timeout
 func (db *Db) Context() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), db.Timeout)
+}
+
+// QueryRow ...
+func (db *Db) QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row {
+	go db.IncFunc()
+	return db.Pool.QueryRow(ctx, sql, args...)
+}
+
+// Query ...
+func (db *Db) Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error) {
+	go db.IncFunc()
+	return db.Pool.Query(ctx, sql, args...)
+}
+
+// Exec ...
+func (db *Db) Exec(ctx context.Context, sql string, args ...interface{}) (pgconn.CommandTag, error) {
+	go db.IncFunc()
+	return db.Pool.Exec(ctx, sql, args...)
 }

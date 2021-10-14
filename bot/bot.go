@@ -127,6 +127,8 @@ func (bot *Bot) setupStats() {
 			})
 		})
 
+		bot.DB.IncFunc = bot.Stats.IncQuery
+
 		go bot.Stats.submit()
 	}
 }

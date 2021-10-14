@@ -18,6 +18,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/influxdata/influxdb-client-go/v2 v2.5.1
+	github.com/jackc/pgconn v1.8.1
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/joho/godotenv v1.3.0

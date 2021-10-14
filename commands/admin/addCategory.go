@@ -17,7 +17,7 @@ func (c *Admin) addCategory(ctx *bcr.Context) (err error) {
 	con, cancel := c.DB.Context()
 	defer cancel()
 
-	err = c.DB.Pool.QueryRow(con, "select exists (select from categories where lower(name) = lower($1))", ctx.RawArgs).Scan(&e)
+	err = c.DB.QueryRow(con, "select exists (select from categories where lower(name) = lower($1))", ctx.RawArgs).Scan(&e)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}
@@ -34,7 +34,7 @@ func (c *Admin) addCategory(ctx *bcr.Context) (err error) {
 	con, cancel = c.DB.Context()
 	defer cancel()
 
-	err = c.DB.Pool.QueryRow(con, "insert into public.categories (name) values ($1) returning id", ctx.RawArgs).Scan(&id)
+	err = c.DB.QueryRow(con, "insert into public.categories (name) values ($1) returning id", ctx.RawArgs).Scan(&id)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
 	}

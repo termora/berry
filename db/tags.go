@@ -11,7 +11,7 @@ func (db *Db) Tags() (s []string, err error) {
 
 	Debug("Getting all tags")
 
-	err = db.Pool.QueryRow(ctx, "select array(select display from tags order by tags)").Scan(&s)
+	err = db.QueryRow(ctx, "select array(select display from tags order by tags)").Scan(&s)
 	return
 }
 

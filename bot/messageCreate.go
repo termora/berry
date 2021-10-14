@@ -83,6 +83,8 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 			}
 			bot.Sugar.Error(err)
 		}
+
+		bot.Stats.IncCommand()
 	}
 }
 

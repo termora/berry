@@ -25,7 +25,7 @@ func (db *Db) TermCount() (count int) {
 
 	Debug("Getting term count")
 
-	db.Pool.QueryRow(ctx, "select count(id) from public.terms").Scan(&count)
+	db.QueryRow(ctx, "select count(id) from public.terms").Scan(&count)
 	return count
 }
 
@@ -90,7 +90,7 @@ func (db *Db) AddTerm(t *Term) (*Term, error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
-	err := db.Pool.QueryRow(ctx, "insert into public.terms (name, category, aliases, description, source, aliases_string, tags) values ($1, $2, $3, $4, $5, $6, $7) returning id, created", t.Name, t.Category, t.Aliases, t.Description, t.Source, strings.Join(t.Aliases, ", "), t.Tags).Scan(&t.ID, &t.Created)
+	err := db.QueryRow(ctx, "insert into public.terms (name, category, aliases, description, source, aliases_string, tags) values ($1, $2, $3, $4, $5, $6, $7) returning id, created", t.Name, t.Category, t.Aliases, t.Description, t.Source, strings.Join(t.Aliases, ", "), t.Tags).Scan(&t.ID, &t.Created)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (db *Db) RemoveTerm(id int) (err error) {
 
 	Debug("Deleting term %v", id)
 
-	ct, err := db.Pool.Exec(ctx, "delete from public.terms where id = $1", id)
+	ct, err := db.Exec(ctx, "delete from public.terms where id = $1", id)
 	if err != nil {
 		return
 	}
@@ -202,7 +202,7 @@ func (db *Db) SetFlags(id int, flags search.TermFlag) (err error) {
 
 	Debug("Setting flags for %v to %v", id, flags)
 
-	commandTag, err := db.Pool.Exec(ctx, "update public.terms set flags = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", flags, id)
+	commandTag, err := db.Exec(ctx, "update public.terms set flags = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", flags, id)
 	if err != nil {
 		return
 	}
@@ -220,7 +220,7 @@ func (db *Db) SetCW(id int, text string) (err error) {
 
 	Debug("Setting cw for %v to `%v`", id, text)
 
-	commandTag, err := db.Pool.Exec(ctx, "update public.terms set content_warnings = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", text, id)
+	commandTag, err := db.Exec(ctx, "update public.terms set content_warnings = $1, last_modified = (current_timestamp at time zone 'utc') where id = $2", text, id)
 	if err != nil {
 		return
 	}

@@ -232,7 +232,7 @@ func (bot *AuditLog) SendLog(subjectID int, subjectType EntrySubject, actionType
 		return entry.ID, errors.Wrap(err, string(ErrAuditLogSendFailed))
 	}
 
-	_, err = bot.DB.Pool.Exec(context.Background(), "update audit_log set public_message_id = $1, private_message_id = $2 where id = $3", publicID, privateID, entry.ID)
+	_, err = bot.DB.Exec(context.Background(), "update audit_log set public_message_id = $1, private_message_id = $2 where id = $3", publicID, privateID, entry.ID)
 	return entry.ID, err
 }
 

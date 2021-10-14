@@ -17,7 +17,7 @@ func (db *Db) CategoryID(s string) (id int, err error) {
 
 	Debug("Getting category with name %v", s)
 
-	err = db.Pool.QueryRow(ctx, "select id from public.categories where lower(name) = lower($1)", s).Scan(&id)
+	err = db.QueryRow(ctx, "select id from public.categories where lower(name) = lower($1)", s).Scan(&id)
 	return
 }
 
