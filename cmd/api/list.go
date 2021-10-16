@@ -25,6 +25,7 @@ func (a *api) list(c echo.Context) (err error) {
 			return c.NoContent(http.StatusNoContent)
 		}
 		// otherwise, internal server error
+		a.sugar.Errorf("Error getting terms: %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
@@ -49,6 +50,7 @@ func (a *api) listCategory(c echo.Context) (err error) {
 		if errors.Cause(err) == pgx.ErrNoRows {
 			return c.NoContent(http.StatusNoContent)
 		}
+		a.sugar.Errorf("Error getting terms: %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
@@ -67,6 +69,7 @@ func (a *api) categories(c echo.Context) (err error) {
 		if errors.Cause(err) == pgx.ErrNoRows {
 			return c.NoContent(http.StatusNoContent)
 		}
+		a.sugar.Errorf("Error getting categories: %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	if len(categories) == 0 {
@@ -85,7 +88,48 @@ func (a *api) explanations(c echo.Context) (err error) {
 		if errors.Cause(err) == pgx.ErrNoRows {
 			return c.NoContent(http.StatusNoContent)
 		}
+		a.sugar.Errorf("Error getting explanations: %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	return c.JSON(http.StatusOK, explanations)
+}
+
+func (a *api) pronouns(c echo.Context) (err error) {
+	pronouns, err := a.db.Pronouns()
+	if err != nil {
+		// if no rows were returned, return no content
+		if errors.Cause(err) == pgx.ErrNoRows {
+			return c.NoContent(http.StatusNoContent)
+		}
+		// otherwise, internal server error
+		a.sugar.Errorf("Error getting pronouns: %v", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	// if no rows were returned, return no content
+	if len(pronouns) == 0 {
+		return c.NoContent(http.StatusNoContent)
+	}
+
+	return c.JSON(http.StatusOK, pronouns)
+}
+
+func (a *api) tags(c echo.Context) (err error) {
+	tags, err := a.db.Tags()
+	if err != nil {
+		// if no rows were returned, return no content
+		if errors.Cause(err) == pgx.ErrNoRows {
+			return c.NoContent(http.StatusNoContent)
+		}
+		// otherwise, internal server error
+		a.sugar.Errorf("Error getting tags: %v", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	// if no rows were returned, return no content
+	if len(tags) == 0 {
+		return c.NoContent(http.StatusNoContent)
+	}
+
+	return c.JSON(http.StatusOK, tags)
 }

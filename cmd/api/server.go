@@ -64,6 +64,8 @@ func main() {
 	e.GET("/v1/list/:id", r.listCategory)
 	e.GET("/v1/categories", r.categories)
 	e.GET("/v1/explanations", r.explanations)
+	e.GET("/v1/tags", r.tags)
+	e.GET("/v1/pronouns", r.pronouns)
 
 	e.GET("/robots.txt", func(c echo.Context) error {
 		return c.String(http.StatusOK, `User-agent: *
