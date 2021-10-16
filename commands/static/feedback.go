@@ -27,7 +27,7 @@ func (c *Commands) feedback(ctx *bcr.Context) (err error) {
 	}
 
 	if ctx.Message.GuildID.IsValid() {
-		ctx.State.DeleteMessage(ctx.Message.ChannelID, ctx.Message.ID)
+		ctx.State.DeleteMessage(ctx.Message.ChannelID, ctx.Message.ID, "")
 	}
 
 	msg, err := ctx.Send("React with ✅ to send, or with ❌ to cancel.", discord.Embed{
@@ -72,7 +72,7 @@ func (c *Commands) feedback(ctx *bcr.Context) (err error) {
 	}
 
 	if ctx.Message.GuildID.IsValid() {
-		ctx.State.DeleteMessage(msg.ChannelID, msg.ID)
+		ctx.State.DeleteMessage(msg.ChannelID, msg.ID, "")
 		_, err = ctx.NewDM(ctx.Author.ID).Content("Thanks for submitting feedback!").Send()
 	} else {
 		_, err = ctx.Send("Thanks for submitting feedback!")

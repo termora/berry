@@ -224,7 +224,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	}
 
 	// delete the original message, then send the definition
-	ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID)
+	ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID, "")
 	_, err = ctx.Send("", c.DB.TermEmbed(termSlices[page][n-1]))
 	return
 }
@@ -306,29 +306,29 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 		embeds = append(embeds, searchResultEmbed(query, i+1, len(termSlices), len(terms), t))
 	}
 
-	components := []discord.Component{discord.ActionRowComponent{
+	components := []discord.Component{&discord.ActionRowComponent{
 		Components: []discord.Component{
-			discord.ButtonComponent{
+			&discord.ButtonComponent{
 				Label:    "1",
 				CustomID: "1",
 				Style:    discord.SecondaryButton,
 			},
-			discord.ButtonComponent{
+			&discord.ButtonComponent{
 				Label:    "2",
 				CustomID: "2",
 				Style:    discord.SecondaryButton,
 			},
-			discord.ButtonComponent{
+			&discord.ButtonComponent{
 				Label:    "3",
 				CustomID: "3",
 				Style:    discord.SecondaryButton,
 			},
-			discord.ButtonComponent{
+			&discord.ButtonComponent{
 				Label:    "4",
 				CustomID: "4",
 				Style:    discord.SecondaryButton,
 			},
-			discord.ButtonComponent{
+			&discord.ButtonComponent{
 				Label:    "5",
 				CustomID: "5",
 				Style:    discord.SecondaryButton,
@@ -372,6 +372,8 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 			return false
 		}
 
+		data, ok := ev.Data.(*discord.ComponentInteractionData)
+
 		if ev.Message == nil {
 			return false
 		}
@@ -380,7 +382,7 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 			return false
 		}
 
-		switch ev.Data.CustomID {
+		switch data.CustomID {
 		case "prev", "next", "first", "last", "cross":
 			return false
 		}
@@ -395,7 +397,7 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 			}
 		}
 
-		n, err = strconv.Atoi(ev.Data.CustomID)
+		n, err = strconv.Atoi(data.CustomID)
 		if err != nil {
 			return ignoreFn(ev)
 		}

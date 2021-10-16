@@ -3,6 +3,7 @@ package pg
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/georgysavva/scany/pgxscan"
@@ -52,6 +53,16 @@ func (db *pg) Search(input string, limit int, ignore []string) (terms []*search.
 	and not $4 && tags
 	order by rank desc
 	limit $2`, input, limit, search.FlagSearchHidden, ignore)
+	return terms, err
+}
+
+func (db *pg) Autocomplete(input string) (terms []string, err error) {
+	ctx, cancel := getContext()
+	defer cancel()
+
+	input = strings.ToLower(input)
+
+	err = db.QueryRow(ctx, "select array(select name from terms where position($1 in lower(name)) > 0 order by name limit 25)", input).Scan(&terms)
 	return terms, err
 }
 

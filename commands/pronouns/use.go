@@ -125,7 +125,7 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 		})
 	}
 
-	comp := []discord.Component{discord.ActionRowComponent{Components: []discord.Component{discord.SelectComponent{
+	comp := []discord.Component{&discord.ActionRowComponent{Components: []discord.Component{&discord.SelectComponent{
 		CustomID:    "pronouns",
 		Options:     options,
 		Placeholder: "Select a pronoun set...",
@@ -166,7 +166,12 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 			return false
 		}
 
-		if ev.Data.ComponentType != discord.SelectComponentType || ev.Message.ID != msg.ID {
+		data, ok := ev.Data.(*discord.ComponentInteractionData)
+		if !ok {
+			return false
+		}
+
+		if data.ComponentType != discord.SelectComponentType || ev.Message.ID != msg.ID {
 			return false
 		}
 
@@ -179,7 +184,7 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 			return ignoreFn(ev)
 		}
 
-		ind, err = strconv.Atoi(ev.Data.Values[0])
+		ind, err = strconv.Atoi(data.Values[0])
 		if err != nil {
 			return ignoreFn(ev)
 		}
@@ -187,7 +192,7 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 		return true
 	})
 
-	comp = []discord.Component{discord.ActionRowComponent{Components: []discord.Component{discord.SelectComponent{
+	comp = []discord.Component{&discord.ActionRowComponent{Components: []discord.Component{&discord.SelectComponent{
 		CustomID:    "pronouns",
 		Options:     options,
 		Placeholder: "Select a pronoun set...",
@@ -247,7 +252,7 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 		}
 	}
 
-	err = ctx.Session().DeleteMessage(msg.ChannelID, msg.ID)
+	err = ctx.Session().DeleteMessage(msg.ChannelID, msg.ID, "")
 	if err != nil {
 		c.Sugar.Errorf("Error deleting message: %v", err)
 	}

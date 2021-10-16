@@ -55,7 +55,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	ctx.State.DeleteMessage(m.ChannelID, m.ID)
+	ctx.State.DeleteMessage(m.ChannelID, m.ID, "")
 
 	m, timeout = ctx.WaitForMessage(ctx.Channel.ID, ctx.Author.ID, 15*time.Minute, nil)
 	if timeout {
@@ -73,7 +73,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	ctx.State.DeleteMessage(m.ChannelID, m.ID)
+	ctx.State.DeleteMessage(m.ChannelID, m.ID, "")
 
 	m, timeout = ctx.WaitForMessage(ctx.Channel.ID, ctx.Author.ID, 15*time.Minute, nil)
 	if timeout {
@@ -111,7 +111,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	ctx.State.DeleteMessage(m.ChannelID, m.ID)
+	ctx.State.DeleteMessage(m.ChannelID, m.ID, "")
 
 	yes, timeout := ctx.YesNoHandler(*info, ctx.Author.ID)
 	if timeout {

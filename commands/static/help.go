@@ -120,7 +120,7 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 		e.Fields = append(e.Fields, c.Config.Bot.HelpFields...)
 	}
 
-	components := []discord.Component{discord.ActionRowComponent{Components: []discord.Component{discord.SelectComponent{
+	components := []discord.Component{&discord.ActionRowComponent{Components: []discord.Component{&discord.SelectComponent{
 		CustomID:    "help_options",
 		Placeholder: "More info about...",
 		Options: []discord.SelectComponentOption{
@@ -152,12 +152,17 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 			return
 		}
 
-		if ev.Data.ComponentType != discord.SelectComponentType || ev.Message.ID != msg.ID {
+		data, ok := ev.Data.(*discord.ComponentInteractionData)
+		if !ok {
+			return
+		}
+
+		if data.ComponentType != discord.SelectComponentType || ev.Message.ID != msg.ID {
 			return
 		}
 
 		s := ""
-		switch ev.Data.Values[0] {
+		switch data.Values[0] {
 		case "permissions":
 			s = c.permText(ctx)
 		case "privacy":

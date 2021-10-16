@@ -8,6 +8,9 @@ type Searcher interface {
 	Search(input string, limit int, ignore []string) (terms []*Term, err error)
 	SearchCat(input string, cat, limit int, ignore []string) (terms []*Term, err error)
 
+	// Return terms starting with the input
+	Autocomplete(input string) (terms []string, err error)
+
 	// Synchronize all terms with the search store
 	SyncTerms(terms []*Term) (err error)
 	// Synchronize a single term after updates
