@@ -60,6 +60,17 @@ A `?` after the column type indicates an optional (nullable) parameter.
 | description | string   |                                |
 | created     | datetime |                                |
 
+### Pronoun object
+
+| Key                   | Type   | Notes                          |
+| --------------------- | ------ | ------------------------------ |
+| id                    | number | The pronoun set's internal ID. |
+| subjective            | string |                                |
+| objective             | string |                                |
+| possessive_pronoun    | string |                                |
+| possessive_determiner | string |                                |
+| reflexive             | string |                                |
+
 ## Endpoints
 
 ### `GET /term/:id`
@@ -324,6 +335,56 @@ GET https://api.termora.org/v1/list/2
 ]
 ```
 
+### `GET /pronouns`
+
+Gets all pronouns from the database. Returns an array of [pronoun objects](#pronoun-object) on success.
+
+**Example query**
+
+```
+GET https://api.termora.org/v1/pronouns
+```
+
+**Example response**
+
+```json
+[
+    {
+        "id": 201,
+        "objective": "sols",
+        "possessive_determiner": "sols",
+        "possessive_pronoun": "solars",
+        "reflexive": "solarself",
+        "subjective": "sol"
+    },
+    // ...
+]
+```
+
+### `GET /tags`
+
+Gets all tags from the database.
+
+**Example query**
+
+```
+GET https://api.termora.org/v1/tags
+```
+
+**Example response**
+
+```json
+[
+    "Abinary In Nature",
+    "Acespec",
+    "Administration",
+    "Agender In Nature",
+    "Aromantic Spectrum",
+    // ...
+]
+```
+
 ## Version history
 
+- **2021-10-18**: add /tags and /pronouns endpoints
 - **2021-04-08** (v1): initial documentation
