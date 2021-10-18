@@ -226,6 +226,54 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Command:           c.upload,
 	})
 
+	contributors := a.AddSubcommand(&bcr.Command{
+		Name:              "contributor",
+		Summary:           "Add contributors",
+		CustomPermissions: directors,
+		Command: func(ctx *bcr.Context) (err error) {
+			return ctx.Help([]string{"admin", "contributor"})
+		},
+	})
+
+	contributors.AddSubcommand(&bcr.Command{
+		Name:              "category",
+		Summary:           "List contributor categories",
+		CustomPermissions: directors,
+		Command:           c.listContributorCategories,
+	}).AddSubcommand(&bcr.Command{
+		Name:              "add",
+		Summary:           "Add a contributor category",
+		Usage:             "<name> [role]",
+		Args:              bcr.MinArgs(1),
+		CustomPermissions: admins,
+		Command:           c.addContributorCategory,
+	})
+
+	contributors.AddSubcommand(&bcr.Command{
+		Name:              "add",
+		Summary:           "Add a contributor",
+		Usage:             "<user> <category>",
+		Args:              bcr.MinArgs(2),
+		CustomPermissions: directors,
+		Command:           c.addContributor,
+	})
+
+	contributors.AddSubcommand(&bcr.Command{
+		Name:              "override",
+		Summary:           "Override a contributor's name",
+		Usage:             "<user> <new name|-clear>",
+		Args:              bcr.MinArgs(2),
+		CustomPermissions: directors,
+		Command:           c.overrideContributor,
+	})
+
+	contributors.AddSubcommand(&bcr.Command{
+		Name:      "import",
+		Summary:   "Import all existing contributors (by role)",
+		OwnerOnly: true,
+		Command:   c.allContributors,
+	})
+
 	i := bot.Router.AddCommand(bot.Router.AliasMust("ai", nil, []string{"admin", "import"}, nil))
 	i.Args = bcr.MinArgs(1)
 

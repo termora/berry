@@ -33,9 +33,20 @@ func (c *Commands) credits(ctx *bcr.Context) (err error) {
 		Description: fmt.Sprintf("These are the people who have contributed to %v in some capacity!", ctx.Bot.Username),
 	}
 
-	for _, role := range c.Config.ContributorRoles {
-		members := c.filterByRole(role.ID)
-		if len(members) == 0 {
+	cats, err := c.DB.ContributorCategories()
+	if err != nil {
+		_, err = ctx.PagedEmbed(embeds, false)
+		return err
+	}
+
+	for _, cat := range cats {
+		contributors, err := c.DB.Contributors(cat.ID)
+		if err != nil {
+			_, err = ctx.PagedEmbed(embeds, false)
+			return err
+		}
+
+		if len(contributors) == 0 {
 			continue
 		}
 
@@ -43,10 +54,10 @@ func (c *Commands) credits(ctx *bcr.Context) (err error) {
 			slice []string
 			s     string
 		)
-		for _, m := range members {
-			name := m.Nick
-			if name == "" {
-				name = m.User.Username
+		for _, m := range contributors {
+			name := m.Name
+			if m.Override != nil {
+				name = *m.Override
 			}
 			slice = append(slice, name)
 		}
@@ -61,7 +72,7 @@ func (c *Commands) credits(ctx *bcr.Context) (err error) {
 			s += m
 		}
 
-		name := role.Name
+		name := cat.Name
 		if len(slice) != 1 {
 			name += "s"
 		}

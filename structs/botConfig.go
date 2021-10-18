@@ -47,6 +47,10 @@ type BotConfig struct {
 		Support struct {
 			Invite         string
 			PronounChannel discord.ChannelID `json:"pronoun_channel" toml:"pronoun_channel"`
+
+			// These should be the support server, and a token for a bot *in* said support server, with the guild members intent (and in the future, message content) enabled. Blame Discord.
+			GuildID discord.GuildID `toml:"guild_id"`
+			Token   string          `toml:"token"`
 		}
 
 		// mostly for debugging, send a webhook message when the bot shuts down

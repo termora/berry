@@ -15,6 +15,7 @@ import (
 	"github.com/starshine-sys/bcr"
 	bcrbot "github.com/starshine-sys/bcr/bot"
 	"github.com/termora/berry/db"
+	"github.com/termora/berry/helper"
 	"github.com/termora/berry/structs"
 	"go.uber.org/zap"
 )
@@ -34,6 +35,8 @@ type Bot struct {
 	GuildsMu sync.Mutex
 
 	Stats *StatsClient
+
+	Helper *helper.Helper
 }
 
 // Module is a single module/category of commands
@@ -75,6 +78,14 @@ func New(
 
 	// setup stats if metrics are enabled
 	b.setupStats()
+
+	if config.Bot.Support.Token != "" {
+		h, err := helper.New(config.Bot.Support.Token, config.Bot.Support.GuildID, db, s)
+		if err != nil {
+			s.Errorf("Error creating helper: %v", err)
+		}
+		b.Helper = h
+	}
 
 	return b
 }
