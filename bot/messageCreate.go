@@ -67,8 +67,16 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 
 	// get context
 	ctx, err = bot.Router.NewContext(m)
-	if err != nil && err != bcr.ErrEmptyMessage {
-		bot.Sugar.Error("Error creating context:", err)
+	if err != nil {
+		if err != bcr.ErrEmptyMessage {
+			bot.Sugar.Error("Error creating context:", err)
+		}
+		return
+	}
+
+	// apparently we sometimes panic on line 83, not sure what happens there--just gonna return here
+	if ctx == nil {
+		bot.Sugar.Errorf("Error was %v, but Context is nil.", err)
 		return
 	}
 
