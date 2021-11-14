@@ -27,6 +27,7 @@ func (c *Client) SearchCat(input string, cat, limit int, ignore []string) (terms
 		QueryByWeights:          []int{2, 1, 1},
 		Prefix:                  []bool{true, false, false},
 		SortBy:                  []string{"_text_match:desc"},
+		NumTypos:                jsonutil.IntPointer(0),
 		PerPage:                 limit,
 		HighlightStartTag:       jsonutil.StringPointer("**"),
 		HighlightEndTag:         jsonutil.StringPointer("**"),

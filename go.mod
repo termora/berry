@@ -35,7 +35,7 @@ require (
 	github.com/starshine-sys/pkgo v0.3.2
 	github.com/starshine-sys/snowflake/v2 v2.0.0
 	github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942 // indirect
-	github.com/termora/tsclient v0.1.1-0.20211016124020-32564c907106
+	github.com/termora/tsclient v0.1.1-0.20211023215112-97c6ef46a5c5
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.17.0

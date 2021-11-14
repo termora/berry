@@ -567,6 +567,8 @@ github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942 h1:t0lM6y/M5IiU
 github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/termora/tsclient v0.1.1-0.20211016124020-32564c907106 h1:HffilRBJxX1nQzNEjHcimUCD43QnlgklRGsjFZ9TYQs=
 github.com/termora/tsclient v0.1.1-0.20211016124020-32564c907106/go.mod h1:cr1oyGgPpBfEvmaclf3iWw+ANCQrJ41Tu7ENNTYUnIw=
+github.com/termora/tsclient v0.1.1-0.20211023215112-97c6ef46a5c5 h1:TaA5pIZ8MU+9FONLU1wUmSWIPpeslByV36dunNpoAT4=
+github.com/termora/tsclient v0.1.1-0.20211023215112-97c6ef46a5c5/go.mod h1:cr1oyGgPpBfEvmaclf3iWw+ANCQrJ41Tu7ENNTYUnIw=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
