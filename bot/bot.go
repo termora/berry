@@ -69,11 +69,10 @@ func New(
 		state := s.(*state.State)
 
 		state.PreHandler = handler.New()
-		state.PreHandler.Synchronous = true
 		state.AddHandler(b.MessageCreate)
 		state.AddHandler(b.InteractionCreate)
 		state.AddHandler(b.GuildCreate)
-		state.PreHandler.AddHandler(b.GuildDelete)
+		state.PreHandler.AddSyncHandler(b.GuildDelete)
 	})
 
 	// setup stats if metrics are enabled

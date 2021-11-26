@@ -80,15 +80,13 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Cooldown:      time.Second,
 		SlashCommand:  c.use,
 		Options: &[]discord.CommandOption{
-			{
-				Type:        discord.StringOption,
-				Name:        "pronouns",
+			&discord.StringOption{
+				OptionName:  "pronouns",
 				Description: "The pronouns to show",
 				Required:    true,
 			},
-			{
-				Type:        discord.StringOption,
-				Name:        "name",
+			&discord.StringOption{
+				OptionName:  "name",
 				Description: "The name to use",
 				Required:    false,
 			},

@@ -33,29 +33,25 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		SlashCommand: c.searchSlash,
 		Options: &[]discord.CommandOption{
-			{
-				Name:        "query",
+			&discord.StringOption{
+				OptionName:  "query",
 				Description: "The term to search for",
 				Required:    true,
-				Type:        discord.StringOption,
 			},
-			{
-				Name:        "category",
+			&discord.StringOption{
+				OptionName:  "category",
 				Description: "The category to limit your search to",
 				Required:    false,
-				Type:        discord.StringOption,
 			},
-			{
-				Name:        "ignore-tags",
+			&discord.StringOption{
+				OptionName:  "ignore-tags",
 				Description: "Tags to ignore (comma-separated)",
 				Required:    false,
-				Type:        discord.StringOption,
 			},
-			{
-				Name:        "no-cw",
+			&discord.BooleanOption{
+				OptionName:  "no-cw",
 				Description: "Whether to hide terms with content warnings",
 				Required:    false,
-				Type:        discord.BooleanOption,
 			},
 		},
 	}))
@@ -72,15 +68,13 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		SlashCommand: c.random,
 		Options: &[]discord.CommandOption{
-			{
-				Name:        "category",
+			&discord.StringOption{
+				OptionName:  "category",
 				Description: "The category to find a random term in",
-				Type:        discord.StringOption,
 			},
-			{
-				Name:        "ignore",
+			&discord.StringOption{
+				OptionName:  "ignore",
 				Description: "The tags to ignore (comma-separated)",
-				Type:        discord.StringOption,
 			},
 		},
 	}))
@@ -96,12 +90,13 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Blacklistable: false,
 
 		SlashCommand: c.explanation,
-		Options: &[]discord.CommandOption{{
-			Name:        "explanation",
-			Description: "Which explanation to show",
-			Required:    true,
-			Type:        discord.StringOption,
-		}},
+		Options: &[]discord.CommandOption{
+			&discord.StringOption{
+				OptionName:  "explanation",
+				Description: "Which explanation to show",
+				Required:    true,
+			},
+		},
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
@@ -131,12 +126,13 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Blacklistable: true,
 		Command:       c.term,
 		SlashCommand:  c.termSlash,
-		Options: &[]discord.CommandOption{{
-			Name:        "query",
-			Description: "The term to define",
-			Type:        discord.StringOption,
-			Required:    true,
-		}},
+		Options: &[]discord.CommandOption{
+			&discord.StringOption{
+				OptionName:  "query",
+				Description: "The term to define",
+				Required:    true,
+			},
+		},
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
@@ -188,30 +184,10 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Command:      c.autopostText,
 		SlashCommand: c.autopost,
 		Options: &[]discord.CommandOption{
-			{
-				Type:        discord.ChannelOption,
-				Name:        "channel",
-				Description: "The channel to post to",
-				Required:    true,
-			},
-			{
-				Type:        discord.StringOption,
-				Name:        "interval",
-				Description: "How often to post a term (\"reset\" or \"off\" to disable posting in the channel)",
-				Required:    true,
-			},
-			{
-				Type:        discord.StringOption,
-				Name:        "category",
-				Description: "The category to post terms from",
-				Required:    false,
-			},
-			{
-				Type:        discord.RoleOption,
-				Name:        "role",
-				Description: "The role to mention when posting a term",
-				Required:    false,
-			},
+			discord.NewChannelOption("channel", "The channel to post to", true),
+			discord.NewStringOption("interval", `How often to post a term ("reset" or "off" to disable posting in the channel)`, true),
+			discord.NewStringOption("category", "The category to post terms from", false),
+			discord.NewRoleOption("role", "The role to mention when posting a term", false),
 		},
 	})
 

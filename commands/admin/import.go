@@ -153,7 +153,7 @@ done:
 		Message:   "Do you want to add this term?",
 		Embeds:    []discord.Embed{c.DB.TermEmbed(t)},
 		YesPrompt: "Add term",
-		YesStyle:  discord.SuccessButton,
+		YesStyle:  discord.SuccessButtonStyle(),
 	})
 	if timeout {
 		_, err = ctx.Send(":x: Operation timed out.")

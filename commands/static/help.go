@@ -120,27 +120,29 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 		e.Fields = append(e.Fields, c.Config.Bot.HelpFields...)
 	}
 
-	components := []discord.Component{&discord.ActionRowComponent{Components: []discord.Component{&discord.SelectComponent{
-		CustomID:    "help_options",
-		Placeholder: "More info about...",
-		Options: []discord.SelectComponentOption{
-			{
-				Label:       "Permissions",
-				Description: fmt.Sprintf("Show all the permissions %v needs!", c.Router.Bot.Username),
-				Value:       "permissions",
-			},
-			{
-				Label:       "Privacy",
-				Description: fmt.Sprintf("Show %v's privacy policy!", c.Router.Bot.Username),
-				Value:       "privacy",
-			},
-			{
-				Label:       "Automatically posting terms",
-				Description: fmt.Sprintf("How to make %v automatically post terms!", c.Router.Bot.Username),
-				Value:       "autopost",
+	components := discord.Components(
+		&discord.SelectComponent{
+			CustomID:    "help_options",
+			Placeholder: "More info about...",
+			Options: []discord.SelectOption{
+				{
+					Label:       "Permissions",
+					Description: fmt.Sprintf("Show all the permissions %v needs!", c.Router.Bot.Username),
+					Value:       "permissions",
+				},
+				{
+					Label:       "Privacy",
+					Description: fmt.Sprintf("Show %v's privacy policy!", c.Router.Bot.Username),
+					Value:       "privacy",
+				},
+				{
+					Label:       "Automatically posting terms",
+					Description: fmt.Sprintf("How to make %v automatically post terms!", c.Router.Bot.Username),
+					Value:       "autopost",
+				},
 			},
 		},
-	}}}}
+	)
 
 	msg, err := ctx.SendComponents(components, "", e)
 	if err != nil {
@@ -152,12 +154,12 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 			return
 		}
 
-		data, ok := ev.Data.(*discord.ComponentInteractionData)
+		data, ok := ev.Data.(*discord.SelectInteraction)
 		if !ok {
 			return
 		}
 
-		if data.ComponentType != discord.SelectComponentType || ev.Message.ID != msg.ID {
+		if ev.Message.ID != msg.ID {
 			return
 		}
 
@@ -190,9 +192,10 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 		})
 		return
 	})
-	time.AfterFunc(1*time.Minute, func() {
+
+	time.AfterFunc(5*time.Minute, func() {
 		ctx.Session().EditMessageComplex(msg.ChannelID, msg.ID, api.EditMessageData{
-			Components: &[]discord.Component{},
+			Components: discord.ComponentsPtr(),
 		})
 		rm()
 	})

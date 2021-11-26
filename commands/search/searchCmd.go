@@ -306,33 +306,31 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 		embeds = append(embeds, searchResultEmbed(query, i+1, len(termSlices), len(terms), t))
 	}
 
-	components := []discord.Component{&discord.ActionRowComponent{
-		Components: []discord.Component{
-			&discord.ButtonComponent{
-				Label:    "1",
-				CustomID: "1",
-				Style:    discord.SecondaryButton,
-			},
-			&discord.ButtonComponent{
-				Label:    "2",
-				CustomID: "2",
-				Style:    discord.SecondaryButton,
-			},
-			&discord.ButtonComponent{
-				Label:    "3",
-				CustomID: "3",
-				Style:    discord.SecondaryButton,
-			},
-			&discord.ButtonComponent{
-				Label:    "4",
-				CustomID: "4",
-				Style:    discord.SecondaryButton,
-			},
-			&discord.ButtonComponent{
-				Label:    "5",
-				CustomID: "5",
-				Style:    discord.SecondaryButton,
-			},
+	components := discord.ContainerComponents{&discord.ActionRowComponent{
+		&discord.ButtonComponent{
+			Label:    "1",
+			CustomID: "1",
+			Style:    discord.SecondaryButtonStyle(),
+		},
+		&discord.ButtonComponent{
+			Label:    "2",
+			CustomID: "2",
+			Style:    discord.SecondaryButtonStyle(),
+		},
+		&discord.ButtonComponent{
+			Label:    "3",
+			CustomID: "3",
+			Style:    discord.SecondaryButtonStyle(),
+		},
+		&discord.ButtonComponent{
+			Label:    "4",
+			CustomID: "4",
+			Style:    discord.SecondaryButtonStyle(),
+		},
+		&discord.ButtonComponent{
+			Label:    "5",
+			CustomID: "5",
+			Style:    discord.SecondaryButtonStyle(),
 		},
 	}}
 
@@ -348,12 +346,10 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 	sctx := ctx.(*bcr.SlashContext)
 
 	ignoreFn := func(ev *gateway.InteractionCreateEvent) bool {
-		components := discord.UnwrapComponents(ev.Message.Components)
-
 		err := ctx.Session().RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
 			Type: api.UpdateMessage,
 			Data: &api.InteractionResponseData{
-				Components: &components,
+				Components: &ev.Message.Components,
 			},
 		})
 		if err != nil {
@@ -372,7 +368,10 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 			return false
 		}
 
-		data, ok := ev.Data.(*discord.ComponentInteractionData)
+		data, ok := ev.Data.(*discord.ButtonInteraction)
+		if !ok {
+			return false
+		}
 
 		if ev.Message == nil {
 			return false
@@ -397,7 +396,7 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 			}
 		}
 
-		n, err = strconv.Atoi(data.CustomID)
+		n, err = strconv.Atoi(string(data.CustomID))
 		if err != nil {
 			return ignoreFn(ev)
 		}
@@ -431,7 +430,7 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 	_, err = ctx.EditOriginal(api.EditInteractionResponseData{
 		Content:    option.NewNullableString(""),
 		Embeds:     &[]discord.Embed{c.DB.TermEmbed(termSlices[page][n-1])},
-		Components: &[]discord.Component{},
+		Components: &discord.ContainerComponents{},
 	})
 	return
 }

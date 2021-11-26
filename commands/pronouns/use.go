@@ -116,20 +116,20 @@ func (c *commands) pronounEmbeds(set, useSet *db.PronounSet) (e []discord.Embed,
 func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name string) (err error) {
 	s := fmt.Sprintf("Found more than one set matching your input! Please select the set you want to use:")
 
-	options := []discord.SelectComponentOption{}
+	options := []discord.SelectOption{}
 
 	for i, set := range sets {
-		options = append(options, discord.SelectComponentOption{
+		options = append(options, discord.SelectOption{
 			Label: set.String(),
 			Value: fmt.Sprint(i),
 		})
 	}
 
-	comp := []discord.Component{&discord.ActionRowComponent{Components: []discord.Component{&discord.SelectComponent{
+	comp := discord.Components(&discord.ActionRowComponent{&discord.SelectComponent{
 		CustomID:    "pronouns",
 		Options:     options,
 		Placeholder: "Select a pronoun set...",
-	}}}}
+	}})
 
 	msg, err := ctx.SendComponents(comp, s)
 	if err != nil {
@@ -140,12 +140,10 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 	defer cancel()
 
 	ignoreFn := func(ev *gateway.InteractionCreateEvent) bool {
-		components := discord.UnwrapComponents(ev.Message.Components)
-
 		err := ctx.Session().RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
 			Type: api.UpdateMessage,
 			Data: &api.InteractionResponseData{
-				Components: &components,
+				Components: &ev.Message.Components,
 			},
 		})
 		if err != nil {
@@ -166,12 +164,12 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 			return false
 		}
 
-		data, ok := ev.Data.(*discord.ComponentInteractionData)
+		data, ok := ev.Data.(*discord.SelectInteraction)
 		if !ok {
 			return false
 		}
 
-		if data.ComponentType != discord.SelectComponentType || ev.Message.ID != msg.ID {
+		if ev.Message.ID != msg.ID {
 			return false
 		}
 
@@ -192,12 +190,12 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 		return true
 	})
 
-	comp = []discord.Component{&discord.ActionRowComponent{Components: []discord.Component{&discord.SelectComponent{
+	comp = discord.Components(&discord.ActionRowComponent{&discord.SelectComponent{
 		CustomID:    "pronouns",
 		Options:     options,
 		Placeholder: "Select a pronoun set...",
 		Disabled:    true,
-	}}}}
+	}})
 
 	ctx.EditOriginal(api.EditInteractionResponseData{
 		Components: &comp,

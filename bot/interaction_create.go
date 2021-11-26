@@ -13,7 +13,7 @@ import (
 
 // InteractionCreate is called when an interaction create event is received.
 func (bot *Bot) InteractionCreate(ic *gateway.InteractionCreateEvent) {
-	if ic.Type != discord.CommandInteraction {
+	if ic.Data.InteractionType() != discord.CommandInteractionType {
 		return
 	}
 
@@ -21,7 +21,7 @@ func (bot *Bot) InteractionCreate(ic *gateway.InteractionCreateEvent) {
 		r := recover()
 		if r != nil {
 			bot.Sugar.Errorf("Caught panic in channel ID %v (guild %v): %v", ic.ChannelID, ic.GuildID, r)
-			bot.Sugar.Infof("Panicking command: %v", ic.Data.(*discord.CommandInteractionData).Name)
+			bot.Sugar.Infof("Panicking command: %v", ic.Data.(*discord.CommandInteraction).Name)
 
 			// if something causes a panic, it's our problem, because *it shouldn't panic*
 			// so skip checking the error and just immediately report it
