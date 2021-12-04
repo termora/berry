@@ -22,6 +22,7 @@ func (c *Client) SearchCat(input string, cat, limit int, ignore []string) (terms
 	c.Debug("Searching for \"%v\"", input)
 
 	resp, err := c.ts.Search("terms", tsclient.SearchData{
+		NoPreSegmentedQuery:     true,
 		Query:                   input,
 		QueryBy:                 []string{"names", "description", "source"},
 		QueryByWeights:          []int{2, 1, 1},

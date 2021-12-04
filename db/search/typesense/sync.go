@@ -86,5 +86,3 @@ func (c *Client) SyncTerm(t *search.Term) error {
 func (c *Client) SyncDelete(id int) error {
 	return c.ts.DeleteDocument("terms", fmt.Sprint(id), nil)
 }
-
-func boolPointer(b bool) *bool { return &b }

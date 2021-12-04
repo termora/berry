@@ -10,9 +10,7 @@ import (
 // New returns a new Searcher
 func New(dsn, apiKey string, pg *pgxpool.Pool, debugFunc func(string, ...interface{})) (search.Searcher, error) {
 	if debugFunc == nil {
-		debugFunc = func(string, ...interface{}) {
-			return
-		}
+		debugFunc = func(string, ...interface{}) {}
 	}
 
 	c, err := tsclient.New(dsn, apiKey)
