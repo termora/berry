@@ -30,6 +30,11 @@ func (c *commands) autopostText(ctx *bcr.Context) (err error) {
 		return ctx.SendX(":x: Couldn't find that channel, or it's not in this server.")
 	}
 
+	botPerms, err := ctx.State.Permissions(ch.ID, ctx.Router.Bot.ID)
+	if err != nil || !botPerms.Has(discord.PermissionViewChannel|discord.PermissionSendMessages|discord.PermissionEmbedLinks) {
+		return ctx.SendfX(":x: %v cannot send term embeds in %v. Please ensure that %v has the *View Channel*, *Send Messages*, and *Embed Links* permissions in that channel.", ctx.Router.Bot.Username, ch.Mention(), ctx.Router.Bot.Username)
+	}
+
 	dur, err := durationparser.Parse(ctx.Args[1])
 	if err != nil || (dur < 2*time.Hour && dur != 0) || dur > 7*24*time.Hour {
 		s := ctx.Args[1]
@@ -109,6 +114,11 @@ func (c *commands) autopost(ctx bcr.Contexter) (err error) {
 	perms := discord.CalcOverwrites(*ctx.GetGuild(), *ch, *ctx.GetMember())
 	if !perms.Has(discord.PermissionViewChannel | discord.PermissionSendMessages | discord.PermissionManageRoles) {
 		return ctx.SendEphemeral(":x: Couldn't find that channel, or it's not in this server.")
+	}
+
+	botPerms, err := ctx.Session().Permissions(ch.ID, c.Router.Bot.ID)
+	if err != nil || !botPerms.Has(discord.PermissionViewChannel|discord.PermissionSendMessages|discord.PermissionEmbedLinks) {
+		return ctx.SendfX(":x: %v cannot send term embeds in %v. Please ensure that %v has the *View Channel*, *Send Messages*, and *Embed Links* permissions in that channel.", c.Router.Bot.Username, ch.Mention(), c.Router.Bot.Username)
 	}
 
 	dur, err := durationparser.Parse(ctx.GetStringFlag("interval"))
@@ -274,7 +284,8 @@ func (c *commands) doAutopost(ap Autopost) (err error) {
 
 	_, err = s.SendMessage(ap.ChannelID, str, c.DB.TermEmbed(t))
 	if err != nil {
-		return errors.Wrap(err, "send message")
+		err2 := c.setAutopost(0, ap.ChannelID, nil, nil, 0)
+		return errors.Wrap(errors.Append(err, err2), "send message")
 	}
 
 	toAdd := ap.Interval
