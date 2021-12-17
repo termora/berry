@@ -19,6 +19,9 @@ type commands struct {
 func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	c := commands{Bot: bot}
 
+	// add autocomplete handler
+	bot.Router.AddHandler(c.doAutocomplete)
+
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "search",
 		Aliases: []string{"s"},
@@ -34,9 +37,10 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		SlashCommand: c.searchSlash,
 		Options: &[]discord.CommandOption{
 			&discord.StringOption{
-				OptionName:  "query",
-				Description: "The term to search for",
-				Required:    true,
+				OptionName:   "query",
+				Description:  "The term to search for",
+				Required:     true,
+				Autocomplete: true,
 			},
 			&discord.StringOption{
 				OptionName:  "category",
@@ -128,9 +132,10 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		SlashCommand:  c.termSlash,
 		Options: &[]discord.CommandOption{
 			&discord.StringOption{
-				OptionName:  "query",
-				Description: "The term to define",
-				Required:    true,
+				OptionName:   "query",
+				Description:  "The term to define",
+				Required:     true,
+				Autocomplete: true,
 			},
 		},
 	}))
