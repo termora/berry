@@ -57,6 +57,8 @@ func (c *commands) use(ctx bcr.Contexter) (err error) {
 	// use the first set
 	set := sets[0]
 
+	go c.DB.IncrementPronounUse(set)
+
 	if tmplCount == 0 {
 		return ctx.SendEphemeral("There are no examples available for pronouns! If you think this is in error, please join the bot support server and ask there.")
 	}
@@ -73,6 +75,9 @@ func (c *commands) use(ctx bcr.Contexter) (err error) {
 	}
 
 	e, err := c.pronounEmbeds(set, useSet)
+	if err != nil {
+		return c.DB.InternalError(ctx, err)
+	}
 
 	if v, ok := ctx.(*bcr.Context); ok {
 		_, err = v.PagedEmbed(e, false)
@@ -114,7 +119,7 @@ func (c *commands) pronounEmbeds(set, useSet *db.PronounSet) (e []discord.Embed,
 }
 
 func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name string) (err error) {
-	s := fmt.Sprintf("Found more than one set matching your input! Please select the set you want to use:")
+	s := "Found more than one set matching your input! Please select the set you want to use:"
 
 	options := []discord.SelectOption{}
 
@@ -206,6 +211,9 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 	}
 
 	set := sets[ind]
+
+	go c.DB.IncrementPronounUse(set)
+
 	useSet := &db.PronounSet{
 		Subjective: set.Subjective,
 		Objective:  set.Objective,

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/termora/berry/db"
 	"github.com/termora/berry/db/search"
 
 	"github.com/jackc/pgx/v4"
@@ -95,7 +96,7 @@ func (a *api) explanations(c echo.Context) (err error) {
 }
 
 func (a *api) pronouns(c echo.Context) (err error) {
-	pronouns, err := a.db.Pronouns()
+	pronouns, err := a.db.Pronouns(db.AlphabeticPronounOrder)
 	if err != nil {
 		// if no rows were returned, return no content
 		if errors.Cause(err) == pgx.ErrNoRows {

@@ -2,17 +2,38 @@ package pronouns
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 
 	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/dustin/go-humanize/english"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
 
 func (c *commands) list(ctx *bcr.Context) (err error) {
-	p, err := c.DB.Pronouns()
+	footerTmpl := "Page %v/%v"
+	order := db.AlphabeticPronounOrder
+	if flag, _ := ctx.Flags.GetBool("random"); flag {
+		order = db.RandomPronounOrder
+		footerTmpl = "Sorting randomly | Page %v/%v"
+	} else if flag, _ := ctx.Flags.GetBool("alphabetical"); flag {
+		order = db.AlphabeticPronounOrder
+		footerTmpl = "Sorting alphabetically | Page %v/%v"
+	} else if flag, _ := ctx.Flags.GetBool("by-uses"); flag {
+		order = db.UsesPronounOrder
+		footerTmpl = "Sorting by # of uses | Page %v/%v"
+	}
+
+	p, err := c.DB.Pronouns(order)
 	if err != nil {
 		return c.DB.InternalError(ctx, err)
+	}
+
+	if order == db.RandomPronounOrder {
+		rand.Shuffle(len(p), func(i, j int) {
+			p[i], p[j] = p[j], p[i]
+		})
 	}
 
 	var (
@@ -27,7 +48,11 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 			b.Reset()
 			count = 0
 		}
-		b.WriteString(fmt.Sprintf("`%v`: %s\n", p.ID, p))
+		b.WriteString(p.String())
+		if order == db.UsesPronounOrder {
+			b.WriteString(" (" + english.Plural(int(p.Uses), "use", "uses") + ")")
+		}
+		b.WriteRune('\n')
 		count++
 	}
 	s = append(s, b.String())
@@ -39,7 +64,7 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 			Description: page,
 			Color:       db.EmbedColour,
 			Footer: &discord.EmbedFooter{
-				Text: fmt.Sprintf("Page %v/%v", i+1, len(s)),
+				Text: fmt.Sprintf(footerTmpl, i+1, len(s)),
 			},
 		})
 	}

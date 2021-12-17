@@ -8,6 +8,7 @@ import (
 
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
 )
@@ -43,6 +44,13 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Aliases: []string{"pronoun-list", "listpronouns", "pronounlist"},
 
 		Summary: "Show a list of all pronouns",
+
+		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
+			fs.BoolP("random", "r", false, "Sort pronouns randomly")
+			fs.BoolP("alphabetical", "a", false, "Sort pronouns alphabetically")
+			fs.BoolP("by-uses", "u", false, "Sort pronouns by number of uses")
+			return fs
+		},
 
 		Blacklistable: true,
 		Cooldown:      time.Second,

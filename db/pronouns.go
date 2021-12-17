@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"errors"
 	"math/rand"
 	"strings"
@@ -17,6 +18,9 @@ type PronounSet struct {
 	PossDet    string `json:"possessive_determiner"`
 	PossPro    string `json:"possessive_pronoun"`
 	Reflexive  string `json:"reflexive"`
+	Uses       int64  `json:"uses"`
+
+	Sorting int `json:"-"`
 }
 
 func (p PronounSet) String() string {
@@ -114,13 +118,40 @@ func (db *Db) AddPronoun(p PronounSet) (id int, err error) {
 	return id, err
 }
 
+type PronounOrder int
+
+const (
+	AlphabeticPronounOrder PronounOrder = iota
+	UsesPronounOrder
+	RandomPronounOrder
+)
+
 // Pronouns ...
-func (db *Db) Pronouns() (p []*PronounSet, err error) {
+func (db *Db) Pronouns(order PronounOrder) (p []*PronounSet, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
 	Debug("Getting all pronouns")
 
-	err = pgxscan.Select(ctx, db.Pool, &p, "select id, subjective, objective, poss_det, poss_pro, reflexive from pronouns order by sorting, subjective, objective, poss_det, poss_pro, reflexive")
+	var sql string
+	switch order {
+	case AlphabeticPronounOrder:
+		sql = "select * from pronouns order by sorting, subjective, objective, poss_det, poss_pro, reflexive"
+	case UsesPronounOrder:
+		sql = "select * from pronouns order by uses desc, subjective asc, objective asc, poss_det asc, poss_pro asc, reflexive asc"
+	default:
+		sql = "select * from pronouns"
+	}
+
+	err = pgxscan.Select(ctx, db.Pool, &p, sql)
 	return
+}
+
+func (db *Db) IncrementPronounUse(p *PronounSet) {
+	Debug("Incrementing pronoun usage for %v, new usage %v", p.String(), p.Uses+1)
+
+	_, err := db.Exec(context.Background(), "update pronouns set uses = uses + 1 where id = $1", p.ID)
+	if err != nil {
+		db.Sugar.Errorf("Error updating uses of pronoun set %v: %v", p.String(), err)
+	}
 }
