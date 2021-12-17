@@ -26,7 +26,7 @@ type Bot struct {
 
 	Sugar  *zap.SugaredLogger
 	Config *structs.BotConfig
-	DB     *db.Db
+	DB     *db.DB
 
 	Sentry    *sentry.Hub
 	UseSentry bool
@@ -50,7 +50,7 @@ func New(
 	bot *bcrbot.Bot,
 	s *zap.SugaredLogger,
 	config *structs.BotConfig,
-	db *db.Db, hub *sentry.Hub) *Bot {
+	db *db.DB, hub *sentry.Hub) *Bot {
 	b := &Bot{
 		Bot:       bot,
 		Sugar:     s,

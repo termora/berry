@@ -19,7 +19,7 @@ var (
 )
 
 // TermCount ...
-func (db *Db) TermCount() (count int) {
+func (db *DB) TermCount() (count int) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -30,7 +30,7 @@ func (db *Db) TermCount() (count int) {
 }
 
 // GetTerms gets all terms not blocked by the given mask
-func (db *Db) GetTerms(mask search.TermFlag) (terms []*Term, err error) {
+func (db *DB) GetTerms(mask search.TermFlag) (terms []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -46,7 +46,7 @@ func (db *Db) GetTerms(mask search.TermFlag) (terms []*Term, err error) {
 }
 
 // GetCategoryTerms gets terms by category
-func (db *Db) GetCategoryTerms(id int, mask search.TermFlag) (terms []*Term, err error) {
+func (db *DB) GetCategoryTerms(id int, mask search.TermFlag) (terms []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -63,7 +63,7 @@ func (db *Db) GetCategoryTerms(id int, mask search.TermFlag) (terms []*Term, err
 }
 
 // TermName gets a term by name
-func (db *Db) TermName(n string) (t []*Term, err error) {
+func (db *DB) TermName(n string) (t []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -77,7 +77,7 @@ func (db *Db) TermName(n string) (t []*Term, err error) {
 }
 
 // AddTerm adds a term to the database
-func (db *Db) AddTerm(t *Term) (*Term, error) {
+func (db *DB) AddTerm(t *Term) (*Term, error) {
 	if t.Aliases == nil {
 		t.Aliases = []string{}
 	}
@@ -99,7 +99,7 @@ func (db *Db) AddTerm(t *Term) (*Term, error) {
 }
 
 // RemoveTerm removes a term from the database
-func (db *Db) RemoveTerm(id int) (err error) {
+func (db *DB) RemoveTerm(id int) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -117,7 +117,7 @@ func (db *Db) RemoveTerm(id int) (err error) {
 }
 
 // GetTerm gets a term by ID
-func (db *Db) GetTerm(id int) (t *Term, err error) {
+func (db *DB) GetTerm(id int) (t *Term, err error) {
 	t = &Term{}
 
 	ctx, cancel := db.Context()
@@ -133,7 +133,7 @@ func (db *Db) GetTerm(id int) (t *Term, err error) {
 }
 
 // RandomTerm gets a random term from the database
-func (db *Db) RandomTerm(ignore []string) (t *Term, err error) {
+func (db *DB) RandomTerm(ignore []string) (t *Term, err error) {
 	var terms []*Term
 
 	ctx, cancel := db.Context()
@@ -164,7 +164,7 @@ func (db *Db) RandomTerm(ignore []string) (t *Term, err error) {
 }
 
 // RandomTermCategory gets a random term from the database from the specified category
-func (db *Db) RandomTermCategory(id int, ignore []string) (t *Term, err error) {
+func (db *DB) RandomTermCategory(id int, ignore []string) (t *Term, err error) {
 	var terms []*Term
 
 	ctx, cancel := db.Context()
@@ -196,7 +196,7 @@ func (db *Db) RandomTermCategory(id int, ignore []string) (t *Term, err error) {
 }
 
 // SetFlags sets the flags for a term
-func (db *Db) SetFlags(id int, flags search.TermFlag) (err error) {
+func (db *DB) SetFlags(id int, flags search.TermFlag) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -214,7 +214,7 @@ func (db *Db) SetFlags(id int, flags search.TermFlag) (err error) {
 }
 
 // SetCW sets the content warning for a term
-func (db *Db) SetCW(id int, text string) (err error) {
+func (db *DB) SetCW(id int, text string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -232,7 +232,7 @@ func (db *Db) SetCW(id int, text string) (err error) {
 }
 
 // UpdateDesc updates the description for a term
-func (db *Db) UpdateDesc(id int, desc string) (err error) {
+func (db *DB) UpdateDesc(id int, desc string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -248,7 +248,7 @@ func (db *Db) UpdateDesc(id int, desc string) (err error) {
 }
 
 // UpdateSource updates the source for a term
-func (db *Db) UpdateSource(id int, source string) (err error) {
+func (db *DB) UpdateSource(id int, source string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -264,7 +264,7 @@ func (db *Db) UpdateSource(id int, source string) (err error) {
 }
 
 // UpdateTitle updates the title for a term
-func (db *Db) UpdateTitle(id int, title string) (err error) {
+func (db *DB) UpdateTitle(id int, title string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -280,7 +280,7 @@ func (db *Db) UpdateTitle(id int, title string) (err error) {
 }
 
 // UpdateImage updates the image for a term
-func (db *Db) UpdateImage(id int, img string) (err error) {
+func (db *DB) UpdateImage(id int, img string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -296,7 +296,7 @@ func (db *Db) UpdateImage(id int, img string) (err error) {
 }
 
 // UpdateAliases updates the aliases for a term
-func (db *Db) UpdateAliases(id int, aliases []string) (err error) {
+func (db *DB) UpdateAliases(id int, aliases []string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -316,7 +316,7 @@ func (db *Db) UpdateAliases(id int, aliases []string) (err error) {
 }
 
 // SetNote updates the note for a term
-func (db *Db) SetNote(id int, note string) (err error) {
+func (db *DB) SetNote(id int, note string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -332,7 +332,7 @@ func (db *Db) SetNote(id int, note string) (err error) {
 }
 
 // UpdateTags updates the tags for a term
-func (db *Db) UpdateTags(id int, tags []string) (err error) {
+func (db *DB) UpdateTags(id int, tags []string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 

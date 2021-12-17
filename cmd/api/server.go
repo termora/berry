@@ -17,7 +17,7 @@ import (
 )
 
 type api struct {
-	db    *db.Db
+	db    *db.DB
 	conf  conf
 	sugar *zap.SugaredLogger
 }
@@ -37,9 +37,13 @@ func main() {
 
 	configFile, err := ioutil.ReadFile("config.yaml")
 	if err != nil {
-		panic(err)
+		sugar.Fatal(err)
 	}
 	err = yaml.Unmarshal(configFile, &c)
+	if err != nil {
+		sugar.Fatal(err)
+	}
+
 	sugar.Info("Loaded configuration file.")
 
 	// connect to the database
@@ -74,14 +78,14 @@ Disallow: /`)
 
 	// get port
 	port := c.Port
-	strings.TrimPrefix(port, ":")
+	port = strings.TrimPrefix(port, ":")
 	if port == "" {
 		port = "1300"
 	}
 
 	// run the server
 	go func() {
-		if err := e.Start(":" + c.Port); err != nil {
+		if err := e.Start(":" + port); err != nil {
 			sugar.Info("Shutting down server")
 		}
 	}()

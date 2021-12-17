@@ -7,7 +7,7 @@ import (
 )
 
 // TermsSince returns all terms added since the specified date
-func (db *Db) TermsSince(d time.Time) (t []*Term, err error) {
+func (db *DB) TermsSince(d time.Time) (t []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 

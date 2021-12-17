@@ -15,14 +15,14 @@ type Helper struct {
 	*session.Session
 
 	GuildID discord.GuildID
-	DB      *db.Db
+	DB      *db.DB
 	Log     *zap.SugaredLogger
 }
 
 const intents = gateway.IntentGuildMembers | gateway.IntentGuildMessages
 
 // New creates a new Helper, adds the required intents and event handlers, and opens the connection.
-func New(token string, id discord.GuildID, db *db.Db, log *zap.SugaredLogger) (*Helper, error) {
+func New(token string, id discord.GuildID, db *db.DB, log *zap.SugaredLogger) (*Helper, error) {
 	s, err := session.NewWithIntents("Bot "+token, intents)
 	if err != nil {
 		return nil, err

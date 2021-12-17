@@ -36,7 +36,7 @@ var (
 
 // GetPronoun gets a pronoun from the database
 // gods this function is shit but idc, if it works it works
-func (db *Db) GetPronoun(forms ...string) (sets []*PronounSet, err error) {
+func (db *DB) GetPronoun(forms ...string) (sets []*PronounSet, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -80,7 +80,7 @@ func (db *Db) GetPronoun(forms ...string) (sets []*PronounSet, err error) {
 }
 
 // RandomPronouns gets a random pronoun set from the database
-func (db *Db) RandomPronouns() (p *PronounSet, err error) {
+func (db *DB) RandomPronouns() (p *PronounSet, err error) {
 	var pronouns []*PronounSet
 
 	ctx, cancel := db.Context()
@@ -102,7 +102,7 @@ func (db *Db) RandomPronouns() (p *PronounSet, err error) {
 }
 
 // AddPronoun adds a pronoun set, returning the ID
-func (db *Db) AddPronoun(p PronounSet) (id int, err error) {
+func (db *DB) AddPronoun(p PronounSet) (id int, err error) {
 	if p.Subjective == "" || p.Objective == "" || p.PossDet == "" || p.PossPro == "" || p.Reflexive == "" {
 		return 0, ErrNoForms
 	}
@@ -127,7 +127,7 @@ const (
 )
 
 // Pronouns ...
-func (db *Db) Pronouns(order PronounOrder) (p []*PronounSet, err error) {
+func (db *DB) Pronouns(order PronounOrder) (p []*PronounSet, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -147,7 +147,7 @@ func (db *Db) Pronouns(order PronounOrder) (p []*PronounSet, err error) {
 	return
 }
 
-func (db *Db) IncrementPronounUse(p *PronounSet) {
+func (db *DB) IncrementPronounUse(p *PronounSet) {
 	Debug("Incrementing pronoun usage for %v, new usage %v", p.String(), p.Uses+1)
 
 	_, err := db.Exec(context.Background(), "update pronouns set uses = uses + 1 where id = $1", p.ID)

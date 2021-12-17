@@ -14,7 +14,7 @@ var (
 )
 
 // IsBlacklisted returns true if a channel is blacklisted
-func (db *Db) IsBlacklisted(guildID, channelID string) (b bool) {
+func (db *DB) IsBlacklisted(guildID, channelID string) (b bool) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -25,7 +25,7 @@ func (db *Db) IsBlacklisted(guildID, channelID string) (b bool) {
 }
 
 // AddToBlacklist adds the given channelID to the blacklist for guildID
-func (db *Db) AddToBlacklist(guildID string, channelIDs []string) (err error) {
+func (db *DB) AddToBlacklist(guildID string, channelIDs []string) (err error) {
 	for _, channelID := range channelIDs {
 		if db.IsBlacklisted(guildID, channelID) {
 			return ErrorAlreadyBlacklisted
@@ -49,7 +49,7 @@ func (db *Db) AddToBlacklist(guildID string, channelIDs []string) (err error) {
 }
 
 // RemoveFromBlacklist removes the given channelID from the blacklist for guildID
-func (db *Db) RemoveFromBlacklist(guildID, channelID string) (err error) {
+func (db *DB) RemoveFromBlacklist(guildID, channelID string) (err error) {
 	if !db.IsBlacklisted(guildID, channelID) {
 		return ErrorNotBlacklisted
 	}
@@ -71,7 +71,7 @@ func (db *Db) RemoveFromBlacklist(guildID, channelID string) (err error) {
 }
 
 // GetBlacklist returns the channel blacklist for guildID
-func (db *Db) GetBlacklist(guildID string) (b []string, err error) {
+func (db *DB) GetBlacklist(guildID string) (b []string, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -82,7 +82,7 @@ func (db *Db) GetBlacklist(guildID string) (b []string, err error) {
 }
 
 // CtxInBlacklist is a wrapper around IsBlacklisted for bcr
-func (db *Db) CtxInBlacklist(ctx bcr.Contexter) bool {
+func (db *DB) CtxInBlacklist(ctx bcr.Contexter) bool {
 	if ctx.GetGuild() == nil {
 		return false
 	}

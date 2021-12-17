@@ -19,7 +19,7 @@ const DisputedText = "This term is **disputed**. This means for one reason or an
 type Term = search.Term
 
 // TermEmbed creates a Discord embed from a term object
-func (db *Db) TermEmbed(t *Term) discord.Embed {
+func (db *DB) TermEmbed(t *Term) discord.Embed {
 	if t == nil {
 		return discord.Embed{Color: EmbedColour}
 	}
@@ -136,7 +136,7 @@ var linkRegexp = regexp.MustCompile(`\[\[(.*?)(\|.*?)?\]\]`)
 var lowercaseRegexp = regexp.MustCompile(`[a-z]`)
 
 // LinkTerms creates a strings.Replacer for all links in the page
-func (db *Db) LinkTerms(input string) string {
+func (db *DB) LinkTerms(input string) string {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -193,7 +193,7 @@ func (db *Db) LinkTerms(input string) string {
 
 var numberRegex = regexp.MustCompile(`^\d+$`)
 
-func (db *Db) findTerm(ctx context.Context, conn *pgxpool.Conn, in string) (id int, name string, err error) {
+func (db *DB) findTerm(ctx context.Context, conn *pgxpool.Conn, in string) (id int, name string, err error) {
 	sql := "select id, name from terms where "
 
 	if numberRegex.MatchString(in) {

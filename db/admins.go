@@ -1,7 +1,7 @@
 package db
 
 // AddAdmin adds an admin to the database
-func (db *Db) AddAdmin(id string) (err error) {
+func (db *DB) AddAdmin(id string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -21,7 +21,7 @@ func (db *Db) AddAdmin(id string) (err error) {
 }
 
 // GetAdmins gets the current admins as a slice of strings
-func (db *Db) GetAdmins() (admins []string, err error) {
+func (db *DB) GetAdmins() (admins []string, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 

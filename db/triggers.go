@@ -18,7 +18,7 @@ type Explanation struct {
 }
 
 // AddExplanation adds an explanation to the database
-func (db *Db) AddExplanation(e *Explanation) (ex *Explanation, err error) {
+func (db *DB) AddExplanation(e *Explanation) (ex *Explanation, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -29,7 +29,7 @@ func (db *Db) AddExplanation(e *Explanation) (ex *Explanation, err error) {
 }
 
 // GetExplanation ...
-func (db *Db) GetExplanation(s string) (e *Explanation, err error) {
+func (db *DB) GetExplanation(s string) (e *Explanation, err error) {
 	e = &Explanation{}
 
 	ctx, cancel := db.Context()
@@ -42,7 +42,7 @@ func (db *Db) GetExplanation(s string) (e *Explanation, err error) {
 }
 
 // GetAllExplanations ...
-func (db *Db) GetAllExplanations() (e []*Explanation, err error) {
+func (db *DB) GetAllExplanations() (e []*Explanation, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -53,7 +53,7 @@ func (db *Db) GetAllExplanations() (e []*Explanation, err error) {
 }
 
 // GetCmdExplanations ...
-func (db *Db) GetCmdExplanations() (e []*Explanation, err error) {
+func (db *DB) GetCmdExplanations() (e []*Explanation, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -64,7 +64,7 @@ func (db *Db) GetCmdExplanations() (e []*Explanation, err error) {
 }
 
 // SetAsCommand ...
-func (db *Db) SetAsCommand(id int, b bool) (err error) {
+func (db *DB) SetAsCommand(id int, b bool) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 

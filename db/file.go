@@ -28,7 +28,7 @@ func (f File) URL() string {
 }
 
 // AddFile adds a file
-func (db *Db) AddFile(filename, contentType string, data []byte) (f *File, err error) {
+func (db *DB) AddFile(filename, contentType string, data []byte) (f *File, err error) {
 	f = &File{}
 
 	ctx, cancel := db.Context()
@@ -49,7 +49,7 @@ func (db *Db) AddFile(filename, contentType string, data []byte) (f *File, err e
 }
 
 // File gets a file from the database
-func (db *Db) File(id snowflake.ID) (f File, err error) {
+func (db *DB) File(id snowflake.ID) (f File, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -70,7 +70,7 @@ func (db *Db) File(id snowflake.ID) (f File, err error) {
 }
 
 // Files gets all files
-func (db *Db) Files() (f []File, err error) {
+func (db *DB) Files() (f []File, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -81,7 +81,7 @@ func (db *Db) Files() (f []File, err error) {
 }
 
 // FileName returns files with the given string in their name
-func (db *Db) FileName(s string) (f []File, err error) {
+func (db *DB) FileName(s string) (f []File, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 

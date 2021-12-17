@@ -5,7 +5,7 @@ import (
 )
 
 // Tags gets all tags from the database
-func (db *Db) Tags() (s []string, err error) {
+func (db *DB) Tags() (s []string, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -16,7 +16,7 @@ func (db *Db) Tags() (s []string, err error) {
 }
 
 // TagTerms ...
-func (db *Db) TagTerms(tag string) (t []*Term, err error) {
+func (db *DB) TagTerms(tag string) (t []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -29,7 +29,7 @@ func (db *Db) TagTerms(tag string) (t []*Term, err error) {
 }
 
 // UntaggedTerms ...
-func (db *Db) UntaggedTerms() (t []*Term, err error) {
+func (db *DB) UntaggedTerms() (t []*Term, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 

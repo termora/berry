@@ -21,7 +21,7 @@ import (
 )
 
 type site struct {
-	db    *db.Db
+	db    *db.DB
 	conf  conf
 	sugar *zap.SugaredLogger
 }
@@ -100,7 +100,7 @@ func main() {
 
 	configFile, err := ioutil.ReadFile("config.yaml")
 	if err != nil {
-		panic(err)
+		sugar.Fatal(err)
 	}
 	err = yaml.Unmarshal(configFile, &c)
 	if err != nil {

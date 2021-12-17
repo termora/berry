@@ -21,7 +21,7 @@ type Export struct {
 }
 
 // New exports the database db
-func New(db *dbpkg.Db) (e Export, err error) {
+func New(db *dbpkg.DB) (e Export, err error) {
 	e = Export{ExportDate: time.Now().UTC(), Version: ExportVersion}
 
 	e.Categories, err = db.GetCategories()

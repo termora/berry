@@ -24,7 +24,7 @@ type Error struct {
 }
 
 // InternalError sends an error message and logs the error to the database
-func (db *Db) InternalError(ctx bcr.Contexter, e error) error {
+func (db *DB) InternalError(ctx bcr.Contexter, e error) error {
 	if db.useSentry {
 		return db.sentryError(ctx, e)
 	}
@@ -51,7 +51,7 @@ func (db *Db) InternalError(ctx bcr.Contexter, e error) error {
 }
 
 // CaptureError captures an error with additional context
-func (db *Db) CaptureError(ctx bcr.Contexter, e error) *sentry.EventID {
+func (db *DB) CaptureError(ctx bcr.Contexter, e error) *sentry.EventID {
 	// clone the hub
 	hub := db.sentry.Clone()
 
@@ -88,7 +88,7 @@ func (db *Db) CaptureError(ctx bcr.Contexter, e error) *sentry.EventID {
 	return hub.CaptureException(e)
 }
 
-func (db *Db) sentryError(ctx bcr.Contexter, e error) error {
+func (db *DB) sentryError(ctx bcr.Contexter, e error) error {
 	db.Sugar.Error(e)
 
 	// check if it's a problem on our end, to avoid blowing through Sentry's limits
@@ -134,7 +134,7 @@ func (db *Db) sentryError(ctx bcr.Contexter, e error) error {
 }
 
 // Error ...
-func (db *Db) Error(id string) (e *Error, err error) {
+func (db *DB) Error(id string) (e *Error, err error) {
 	e = &Error{}
 
 	ctx, cancel := db.Context()
@@ -147,7 +147,7 @@ func (db *Db) Error(id string) (e *Error, err error) {
 }
 
 // SetSentry ...
-func (db *Db) SetSentry(hub *sentry.Hub) {
+func (db *DB) SetSentry(hub *sentry.Hub) {
 	if hub == nil {
 		return
 	}

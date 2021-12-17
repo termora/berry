@@ -11,7 +11,7 @@ type Category struct {
 }
 
 // CategoryID gets the ID from a category name
-func (db *Db) CategoryID(s string) (id int, err error) {
+func (db *DB) CategoryID(s string) (id int, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -22,7 +22,7 @@ func (db *Db) CategoryID(s string) (id int, err error) {
 }
 
 // GetCategories ...
-func (db *Db) GetCategories() (c []*Category, err error) {
+func (db *DB) GetCategories() (c []*Category, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -34,7 +34,7 @@ func (db *Db) GetCategories() (c []*Category, err error) {
 }
 
 // CategoryFromID ...
-func (db *Db) CategoryFromID(id int) (c *Category) {
+func (db *DB) CategoryFromID(id int) (c *Category) {
 	c = &Category{}
 
 	ctx, cancel := db.Context()

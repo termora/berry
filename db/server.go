@@ -1,7 +1,7 @@
 package db
 
 // CreateServerIfNotExists returns true if the server exists
-func (db *Db) CreateServerIfNotExists(guildID string) (exists bool, err error) {
+func (db *DB) CreateServerIfNotExists(guildID string) (exists bool, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
@@ -28,7 +28,7 @@ func (db *Db) CreateServerIfNotExists(guildID string) (exists bool, err error) {
 }
 
 // DeleteServer deletes a server's database entry
-func (db *Db) DeleteServer(guildID string) (err error) {
+func (db *DB) DeleteServer(guildID string) (err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 

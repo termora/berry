@@ -28,7 +28,7 @@ import (
 var Debug = func(template string, args ...interface{}) {}
 
 // Db ...
-type Db struct {
+type DB struct {
 	// Embedded search methods
 	search.Searcher
 	*pgxpool.Pool
@@ -51,7 +51,7 @@ type Db struct {
 }
 
 // Init ...
-func Init(url string, sugar *zap.SugaredLogger) (db *Db, err error) {
+func Init(url string, sugar *zap.SugaredLogger) (db *DB, err error) {
 	guildCache := ttlcache.NewCache()
 	guildCache.SetCacheSizeLimit(100)
 	guildCache.SetTTL(10 * time.Minute)
@@ -76,7 +76,7 @@ func Init(url string, sugar *zap.SugaredLogger) (db *Db, err error) {
 		return nil, fmt.Errorf("Unable to connect to database: %w", err)
 	}
 
-	db = &Db{
+	db = &DB{
 		Snowflake:  snowflake.NewGen(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
 		Pool:       pool,
 		Sugar:      sugar,
@@ -122,30 +122,30 @@ func runMigrations(url string, sugar *zap.SugaredLogger) (err error) {
 }
 
 // Time gets the time from a snowflake
-func (db *Db) Time(s snowflake.ID) time.Time {
+func (db *DB) Time(s snowflake.ID) time.Time {
 	t, _ := db.Snowflake.Parse(s)
 	return t
 }
 
 // Context is a convenience method to get a context.Context with the database's timeout
-func (db *Db) Context() (context.Context, context.CancelFunc) {
+func (db *DB) Context() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), db.Timeout)
 }
 
 // QueryRow ...
-func (db *Db) QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row {
+func (db *DB) QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row {
 	go db.IncFunc()
 	return db.Pool.QueryRow(ctx, sql, args...)
 }
 
 // Query ...
-func (db *Db) Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error) {
+func (db *DB) Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error) {
 	go db.IncFunc()
 	return db.Pool.Query(ctx, sql, args...)
 }
 
 // Exec ...
-func (db *Db) Exec(ctx context.Context, sql string, args ...interface{}) (pgconn.CommandTag, error) {
+func (db *DB) Exec(ctx context.Context, sql string, args ...interface{}) (pgconn.CommandTag, error) {
 	go db.IncFunc()
 	return db.Pool.Exec(ctx, sql, args...)
 }

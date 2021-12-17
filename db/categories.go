@@ -1,7 +1,7 @@
 package db
 
 // AddCategory ...
-func (db *Db) AddCategory(name string) (id int, err error) {
+func (db *DB) AddCategory(name string) (id int, err error) {
 	ctx, cancel := db.Context()
 	defer cancel()
 
