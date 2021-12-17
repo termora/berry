@@ -96,9 +96,10 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		SlashCommand: c.explanation,
 		Options: &[]discord.CommandOption{
 			&discord.StringOption{
-				OptionName:  "explanation",
-				Description: "Which explanation to show",
-				Required:    true,
+				OptionName:   "explanation",
+				Description:  "Which explanation to show",
+				Required:     true,
+				Autocomplete: true,
 			},
 		},
 	}))

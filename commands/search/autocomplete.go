@@ -23,6 +23,22 @@ func (c *commands) doAutocomplete(ev *gateway.InteractionCreateEvent) {
 		return
 	}
 
+	if dat.Name == "explain" {
+		exs, err := c.DB.GetAllExplanations()
+		if err != nil {
+			c.Sugar.Errorf("Error getting explanations: %v", err)
+			return
+		}
+
+		choices := make([]api.AutocompleteChoice, 0, len(exs))
+		for _, ex := range exs {
+			choices = append(choices, api.AutocompleteChoice{Name: ex.Name, Value: ex.Name})
+		}
+
+		respond(choices)
+		return
+	}
+
 	if dat.Name != "search" && dat.Name != "define" {
 		return
 	}
