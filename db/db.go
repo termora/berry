@@ -33,7 +33,7 @@ type DB struct {
 	search.Searcher
 	*pgxpool.Pool
 
-	Sugar      *zap.SugaredLogger
+	Log        *zap.SugaredLogger
 	GuildCache *ttlcache.Cache
 
 	Config *structs.BotConfig
@@ -79,7 +79,7 @@ func Init(url string, sugar *zap.SugaredLogger) (db *DB, err error) {
 	db = &DB{
 		Snowflake:  snowflake.NewGen(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
 		Pool:       pool,
-		Sugar:      sugar,
+		Log:        sugar,
 		GuildCache: guildCache,
 		Timeout:    10 * time.Second,
 		Searcher:   pg.New(pool, Debug),

@@ -353,7 +353,7 @@ func (bot *Bot) searchSlash(ctx bcr.Contexter) (err error) {
 			},
 		})
 		if err != nil {
-			bot.Sugar.Errorf("Error responding to interaction: %v", err)
+			bot.Log.Errorf("Error responding to interaction: %v", err)
 		}
 
 		return false

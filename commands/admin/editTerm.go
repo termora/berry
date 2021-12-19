@@ -275,7 +275,7 @@ func (bot *Bot) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 		_, err = bot.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(tags[i]), tags[i])
 		if err != nil {
-			bot.Sugar.Errorf("Error adding tag: %v", err)
+			bot.Log.Errorf("Error adding tag: %v", err)
 		}
 		tags[i] = strings.ToLower(tags[i])
 	}

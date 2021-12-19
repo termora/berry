@@ -19,7 +19,7 @@ func (bot *Bot) setStatusLoop(s *state.State) {
 	// spin off a function to fetch the guild count (well, actually fetch all guilds)
 	// it's also used by `t!admin guilds`, which is why we run this even if the server count isn't shown in the bot's status
 	if s.Gateway.Identifier.Shard.ShardID() == 0 {
-		bot.Sugar.Debugf("Spawning guildCount function on shard %v", s.Gateway.Identifier.Shard.ShardID())
+		bot.Log.Debugf("Spawning guildCount function on shard %v", s.Gateway.Identifier.Shard.ShardID())
 		go bot.guildCount(s)
 	}
 
@@ -27,7 +27,7 @@ func (bot *Bot) setStatusLoop(s *state.State) {
 		// if something else set a static status, return
 		select {
 		case <-bot.stopStatus:
-			bot.Sugar.Infof("Status loop stopped.")
+			bot.Log.Infof("Status loop stopped.")
 			return
 		default:
 		}
@@ -54,7 +54,7 @@ func (bot *Bot) setStatusLoop(s *state.State) {
 				Type: discord.GameActivity,
 			}},
 		}); err != nil {
-			bot.Sugar.Error("Error setting status:", err)
+			bot.Log.Error("Error setting status:", err)
 		}
 
 		// wait two minutes to switch to other status
@@ -68,7 +68,7 @@ func (bot *Bot) setStatusLoop(s *state.State) {
 		// same as above--if a static status was set, return
 		select {
 		case <-bot.stopStatus:
-			bot.Sugar.Infof("Status loop stopped.")
+			bot.Log.Infof("Status loop stopped.")
 			return
 		default:
 		}
@@ -97,7 +97,7 @@ func (bot *Bot) setStatusLoop(s *state.State) {
 				Type: discord.GameActivity,
 			}},
 		}); err != nil {
-			bot.Sugar.Error("Error setting status:", err)
+			bot.Log.Error("Error setting status:", err)
 		}
 
 		// run once every two minutes
@@ -115,7 +115,7 @@ func (bot *Bot) guildCount(s *state.State) {
 		bot.GuildsMu.Unlock()
 
 		if err := bot.postGuildCount(s, count); err != nil {
-			bot.Sugar.Errorf("Error posting guild count: %v", err)
+			bot.Log.Errorf("Error posting guild count: %v", err)
 		}
 
 		// only run this once every hour
@@ -132,7 +132,7 @@ func (bot *Bot) postGuildCount(s *state.State, count int) (err error) {
 	if bot.Config.BotLists.TopGG != "" {
 		url := fmt.Sprintf("https://top.gg/api/bots/%v/stats", u.ID)
 
-		bot.Sugar.Infof("Posting guild count (%v) to top.gg's API", count)
+		bot.Log.Infof("Posting guild count (%v) to top.gg's API", count)
 
 		body := fmt.Sprintf(`{"server_count": %v}`, count)
 
@@ -150,13 +150,13 @@ func (bot *Bot) postGuildCount(s *state.State, count int) (err error) {
 		}
 		resp.Body.Close()
 
-		bot.Sugar.Infof("Posted guild count to top.gg's API")
+		bot.Log.Infof("Posted guild count to top.gg's API")
 	}
 
 	if bot.Config.BotLists.BotsGG != "" {
 		url := fmt.Sprintf("https://discord.bots.gg/api/v1/bots/%v/stats", u.ID)
 
-		bot.Sugar.Infof("Posting guild count (%v) to discord.bots.gg's API", count)
+		bot.Log.Infof("Posting guild count (%v) to discord.bots.gg's API", count)
 
 		body := fmt.Sprintf(`{"guildCount": %v}`, count)
 
@@ -179,7 +179,7 @@ func (bot *Bot) postGuildCount(s *state.State, count int) (err error) {
 		}
 		resp.Body.Close()
 
-		bot.Sugar.Infof("Posted guild count to discord.bots.gg's API")
+		bot.Log.Infof("Posted guild count to discord.bots.gg's API")
 	}
 
 	return nil

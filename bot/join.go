@@ -17,11 +17,11 @@ func (bot *Bot) GuildCreate(g *gateway.GuildCreateEvent) {
 		return
 	}
 	if err != nil {
-		bot.Sugar.Errorf("Error creating database entry for server: %v", err)
+		bot.Log.Errorf("Error creating database entry for server: %v", err)
 		return
 	}
 
-	bot.Sugar.Infof("Joined server %v (%v).", g.Name, g.ID)
+	bot.Log.Infof("Joined server %v (%v).", g.Name, g.ID)
 
 	// if there's no channel to log joins/leaves to, return
 	if bot.Config.Bot.JoinLogChannel == 0 {
@@ -35,7 +35,7 @@ func (bot *Bot) GuildCreate(g *gateway.GuildCreateEvent) {
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
 	if err != nil {
-		bot.Sugar.Errorf("Error sending log message: %v", err)
+		bot.Log.Errorf("Error sending log message: %v", err)
 	}
 	return
 }
@@ -50,7 +50,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 	// delete the server's database entry
 	err := bot.DB.DeleteServer(g.ID.String())
 	if err != nil {
-		bot.Sugar.Errorf("Error deleting database entry for %v: %v", g.ID, err)
+		bot.Log.Errorf("Error deleting database entry for %v: %v", g.ID, err)
 	}
 
 	s, _ := bot.Router.StateFromGuildID(g.ID)
@@ -63,7 +63,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 	}
 
 	// otherwise, use the cached guild
-	bot.Sugar.Infof("Left server %v (%v)", guild.Name, guild.ID)
+	bot.Log.Infof("Left server %v (%v)", guild.Name, guild.ID)
 
 	// if there's no channel to log joins/leaves to, return
 	if bot.Config.Bot.JoinLogChannel == 0 {
@@ -75,7 +75,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
 	if err != nil {
-		bot.Sugar.Errorf("Error sending log message: %v", err)
+		bot.Log.Errorf("Error sending log message: %v", err)
 	}
 	return
 }
@@ -83,7 +83,7 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 // this is run if the left guild isn't found in the state
 // which gives us almost no info, only the ID
 func (bot *Bot) guildDeleteNoState(s *state.State, g *gateway.GuildDeleteEvent) {
-	bot.Sugar.Infof("Left server %v.", g.ID)
+	bot.Log.Infof("Left server %v.", g.ID)
 
 	// if there's no channel to log joins/leaves to, return
 	if bot.Config.Bot.JoinLogChannel == 0 {
@@ -95,7 +95,7 @@ func (bot *Bot) guildDeleteNoState(s *state.State, g *gateway.GuildDeleteEvent) 
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
 	if err != nil {
-		bot.Sugar.Errorf("Error sending log message: %v", err)
+		bot.Log.Errorf("Error sending log message: %v", err)
 	}
 	return
 }

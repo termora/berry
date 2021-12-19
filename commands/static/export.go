@@ -39,7 +39,7 @@ func (bot *Bot) export(ctx *bcr.Context) (err error) {
 
 	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		bot.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		bot.Log.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
 		return
 	}
@@ -111,7 +111,7 @@ func (bot *Bot) exportCSV(ctx *bcr.Context) (err error) {
 
 	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		bot.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		bot.Log.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
 		return
 	}
@@ -172,7 +172,7 @@ func (bot *Bot) exportXLSX(ctx *bcr.Context) (err error) {
 
 	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		bot.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		bot.Log.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
 		return
 	}

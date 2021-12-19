@@ -15,7 +15,7 @@ func (bot *Bot) error(ctx *bcr.Context) (err error) {
 
 	e, err := bot.DB.Error(ctx.RawArgs)
 	if err != nil {
-		bot.Sugar.Errorf("Error when retrieving error with ID %v: %v", ctx.RawArgs, err)
+		bot.Log.Errorf("Error when retrieving error with ID %v: %v", ctx.RawArgs, err)
 		_, err = ctx.Send("Error with that ID not found, or another error occurred.")
 		return err
 	}

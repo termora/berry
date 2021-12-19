@@ -20,8 +20,8 @@ func (bot *Bot) InteractionCreate(ic *gateway.InteractionCreateEvent) {
 	defer func() {
 		r := recover()
 		if r != nil {
-			bot.Sugar.Errorf("Caught panic in channel ID %v (guild %v): %v", ic.ChannelID, ic.GuildID, r)
-			bot.Sugar.Infof("Panicking command: %v", ic.Data.(*discord.CommandInteraction).Name)
+			bot.Log.Errorf("Caught panic in channel ID %v (guild %v): %v", ic.ChannelID, ic.GuildID, r)
+			bot.Log.Infof("Panicking command: %v", ic.Data.(*discord.CommandInteraction).Name)
 
 			// if something causes a panic, it's our problem, because *it shouldn't panic*
 			// so skip checking the error and just immediately report it
@@ -65,13 +65,13 @@ func (bot *Bot) InteractionCreate(ic *gateway.InteractionCreateEvent) {
 
 	ctx, err := bot.Router.NewSlashContext(ic)
 	if err != nil {
-		bot.Sugar.Errorf("Couldn't create slash context: %v", err)
+		bot.Log.Errorf("Couldn't create slash context: %v", err)
 		return
 	}
 
 	err = bot.Router.ExecuteSlash(ctx)
 	if err != nil {
-		bot.Sugar.Errorf("Couldn't execute slash command: %v", err)
+		bot.Log.Errorf("Couldn't execute slash command: %v", err)
 	}
 
 	bot.Stats.IncCommand()

@@ -26,7 +26,7 @@ func (bot *Bot) doAutocomplete(ev *gateway.InteractionCreateEvent) {
 	if dat.Name == "explain" {
 		exs, err := bot.DB.GetAllExplanations()
 		if err != nil {
-			bot.Sugar.Errorf("Error getting explanations: %v", err)
+			bot.Log.Errorf("Error getting explanations: %v", err)
 			return
 		}
 
@@ -60,7 +60,7 @@ func (bot *Bot) doAutocomplete(ev *gateway.InteractionCreateEvent) {
 
 	terms, err := bot.DB.Autocomplete(searchTerm)
 	if err != nil {
-		bot.Sugar.Errorf("Error doing autocomplete search: %v", err)
+		bot.Log.Errorf("Error doing autocomplete search: %v", err)
 		return
 	}
 

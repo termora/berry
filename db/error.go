@@ -29,7 +29,7 @@ func (db *DB) InternalError(ctx bcr.Contexter, e error) error {
 		return db.sentryError(ctx, e)
 	}
 	// log to console
-	db.Sugar.Error(e)
+	db.Log.Error(e)
 
 	s := "An internal error has occurred. If this issue persists, please contact the bot developer."
 	if db.Config != nil {
@@ -89,7 +89,7 @@ func (db *DB) CaptureError(ctx bcr.Contexter, e error) *sentry.EventID {
 }
 
 func (db *DB) sentryError(ctx bcr.Contexter, e error) error {
-	db.Sugar.Error(e)
+	db.Log.Error(e)
 
 	// check if it's a problem on our end, to avoid blowing through Sentry's limits
 	if !IsOurProblem(e) {

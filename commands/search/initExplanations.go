@@ -13,7 +13,7 @@ func (bot *Bot) initExplanations(r *bcr.Router) (out []*bcr.Command) {
 	// get explanations *that are marked as being able to be invoked as commands*
 	explanations, err := bot.DB.GetCmdExplanations()
 	if err != nil {
-		bot.Sugar.Error("Error getting explanations:", err)
+		bot.Log.Error("Error getting explanations:", err)
 		return
 	}
 

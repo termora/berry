@@ -24,7 +24,7 @@ import (
 type Bot struct {
 	*bcrbot.Bot
 
-	Sugar  *zap.SugaredLogger
+	Log    *zap.SugaredLogger
 	Config *structs.BotConfig
 	DB     *db.DB
 
@@ -53,7 +53,7 @@ func New(
 	db *db.DB, hub *sentry.Hub) *Bot {
 	b := &Bot{
 		Bot:       bot,
-		Sugar:     s,
+		Log:       s,
 		Config:    config,
 		DB:        db,
 		Sentry:    hub,
@@ -120,12 +120,12 @@ func (bot *Bot) guildCount() int {
 
 func (bot *Bot) setupStats() {
 	if bot.Config.Auth.InfluxDB.URL != "" {
-		bot.Sugar.Infof("Setting up InfluxDB client")
+		bot.Log.Infof("Setting up InfluxDB client")
 
 		bot.Stats = &StatsClient{
 			Client:     influxdb2.NewClient(bot.Config.Auth.InfluxDB.URL, bot.Config.Auth.InfluxDB.Token).WriteAPI(bot.Config.Auth.InfluxDB.Org, bot.Config.Auth.InfluxDB.Bucket),
 			guildCount: bot.guildCount,
-			log:        bot.Sugar,
+			log:        bot.Log,
 		}
 
 		bot.Router.ShardManager.ForEach(func(s shard.Shard) {

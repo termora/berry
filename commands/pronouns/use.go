@@ -152,7 +152,7 @@ func (bot *Bot) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name strin
 			},
 		})
 		if err != nil {
-			bot.Sugar.Errorf("Error responding to interaction: %v", err)
+			bot.Log.Errorf("Error responding to interaction: %v", err)
 		}
 
 		return false
@@ -249,7 +249,7 @@ func (bot *Bot) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name strin
 			},
 		})
 		if err != nil {
-			bot.Sugar.Errorf("Error responding to interaction: %v", err)
+			bot.Log.Errorf("Error responding to interaction: %v", err)
 		}
 
 		_, _, err = ctx.ButtonPages(e, 15*time.Minute)
@@ -260,7 +260,7 @@ func (bot *Bot) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name strin
 
 	err = ctx.Session().DeleteMessage(msg.ChannelID, msg.ID, "")
 	if err != nil {
-		bot.Sugar.Errorf("Error deleting message: %v", err)
+		bot.Log.Errorf("Error deleting message: %v", err)
 	}
 	return nil
 }

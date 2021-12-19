@@ -36,7 +36,7 @@ func (db *DB) CategoryFromRole(id discord.RoleID) *ContributorCategory {
 	err := pgxscan.Get(context.Background(), db, &c, "select * from contributor_categories where role_id = $1", id)
 	if err != nil {
 		if errors.Cause(err) != pgx.ErrNoRows {
-			db.Sugar.Errorf("Error getting contributor category: %v", err)
+			db.Log.Errorf("Error getting contributor category: %v", err)
 		}
 		return nil
 	}
@@ -57,7 +57,7 @@ func (db *DB) ContributorCategory(name string) *ContributorCategory {
 	err := pgxscan.Get(context.Background(), db, &c, "select * from contributor_categories where $1 ilike name", name)
 	if err != nil {
 		if errors.Cause(err) != pgx.ErrNoRows {
-			db.Sugar.Errorf("Error getting contributor category: %v", err)
+			db.Log.Errorf("Error getting contributor category: %v", err)
 		}
 		return nil
 	}

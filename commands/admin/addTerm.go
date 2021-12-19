@@ -103,7 +103,7 @@ func (bot *Bot) addTerm(ctx *bcr.Context) (err error) {
 		_, err = bot.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(strings.TrimSpace(tag)), tag)
 		if err != nil {
-			bot.Sugar.Errorf("Error adding tag: %v", err)
+			bot.Log.Errorf("Error adding tag: %v", err)
 		}
 	}
 

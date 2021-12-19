@@ -19,8 +19,8 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	defer func() {
 		r := recover()
 		if r != nil {
-			bot.Sugar.Errorf("Caught panic in channel ID %v (user %v, guild %v): %v", m.ChannelID, m.Author.ID, m.GuildID, r)
-			bot.Sugar.Infof("Panic message content:\n```\n%v\n```", m.Content)
+			bot.Log.Errorf("Caught panic in channel ID %v (user %v, guild %v): %v", m.ChannelID, m.Author.ID, m.GuildID, r)
+			bot.Log.Infof("Panic message content:\n```\n%v\n```", m.Content)
 
 			// if something causes a panic, it's our problem, because *it shouldn't panic*
 			// so skip checking the error and just immediately report it
@@ -69,27 +69,27 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 	ctx, err = bot.Router.NewContext(m)
 	if err != nil {
 		if err != bcr.ErrEmptyMessage {
-			bot.Sugar.Error("Error creating context:", err)
+			bot.Log.Error("Error creating context:", err)
 		}
 		return
 	}
 
 	// apparently we sometimes panic on line 83, not sure what happens there--just gonna return here
 	if ctx == nil {
-		bot.Sugar.Errorf("Error was %v, but Context is nil.", err)
+		bot.Log.Errorf("Error was %v, but Context is nil.", err)
 		return
 	}
 
 	// check if the message might be a command
 	if bot.Router.MatchPrefix(m.Message) {
-		bot.Sugar.Debugf("Maybe executing command `%v`", ctx.Command)
+		bot.Log.Debugf("Maybe executing command `%v`", ctx.Command)
 
 		err = bot.Router.Execute(ctx)
 		if err != nil {
 			if db.IsOurProblem(err) && bot.UseSentry {
 				bot.DB.CaptureError(ctx, err)
 			}
-			bot.Sugar.Error(err)
+			bot.Log.Error(err)
 		}
 
 		bot.Stats.IncCommand()

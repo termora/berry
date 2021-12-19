@@ -152,6 +152,6 @@ func (db *DB) IncrementPronounUse(p *PronounSet) {
 
 	_, err := db.Exec(context.Background(), "update pronouns set uses = uses + 1 where id = $1", p.ID)
 	if err != nil {
-		db.Sugar.Errorf("Error updating uses of pronoun set %v: %v", p.String(), err)
+		db.Log.Errorf("Error updating uses of pronoun set %v: %v", p.String(), err)
 	}
 }

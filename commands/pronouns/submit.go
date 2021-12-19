@@ -82,7 +82,7 @@ func (bot *Bot) submit(ctx *bcr.Context) (err error) {
 		// so don't just return immediately
 		ctx.State.React(msg.ChannelID, msg.ID, "✅")
 	} else {
-		bot.Sugar.Errorf("Error adding submission message %v to database: %v", msg.ID, err)
+		bot.Log.Errorf("Error adding submission message %v to database: %v", msg.ID, err)
 	}
 
 	_, err = ctx.NewMessage().Content(

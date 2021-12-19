@@ -87,7 +87,7 @@ func (bot *Bot) updateTags(ctx *bcr.Context) (err error) {
 		if err != nil {
 			return bot.DB.InternalError(ctx, err)
 		}
-		bot.Sugar.Debugf("Updated %v's tags to %v", t.ID, t.Tags)
+		bot.Log.Debugf("Updated %v's tags to %v", t.ID, t.Tags)
 	}
 
 	// hehe numbers
@@ -99,7 +99,7 @@ func (bot *Bot) updateTags(ctx *bcr.Context) (err error) {
 		ct, err := bot.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(t), t)
 		if err != nil {
-			bot.Sugar.Errorf("Error adding tag: %v", err)
+			bot.Log.Errorf("Error adding tag: %v", err)
 		}
 
 		count += ct.RowsAffected()

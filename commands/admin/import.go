@@ -171,7 +171,7 @@ done:
 		_, err = bot.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(t.Tags[i]), t.Tags[i])
 		if err != nil {
-			bot.Sugar.Errorf("Error adding tag: %v", err)
+			bot.Log.Errorf("Error adding tag: %v", err)
 		}
 
 		t.DisplayTags = append(t.DisplayTags, t.Tags[i])

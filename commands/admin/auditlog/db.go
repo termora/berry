@@ -193,7 +193,7 @@ func (bot *AuditLog) desc(entry Entry) string {
 	case TermEntry:
 		term, err := entry.BeforeTerm()
 		if err != nil {
-			bot.DB.Sugar.Errorf("Error unmarshaling term: %v", err)
+			bot.DB.Log.Errorf("Error unmarshaling term: %v", err)
 		}
 
 		desc += " term **"

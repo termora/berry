@@ -173,12 +173,12 @@ func Init(b *bot.Bot) (m string, o []*bcr.Command) {
 
 	bytes, err := os.ReadFile("custom_commands.json")
 	if err != nil {
-		bot.Sugar.Fatalf("Error reading custom commands file: %v", err)
+		bot.Log.Fatalf("Error reading custom commands file: %v", err)
 	}
 
 	cmds, err := cc.ParseBytes(bytes)
 	if err != nil {
-		bot.Sugar.Fatalf("Error parsing custom commands file: %v", err)
+		bot.Log.Fatalf("Error parsing custom commands file: %v", err)
 	}
 
 	for _, c := range cmds {

@@ -38,7 +38,7 @@ func (bot *Bot) setCW(ctx *bcr.Context) (err error) {
 
 	err = bot.DB.SetCW(t.ID, cw)
 	if err != nil {
-		bot.Sugar.Errorf("Error setting CW for %v: %v", id, err)
+		bot.Log.Errorf("Error setting CW for %v: %v", id, err)
 		return bot.DB.InternalError(ctx, err)
 	}
 

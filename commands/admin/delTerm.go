@@ -36,7 +36,7 @@ func (bot *Bot) delTerm(ctx *bcr.Context) (err error) {
 
 	err = bot.DB.RemoveTerm(id)
 	if err != nil {
-		bot.Sugar.Error("Error removing term:", err)
+		bot.Log.Error("Error removing term:", err)
 		bot.DB.InternalError(ctx, err)
 		return
 	}
@@ -48,7 +48,7 @@ func (bot *Bot) delTerm(ctx *bcr.Context) (err error) {
 
 	_, err = ctx.Send("✅ Term deleted.")
 	if err != nil {
-		bot.Sugar.Error("Error sending message:", err)
+		bot.Log.Error("Error sending message:", err)
 	}
 	return nil
 }
