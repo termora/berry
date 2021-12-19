@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -18,8 +19,8 @@ func (bot *Bot) setStatusLoop(s *state.State) {
 
 	// spin off a function to fetch the guild count (well, actually fetch all guilds)
 	// it's also used by `t!admin guilds`, which is why we run this even if the server count isn't shown in the bot's status
-	if s.Gateway.Identifier.Shard.ShardID() == 0 {
-		bot.Log.Debugf("Spawning guildCount function on shard %v", s.Gateway.Identifier.Shard.ShardID())
+	if s.Ready().Shard.ShardID() == 0 {
+		bot.Log.Debugf("Spawning guildCount function on shard 0")
 		go bot.guildCount(s)
 	}
 
@@ -44,10 +45,10 @@ func (bot *Bot) setStatusLoop(s *state.State) {
 		}
 		// if the bot is sharded, also add the shard number to the status
 		if bot.Router.ShardManager.NumShards() > 1 && bot.Config.Bot.ShowShard {
-			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID()+1, bot.Router.ShardManager.NumShards())
+			status = fmt.Sprintf("%v | shard %v/%v", status, s.Ready().Shard.ShardID()+1, bot.Router.ShardManager.NumShards())
 		}
 
-		if err := s.UpdateStatus(gateway.UpdateStatusData{
+		if err := s.Gateway().Send(context.Background(), &gateway.UpdatePresenceCommand{
 			Status: discord.OnlineStatus,
 			Activities: []discord.Activity{{
 				Name: status,
@@ -87,10 +88,10 @@ func (bot *Bot) setStatusLoop(s *state.State) {
 
 		// if the bot is sharded, also add the shard number to the status
 		if bot.Router.ShardManager.NumShards() > 1 && bot.Config.Bot.ShowShard {
-			status = fmt.Sprintf("%v | shard %v/%v", status, s.Gateway.Identifier.Shard.ShardID()+1, bot.Router.ShardManager.NumShards())
+			status = fmt.Sprintf("%v | shard %v/%v", status, s.Ready().Shard.ShardID()+1, bot.Router.ShardManager.NumShards())
 		}
 
-		if err := s.UpdateStatus(gateway.UpdateStatusData{
+		if err := s.Gateway().Send(context.Background(), &gateway.UpdatePresenceCommand{
 			Status: discord.OnlineStatus,
 			Activities: []discord.Activity{{
 				Name: status,

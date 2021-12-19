@@ -11,11 +11,10 @@ import (
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api/webhook"
-	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/diamondburned/arikawa/v3/gateway/shard"
+	"github.com/diamondburned/arikawa/v3/session/shard"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/state/store"
-	"github.com/diamondburned/arikawa/v3/utils/wsutil"
+	"github.com/diamondburned/arikawa/v3/utils/ws"
 	"github.com/getsentry/sentry-go"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -70,7 +69,7 @@ func main() {
 	c := getConfig(sugar)
 
 	if debug {
-		wsutil.WSDebug = sugar.Debug
+		ws.WSDebug = sugar.Debug
 		db.Debug = sugar.Debugf
 	}
 
@@ -134,9 +133,10 @@ func main() {
 		state := s.(*state.State)
 
 		state.Cabinet.MessageStore = store.Noop
-		state.Gateway.ErrorLog = func(err error) {
+
+		state.AddHandler(func(err error) {
 			sugar.Errorf("Gateway error: %v", err)
-		}
+		})
 	})
 
 	b.Owner(c.Bot.BotOwners...)
@@ -199,7 +199,7 @@ func main() {
 
 	exitCh := make(chan struct{})
 	if !disableEventLoop {
-		eventCh := make(chan gateway.Event, 100)
+		eventCh := make(chan interface{}, 100)
 
 		go eventThing(sugar, eventCh, exitCh)
 
@@ -247,7 +247,7 @@ func timer(sugar *zap.SugaredLogger) {
 	}
 }
 
-func eventThing(s *zap.SugaredLogger, ch <-chan gateway.Event, out chan<- struct{}) {
+func eventThing(s *zap.SugaredLogger, ch <-chan interface{}, out chan<- struct{}) {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	defer stop()
 

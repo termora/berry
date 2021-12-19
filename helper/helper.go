@@ -23,10 +23,7 @@ const intents = gateway.IntentGuildMembers | gateway.IntentGuildMessages
 
 // New creates a new Helper, adds the required intents and event handlers, and opens the connection.
 func New(token string, id discord.GuildID, db *db.DB, log *zap.SugaredLogger) (*Helper, error) {
-	s, err := session.NewWithIntents("Bot "+token, intents)
-	if err != nil {
-		return nil, err
-	}
+	s := session.NewWithIntents("Bot "+token, intents)
 
 	h := &Helper{
 		Session: s,
@@ -37,7 +34,7 @@ func New(token string, id discord.GuildID, db *db.DB, log *zap.SugaredLogger) (*
 
 	h.AddHandler(h.memberUpdate)
 
-	err = h.Open(context.Background())
+	err := h.Open(context.Background())
 	if err != nil {
 		return nil, err
 	}
