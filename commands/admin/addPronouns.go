@@ -8,7 +8,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *Admin) addPronouns(ctx *bcr.Context) (err error) {
+func (bot *Bot) addPronouns(ctx *bcr.Context) (err error) {
 	i, skipped := 0, 0
 	for _, arg := range strings.Split(ctx.RawArgs, "\n") {
 		p := strings.Split(arg, "/")
@@ -17,7 +17,7 @@ func (c *Admin) addPronouns(ctx *bcr.Context) (err error) {
 			continue
 		}
 
-		_, err = c.DB.AddPronoun(db.PronounSet{
+		_, err = bot.DB.AddPronoun(db.PronounSet{
 			Subjective: p[0],
 			Objective:  p[1],
 			PossDet:    p[2],

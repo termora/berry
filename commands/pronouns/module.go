@@ -25,19 +25,19 @@ func init() {
 	tmplCount = len(files)
 }
 
-type commands struct {
+type Bot struct {
 	*bot.Bot
 
 	submitCooldown *ttlcache.Cache
 }
 
 // Init ...
-func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
-	c := &commands{
-		Bot:            bot,
+func Init(b *bot.Bot) (m string, list []*bcr.Command) {
+	bot := &Bot{
+		Bot:            b,
 		submitCooldown: ttlcache.NewCache(),
 	}
-	c.submitCooldown.SkipTTLExtensionOnHit(true)
+	bot.submitCooldown.SkipTTLExtensionOnHit(true)
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "list-pronouns",
@@ -54,7 +54,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Blacklistable: true,
 		Cooldown:      time.Second,
-		Command:       c.list,
+		Command:       bot.list,
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
@@ -64,7 +64,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Usage:   "<pronouns, forms separated with />",
 
 		Blacklistable: true,
-		Command:       c.submit,
+		Command:       bot.submit,
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
@@ -74,7 +74,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Blacklistable: true,
 		Cooldown:      time.Second,
-		Command:       c.random,
+		Command:       bot.random,
 	}))
 
 	pronouns := bot.Router.AddCommand(&bcr.Command{
@@ -86,7 +86,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Blacklistable: true,
 		Cooldown:      time.Second,
-		SlashCommand:  c.use,
+		SlashCommand:  bot.use,
 		Options: &[]discord.CommandOption{
 			&discord.StringOption{
 				OptionName:  "pronouns",
@@ -107,14 +107,14 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Usage:         "<pronoun set, space or slash separated>",
 		Blacklistable: true,
 		Cooldown:      time.Second,
-		Command:       c.custom,
+		Command:       bot.custom,
 	})
 
 	pronouns.AddSubcommand(bot.Router.AliasMust("list", []string{"l"}, []string{"list-pronouns"}, nil))
 	pronouns.AddSubcommand(bot.Router.AliasMust("submit", nil, []string{"submit-pronouns"}, nil))
 	pronouns.AddSubcommand(bot.Router.AliasMust("random", []string{"r"}, []string{"random-pronouns"}, nil))
 
-	bot.Router.AddHandler(c.reactionAdd)
+	bot.Router.AddHandler(bot.reactionAdd)
 
 	return "Pronoun commands", append(list, pronouns)
 }

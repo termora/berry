@@ -16,13 +16,13 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *commands) use(ctx bcr.Contexter) (err error) {
+func (bot *Bot) use(ctx bcr.Contexter) (err error) {
 	pronouns := ctx.GetStringFlag("pronouns")
 	name := ctx.GetStringFlag("name")
 	if v, ok := ctx.(*bcr.Context); ok {
 		if len(v.Args) == 0 {
 			return ctx.SendEphemeral(
-				fmt.Sprintf("You didn't give any pronouns to show! Try ``%vlist-pronouns`` for a list of all pronouns.", c.Config.Bot.Prefixes[0]))
+				fmt.Sprintf("You didn't give any pronouns to show! Try ``%vlist-pronouns`` for a list of all pronouns.", bot.Config.Bot.Prefixes[0]))
 		}
 
 		pronouns = v.Args[0]
@@ -33,31 +33,31 @@ func (c *commands) use(ctx bcr.Contexter) (err error) {
 
 	if pronouns == "" {
 		return ctx.SendEphemeral(
-			fmt.Sprintf("You didn't give any pronouns to show! Try ``%vlist-pronouns`` for a list of all pronouns.", c.Config.Bot.Prefixes[0]))
+			fmt.Sprintf("You didn't give any pronouns to show! Try ``%vlist-pronouns`` for a list of all pronouns.", bot.Config.Bot.Prefixes[0]))
 	}
 
-	sets, err := c.DB.GetPronoun(strings.Split(pronouns, "/")...)
+	sets, err := bot.DB.GetPronoun(strings.Split(pronouns, "/")...)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
 			return ctx.SendEphemeral(
-				fmt.Sprintf("Couldn't find any pronoun sets from your input. Try `%vlist-pronouns` for a list of all pronouns; if it's not on there, feel free to submit it with `%vsubmit-pronouns`!", c.Config.Bot.Prefixes[0], c.Config.Bot.Prefixes[0]))
+				fmt.Sprintf("Couldn't find any pronoun sets from your input. Try `%vlist-pronouns` for a list of all pronouns; if it's not on there, feel free to submit it with `%vsubmit-pronouns`!", bot.Config.Bot.Prefixes[0], bot.Config.Bot.Prefixes[0]))
 		}
 		if err == db.ErrTooManyForms {
 			return ctx.SendEphemeral("You gave too many forms! Input up to five forms, separated with a slash (`/`).")
 		}
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	if len(sets) > 1 {
 		if len(sets) > 25 {
 			return ctx.SendEphemeral("Found more than 25 sets matching your input! Please try again.")
 		}
-		return c.pronounList(ctx, sets, name)
+		return bot.pronounList(ctx, sets, name)
 	}
 	// use the first set
 	set := sets[0]
 
-	go c.DB.IncrementPronounUse(set)
+	go bot.DB.IncrementPronounUse(set)
 
 	if tmplCount == 0 {
 		return ctx.SendEphemeral("There are no examples available for pronouns! If you think this is in error, please join the bot support server and ask there.")
@@ -74,9 +74,9 @@ func (c *commands) use(ctx bcr.Contexter) (err error) {
 		useSet.Subjective = name
 	}
 
-	e, err := c.pronounEmbeds(set, useSet)
+	e, err := bot.pronounEmbeds(set, useSet)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	if v, ok := ctx.(*bcr.Context); ok {
@@ -87,7 +87,7 @@ func (c *commands) use(ctx bcr.Contexter) (err error) {
 	return
 }
 
-func (c *commands) pronounEmbeds(set, useSet *db.PronounSet) (e []discord.Embed, err error) {
+func (bot *Bot) pronounEmbeds(set, useSet *db.PronounSet) (e []discord.Embed, err error) {
 	var b strings.Builder
 
 	e = append(e, discord.Embed{
@@ -118,7 +118,7 @@ func (c *commands) pronounEmbeds(set, useSet *db.PronounSet) (e []discord.Embed,
 	return e, err
 }
 
-func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name string) (err error) {
+func (bot *Bot) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name string) (err error) {
 	s := "Found more than one set matching your input! Please select the set you want to use:"
 
 	options := []discord.SelectOption{}
@@ -152,7 +152,7 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 			},
 		})
 		if err != nil {
-			c.Sugar.Errorf("Error responding to interaction: %v", err)
+			bot.Sugar.Errorf("Error responding to interaction: %v", err)
 		}
 
 		return false
@@ -212,7 +212,7 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 
 	set := sets[ind]
 
-	go c.DB.IncrementPronounUse(set)
+	go bot.DB.IncrementPronounUse(set)
 
 	useSet := &db.PronounSet{
 		Subjective: set.Subjective,
@@ -225,9 +225,9 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 		useSet.Subjective = name
 	}
 
-	e, err := c.pronounEmbeds(set, useSet)
+	e, err := bot.pronounEmbeds(set, useSet)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	ev := v.(*gateway.InteractionCreateEvent)
@@ -249,7 +249,7 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 			},
 		})
 		if err != nil {
-			c.Sugar.Errorf("Error responding to interaction: %v", err)
+			bot.Sugar.Errorf("Error responding to interaction: %v", err)
 		}
 
 		_, _, err = ctx.ButtonPages(e, 15*time.Minute)
@@ -260,7 +260,7 @@ func (c *commands) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name st
 
 	err = ctx.Session().DeleteMessage(msg.ChannelID, msg.ID, "")
 	if err != nil {
-		c.Sugar.Errorf("Error deleting message: %v", err)
+		bot.Sugar.Errorf("Error deleting message: %v", err)
 	}
 	return nil
 }

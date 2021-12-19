@@ -11,16 +11,16 @@ import (
 	"github.com/termora/berry/bot"
 )
 
-type commands struct {
+type Bot struct {
 	*bot.Bot
 }
 
 // Init ...
-func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
-	c := commands{Bot: bot}
+func Init(b *bot.Bot) (m string, list []*bcr.Command) {
+	bot := &Bot{Bot: b}
 
 	// add autocomplete handler
-	bot.Router.AddHandler(c.doAutocomplete)
+	bot.Router.AddHandler(bot.doAutocomplete)
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
 		Name:    "search",
@@ -32,9 +32,9 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Blacklistable: true,
 
-		Command: c.search,
+		Command: bot.search,
 
-		SlashCommand: c.searchSlash,
+		SlashCommand: bot.searchSlash,
 		Options: &[]discord.CommandOption{
 			&discord.StringOption{
 				OptionName:   "query",
@@ -70,7 +70,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Cooldown:      time.Second,
 		Blacklistable: true,
 
-		SlashCommand: c.random,
+		SlashCommand: bot.random,
 		Options: &[]discord.CommandOption{
 			&discord.StringOption{
 				OptionName:  "category",
@@ -93,7 +93,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Cooldown:      time.Second,
 		Blacklistable: false,
 
-		SlashCommand: c.explanation,
+		SlashCommand: bot.explanation,
 		Options: &[]discord.CommandOption{
 			&discord.StringOption{
 				OptionName:   "explanation",
@@ -118,7 +118,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Cooldown:      time.Second,
 		Blacklistable: true,
-		Command:       c.list,
+		Command:       bot.list,
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
@@ -129,8 +129,8 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Cooldown:      time.Second,
 		Blacklistable: true,
-		Command:       c.term,
-		SlashCommand:  c.termSlash,
+		Command:       bot.term,
+		SlashCommand:  bot.termSlash,
 		Options: &[]discord.CommandOption{
 			&discord.StringOption{
 				OptionName:   "query",
@@ -149,7 +149,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Cooldown:      time.Second,
 		Blacklistable: true,
-		Command:       c.tags,
+		Command:       bot.tags,
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
@@ -159,7 +159,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Cooldown:      time.Second,
 		Blacklistable: true,
-		Command:       c.files,
+		Command:       bot.files,
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
@@ -170,7 +170,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 
 		Cooldown:      time.Second,
 		Blacklistable: true,
-		Command:       c.file,
+		Command:       bot.file,
 	}))
 
 	ap := bot.Router.AddCommand(&bcr.Command{
@@ -187,8 +187,8 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 			return fs
 		},
 
-		Command:      c.autopostText,
-		SlashCommand: c.autopost,
+		Command:      bot.autopostText,
+		SlashCommand: bot.autopost,
 		Options: &[]discord.CommandOption{
 			discord.NewChannelOption("channel", "The channel to post to", true),
 			discord.NewStringOption("interval", `How often to post a term ("reset" or "off" to disable posting in the channel)`, true),
@@ -202,7 +202,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 		Summary:          "List this server's current autopost configuration",
 		GuildPermissions: discord.PermissionManageGuild,
 		GuildOnly:        true,
-		Command:          c.autopostList,
+		Command:          bot.autopostList,
 	})
 
 	state, _ := bot.Router.StateFromGuildID(0)
@@ -210,7 +210,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	var o sync.Once
 	state.AddHandler(func(_ *gateway.ReadyEvent) {
 		o.Do(func() {
-			go c.autopostLoop()
+			go bot.autopostLoop()
 		})
 	})
 
@@ -235,7 +235,7 @@ func Init(bot *bot.Bot) (m string, list []*bcr.Command) {
 	ls.Description = "Search for a term in the `LGBTQ+` category. Prefix your search with `!` to show the first result."
 	ls.Usage = "<search term>"
 
-	list = append(list, c.initExplanations(bot.Router)...)
+	list = append(list, bot.initExplanations(bot.Router)...)
 	list = append(list, ps, ls, ap)
 	return "Search commands", list
 }

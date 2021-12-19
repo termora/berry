@@ -8,7 +8,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (bot *commands) reactionAdd(m *gateway.MessageReactionAddEvent) {
+func (bot *Bot) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	// if this isn't the pronoun channel, return
 	if m.ChannelID != bot.Config.Bot.Support.PronounChannel || !m.ChannelID.IsValid() {
 		return

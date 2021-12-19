@@ -11,7 +11,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *Admin) addExplanation(ctx *bcr.Context) (err error) {
+func (bot *Bot) addExplanation(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
 		_, err = ctx.Send("Not enough arguments provided.")
 		return err
@@ -41,12 +41,12 @@ func (c *Admin) addExplanation(ctx *bcr.Context) (err error) {
 	e.Description = strings.Join(content[1:], "\n")
 
 	// add the explanation
-	e, err = c.DB.AddExplanation(e)
+	e, err = bot.DB.AddExplanation(e)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
-	_, err = c.AuditLog.SendLog(e.ID, auditlog.ExplanationEntry, auditlog.CreateAction, nil, e, ctx.Author.ID, nil)
+	_, err = bot.AuditLog.SendLog(e.ID, auditlog.ExplanationEntry, auditlog.CreateAction, nil, e, ctx.Author.ID, nil)
 	if err != nil {
 		return
 	}
@@ -55,7 +55,7 @@ func (c *Admin) addExplanation(ctx *bcr.Context) (err error) {
 	return err
 }
 
-func (c *Admin) toggleExplanationCmd(ctx *bcr.Context) (err error) {
+func (bot *Bot) toggleExplanationCmd(ctx *bcr.Context) (err error) {
 	// we can't be bothered to check the *current* status, so just pass a value every time
 	if err = ctx.CheckMinArgs(2); err != nil {
 		_, err = ctx.Send("Not enough arguments provided.")
@@ -77,7 +77,7 @@ func (c *Admin) toggleExplanationCmd(ctx *bcr.Context) (err error) {
 	}
 
 	// set it in the database
-	err = c.DB.SetAsCommand(id, b)
+	err = bot.DB.SetAsCommand(id, b)
 	if err != nil {
 		_, err = ctx.Send(fmt.Sprintf("Internal error occurred: %v", bcr.AsCode(bcr.EscapeBackticks(err.Error()))))
 		return err

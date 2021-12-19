@@ -17,7 +17,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *commands) search(ctx *bcr.Context) (err error) {
+func (bot *Bot) search(ctx *bcr.Context) (err error) {
 	fs := flag.NewFlagSet("", flag.ContinueOnError)
 
 	var (
@@ -61,23 +61,23 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	var terms []*db.Term
 	if cat == "" {
 		// no category given, so just search *all* terms
-		terms, err = c.DB.Search(search, limit, ignoreTags)
+		terms, err = bot.DB.Search(search, limit, ignoreTags)
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		}
 	} else {
 		// category given, so search in category
 
 		// get the category ID
-		category, err := c.DB.CategoryID(cat)
+		category, err := bot.DB.CategoryID(cat)
 		if err != nil {
 			_, err = ctx.Sendf("The category you specified (``%v``) was not found.", bcr.EscapeBackticks(cat))
 			return err
 		}
 
-		terms, err = c.DB.SearchCat(search, category, limit, ignoreTags)
+		terms, err = bot.DB.SearchCat(search, category, limit, ignoreTags)
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		}
 	}
 
@@ -98,7 +98,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	// if there's only one term, just show that one
 	if len(terms) == 1 {
-		_, err = ctx.Send("", c.DB.TermEmbed(terms[0]))
+		_, err = ctx.Send("", bot.DB.TermEmbed(terms[0]))
 		return err
 	}
 
@@ -126,7 +126,7 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 	// actually send the search results
 	msg, _, err := ctx.PagedEmbedTimeout(embeds, false, 15*time.Minute)
 	if err != nil {
-		c.Report(ctx, err)
+		bot.Report(ctx, err)
 		return err
 	}
 
@@ -225,11 +225,11 @@ func (c *commands) search(ctx *bcr.Context) (err error) {
 
 	// delete the original message, then send the definition
 	ctx.State.DeleteMessage(ctx.Channel.ID, msg.ID, "")
-	_, err = ctx.Send("", c.DB.TermEmbed(termSlices[page][n-1]))
+	_, err = ctx.Send("", bot.DB.TermEmbed(termSlices[page][n-1]))
 	return
 }
 
-func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
+func (bot *Bot) searchSlash(ctx bcr.Contexter) (err error) {
 	query := ctx.GetStringFlag("query")
 	cat := ctx.GetStringFlag("category")
 	noCW := ctx.GetBoolFlag("no-cw")
@@ -247,22 +247,22 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 	var terms []*db.Term
 	if cat == "" {
 		// no category given, so just search *all* terms
-		terms, err = c.DB.Search(query, limit, ignoreTags)
+		terms, err = bot.DB.Search(query, limit, ignoreTags)
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		}
 	} else {
 		// category given, so search in category
 
 		// get the category ID
-		category, err := c.DB.CategoryID(cat)
+		category, err := bot.DB.CategoryID(cat)
 		if err != nil {
 			return ctx.SendEphemeral(fmt.Sprintf("The category you specified (``%v``) was not found.", bcr.EscapeBackticks(cat)))
 		}
 
-		terms, err = c.DB.SearchCat(query, category, limit, ignoreTags)
+		terms, err = bot.DB.SearchCat(query, category, limit, ignoreTags)
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		}
 	}
 
@@ -282,7 +282,7 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 
 	// if there's only one term, just show that one
 	if len(terms) == 1 {
-		return ctx.SendX("", c.DB.TermEmbed(terms[0]))
+		return ctx.SendX("", bot.DB.TermEmbed(terms[0]))
 	}
 
 	// split the slice of terms into 5-long slices each
@@ -353,7 +353,7 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 			},
 		})
 		if err != nil {
-			c.Sugar.Errorf("Error responding to interaction: %v", err)
+			bot.Sugar.Errorf("Error responding to interaction: %v", err)
 		}
 
 		return false
@@ -429,7 +429,7 @@ func (c *commands) searchSlash(ctx bcr.Contexter) (err error) {
 
 	_, err = ctx.EditOriginal(api.EditInteractionResponseData{
 		Content:    option.NewNullableString(""),
-		Embeds:     &[]discord.Embed{c.DB.TermEmbed(termSlices[page][n-1])},
+		Embeds:     &[]discord.Embed{bot.DB.TermEmbed(termSlices[page][n-1])},
 		Components: &discord.ContainerComponents{},
 	})
 	return

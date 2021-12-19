@@ -10,7 +10,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (bot *commands) custom(ctx *bcr.Context) (err error) {
+func (bot *Bot) custom(ctx *bcr.Context) (err error) {
 	set := ctx.Args
 	if len(set) != 5 {
 		set = strings.Split(ctx.RawArgs, "/")

@@ -10,7 +10,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *Admin) changelog(ctx *bcr.Context) (err error) {
+func (bot *Bot) changelog(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
 		_, err = ctx.Send("You are missing the required arguments `channel` and/or `since`.")
 		return err
@@ -37,9 +37,9 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	}
 
 	// get terms since the specified date
-	t, err := c.DB.TermsSince(date)
+	t, err := bot.DB.TermsSince(date)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	if len(t) == 0 {
@@ -55,7 +55,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	// check perms in the channel
 	perms, err := ctx.State.Permissions(ch.ID, ctx.Author.ID)
 	if err != nil {
-		c.Sugar.Errorf("Error getting perms for %v in %v: %v", ctx.Author.ID, ch.ID, err)
+		bot.Sugar.Errorf("Error getting perms for %v in %v: %v", ctx.Author.ID, ch.ID, err)
 		_, err = ctx.Sendf(
 			"❌ An error occurred while trying to get permissions.\nIf this issue persists, please contact the bot developer.",
 		)
@@ -73,12 +73,12 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	s := fmt.Sprintf(
 		"Since %v, **%v** new terms have been added, for a total of **%v** terms!\n\n**New terms**\nThe following terms have been added: %v",
 		date.Format("January 02"), len(t),
-		c.DB.TermCount(), strings.Join(terms, ", "),
+		bot.DB.TermCount(), strings.Join(terms, ", "),
 	)
 
 	// if it won't fit in a single embed (which is *very* unlikely), split it into 2000-character-ish chunks
 	if len(s) >= 2000 {
-		s = fmt.Sprintf("Since %v, **%v** new terms have been added, for a total of **%v** terms!", date.Format("January 02"), len(t), c.DB.TermCount())
+		s = fmt.Sprintf("Since %v, **%v** new terms have been added, for a total of **%v** terms!", date.Format("January 02"), len(t), bot.DB.TermCount())
 
 		buf := "**New terms**\nThe following terms have been added:\n"
 		for _, t := range terms {
@@ -91,7 +91,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 		msgs = append(msgs, buf)
 	}
 
-	m, err := ctx.State.SendMessage(ch.ID, c.Config.Bot.TermChangelogPing, discord.Embed{
+	m, err := ctx.State.SendMessage(ch.ID, bot.Config.Bot.TermChangelogPing, discord.Embed{
 		Title:       "Term changelog",
 		Description: s,
 
@@ -105,7 +105,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 	if ch.Type == discord.GuildNews {
 		_, err = ctx.State.CrosspostMessage(m.ChannelID, m.ID)
 		if err != nil {
-			c.Sugar.Errorf("Error crossposting message: %v", err)
+			bot.Sugar.Errorf("Error crossposting message: %v", err)
 		}
 	}
 
@@ -125,7 +125,7 @@ func (c *Admin) changelog(ctx *bcr.Context) (err error) {
 			if ch.Type == discord.GuildNews {
 				_, err = ctx.State.CrosspostMessage(msg.ChannelID, msg.ID)
 				if err != nil {
-					c.Sugar.Errorf("Error crossposting message: %v", err)
+					bot.Sugar.Errorf("Error crossposting message: %v", err)
 				}
 			}
 		}

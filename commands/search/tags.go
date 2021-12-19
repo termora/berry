@@ -11,24 +11,24 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *commands) tags(ctx *bcr.Context) (err error) {
+func (bot *Bot) tags(ctx *bcr.Context) (err error) {
 	if len(ctx.Args) == 0 {
-		t, err := c.DB.Tags()
+		t, err := bot.DB.Tags()
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		}
 
 		_, err = ctx.PagedEmbed(PaginateStrings(t, 15, "Tags", "\n"), false)
 		return err
 	}
 
-	terms, err := c.DB.TagTerms(ctx.RawArgs)
+	terms, err := bot.DB.TagTerms(ctx.RawArgs)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
 			_, err = ctx.Send("I couldn't find any terms with that tag.")
 			return
 		}
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	if len(terms) == 0 {

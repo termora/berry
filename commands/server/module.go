@@ -6,13 +6,13 @@ import (
 	"github.com/termora/berry/bot"
 )
 
-type commands struct {
+type Bot struct {
 	*bot.Bot
 }
 
 // Init ...
-func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
-	c := &commands{Bot: bot}
+func Init(b *bot.Bot) (m string, out []*bcr.Command) {
+	bot := &Bot{Bot: b}
 
 	g := bot.Router.AddCommand(&bcr.Command{
 		Name:    "blacklist",
@@ -20,7 +20,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Manage this server's blacklist",
 
 		Permissions: discord.PermissionManageGuild,
-		Command:     c.blacklist,
+		Command:     bot.blacklist,
 	})
 
 	g.AddSubcommand(&bcr.Command{
@@ -30,7 +30,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<channels...>",
 
 		Permissions: discord.PermissionManageGuild,
-		Command:     c.blacklistAdd,
+		Command:     bot.blacklistAdd,
 	})
 
 	g.AddSubcommand(&bcr.Command{
@@ -40,7 +40,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<channel>",
 
 		Permissions: discord.PermissionManageGuild,
-		Command:     c.blacklistRemove,
+		Command:     bot.blacklistRemove,
 	})
 
 	prefixes := bot.Router.AddCommand(&bcr.Command{
@@ -49,7 +49,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Show this server's prefixes",
 
 		Blacklistable: true,
-		Command:       c.prefixes,
+		Command:       bot.prefixes,
 	})
 
 	prefixes.AddSubcommand(&bcr.Command{
@@ -58,7 +58,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<prefix>",
 
 		Permissions: discord.PermissionManageGuild,
-		Command:     c.addPrefix,
+		Command:     bot.addPrefix,
 	})
 
 	prefixes.AddSubcommand(&bcr.Command{
@@ -67,7 +67,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<prefix>",
 
 		Permissions: discord.PermissionManageGuild,
-		Command:     c.removePrefix,
+		Command:     bot.removePrefix,
 	})
 
 	return "Server configuration commands", append(out, g, prefixes)

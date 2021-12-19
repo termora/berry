@@ -6,8 +6,8 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 )
 
-func (c *commands) doAutocomplete(ev *gateway.InteractionCreateEvent) {
-	s, _ := c.Router.StateFromGuildID(ev.GuildID)
+func (bot *Bot) doAutocomplete(ev *gateway.InteractionCreateEvent) {
+	s, _ := bot.Router.StateFromGuildID(ev.GuildID)
 
 	respond := func(choices []api.AutocompleteChoice) {
 		_ = s.RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
@@ -24,9 +24,9 @@ func (c *commands) doAutocomplete(ev *gateway.InteractionCreateEvent) {
 	}
 
 	if dat.Name == "explain" {
-		exs, err := c.DB.GetAllExplanations()
+		exs, err := bot.DB.GetAllExplanations()
 		if err != nil {
-			c.Sugar.Errorf("Error getting explanations: %v", err)
+			bot.Sugar.Errorf("Error getting explanations: %v", err)
 			return
 		}
 
@@ -58,9 +58,9 @@ func (c *commands) doAutocomplete(ev *gateway.InteractionCreateEvent) {
 		}})
 	}
 
-	terms, err := c.DB.Autocomplete(searchTerm)
+	terms, err := bot.DB.Autocomplete(searchTerm)
 	if err != nil {
-		c.Sugar.Errorf("Error doing autocomplete search: %v", err)
+		bot.Sugar.Errorf("Error doing autocomplete search: %v", err)
 		return
 	}
 

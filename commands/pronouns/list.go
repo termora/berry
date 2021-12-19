@@ -11,7 +11,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *commands) list(ctx *bcr.Context) (err error) {
+func (bot *Bot) list(ctx *bcr.Context) (err error) {
 	footerTmpl := "Page %v/%v"
 	order := db.AlphabeticPronounOrder
 	if flag, _ := ctx.Flags.GetBool("random"); flag {
@@ -25,9 +25,9 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 		footerTmpl = "Sorting by # of uses | Page %v/%v"
 	}
 
-	p, err := c.DB.Pronouns(order)
+	p, err := bot.DB.Pronouns(order)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	if order == db.RandomPronounOrder {

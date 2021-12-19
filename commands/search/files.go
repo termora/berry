@@ -10,16 +10,16 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *commands) files(ctx *bcr.Context) (err error) {
+func (bot *Bot) files(ctx *bcr.Context) (err error) {
 	files := []db.File{}
 	if ctx.RawArgs == "" {
-		files, err = c.DB.Files()
+		files, err = bot.DB.Files()
 	} else {
-		files, err = c.DB.FileName(ctx.RawArgs)
+		files, err = bot.DB.FileName(ctx.RawArgs)
 	}
 
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	if len(files) == 0 {
@@ -30,10 +30,10 @@ func (c *commands) files(ctx *bcr.Context) (err error) {
 	s := []string{}
 
 	for _, f := range files {
-		if c.Config.Bot.Website == "" {
+		if bot.Config.Bot.Website == "" {
 			s = append(s, fmt.Sprintf("`%v`: %v\n", f.ID, f.Filename))
 		} else {
-			s = append(s, fmt.Sprintf("`%v`: [%v](%vfile/%v/%v)\n", f.ID, f.Filename, c.Config.Bot.Website, f.ID, f.Filename))
+			s = append(s, fmt.Sprintf("`%v`: [%v](%vfile/%v/%v)\n", f.ID, f.Filename, bot.Config.Bot.Website, f.ID, f.Filename))
 		}
 	}
 
@@ -51,10 +51,10 @@ func (c *commands) files(ctx *bcr.Context) (err error) {
 	return
 }
 
-func (c *commands) file(ctx *bcr.Context) (err error) {
+func (bot *Bot) file(ctx *bcr.Context) (err error) {
 	i, err := strconv.ParseUint(ctx.RawArgs, 0, 0)
 	if err == nil {
-		f, err := c.DB.File(snowflake.ID(i))
+		f, err := bot.DB.File(snowflake.ID(i))
 		if err != nil {
 			_, err = ctx.Reply("No file with that ID found.")
 			return err
@@ -70,7 +70,7 @@ func (c *commands) file(ctx *bcr.Context) (err error) {
 			Footer: &discord.EmbedFooter{
 				Text: fmt.Sprintf("ID: %v | Added", f.ID),
 			},
-			Timestamp: discord.NewTimestamp(c.DB.Time(f.ID)),
+			Timestamp: discord.NewTimestamp(bot.DB.Time(f.ID)),
 		}
 
 		if f.Description != "" {
@@ -91,9 +91,9 @@ func (c *commands) file(ctx *bcr.Context) (err error) {
 		return err
 	}
 
-	files, err := c.DB.FileName(ctx.RawArgs)
+	files, err := bot.DB.FileName(ctx.RawArgs)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	if len(files) == 0 {
@@ -118,7 +118,7 @@ func (c *commands) file(ctx *bcr.Context) (err error) {
 		Footer: &discord.EmbedFooter{
 			Text: fmt.Sprintf("ID: %v | Added", f.ID),
 		},
-		Timestamp: discord.NewTimestamp(c.DB.Time(f.ID)),
+		Timestamp: discord.NewTimestamp(bot.DB.Time(f.ID)),
 	}
 
 	if f.Description != "" {

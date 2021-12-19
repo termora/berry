@@ -10,7 +10,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (a *Admin) addContributorCategory(ctx *bcr.Context) (err error) {
+func (bot *Bot) addContributorCategory(ctx *bcr.Context) (err error) {
 	name := ctx.Args[0]
 	if len(name) > 200 {
 		_, err = ctx.Replyc(bcr.ColourRed, "Name too long, maximum 200 characters (%v characters)", len(name))
@@ -43,19 +43,19 @@ func (a *Admin) addContributorCategory(ctx *bcr.Context) (err error) {
 		return ctx.SendX("Cancelled.")
 	}
 
-	cat, err := a.DB.AddContributorCategory(name, role)
+	cat, err := bot.DB.AddContributorCategory(name, role)
 	if err != nil {
-		return a.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Reply("Added contributor category %v, with ID %v!", cat.Name, cat.ID)
 	return
 }
 
-func (a *Admin) listContributorCategories(ctx *bcr.Context) (err error) {
-	cats, err := a.DB.ContributorCategories()
+func (bot *Bot) listContributorCategories(ctx *bcr.Context) (err error) {
+	cats, err := bot.DB.ContributorCategories()
 	if err != nil {
-		return a.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	if len(cats) == 0 {
@@ -81,7 +81,7 @@ func (a *Admin) listContributorCategories(ctx *bcr.Context) (err error) {
 	return
 }
 
-func (a *Admin) addContributor(ctx *bcr.Context) (err error) {
+func (bot *Bot) addContributor(ctx *bcr.Context) (err error) {
 	var (
 		id   discord.UserID
 		name string
@@ -104,13 +104,13 @@ func (a *Admin) addContributor(ctx *bcr.Context) (err error) {
 		}
 	}
 
-	cat := a.DB.ContributorCategory(ctx.Args[1])
+	cat := bot.DB.ContributorCategory(ctx.Args[1])
 	if cat == nil {
 		_, err = ctx.Replyc(bcr.ColourRed, "Category `%v` not found.", ctx.Args[1])
 		return
 	}
 
-	err = a.DB.AddContributor(cat.ID, id, name)
+	err = bot.DB.AddContributor(cat.ID, id, name)
 	if err != nil {
 		// probably constraint error
 		_, err = ctx.Replyc(bcr.ColourRed, "Error adding contributor: `%v`", err)
@@ -121,7 +121,7 @@ func (a *Admin) addContributor(ctx *bcr.Context) (err error) {
 	return
 }
 
-func (a *Admin) overrideContributor(ctx *bcr.Context) (err error) {
+func (bot *Bot) overrideContributor(ctx *bcr.Context) (err error) {
 	u, err := ctx.ParseUser(ctx.Args[0])
 	if err != nil {
 		_, err = ctx.Replyc(bcr.ColourRed, "Couldn't find that user.")
@@ -138,7 +138,7 @@ func (a *Admin) overrideContributor(ctx *bcr.Context) (err error) {
 		override = &name
 	}
 
-	err = a.DB.OverrideContributorName(u.ID, override)
+	err = bot.DB.OverrideContributorName(u.ID, override)
 	if err != nil {
 		_, err = ctx.Replyc(bcr.ColourRed, "Error updating override: %v", err)
 		return
@@ -152,8 +152,8 @@ func (a *Admin) overrideContributor(ctx *bcr.Context) (err error) {
 	return
 }
 
-func (a *Admin) allContributors(ctx *bcr.Context) (err error) {
-	members, err := a.Helper.Members(a.Config.Bot.Support.GuildID, 0)
+func (bot *Bot) allContributors(ctx *bcr.Context) (err error) {
+	members, err := bot.Helper.Members(bot.Config.Bot.Support.GuildID, 0)
 	if err != nil {
 		_, err = ctx.Replyc(bcr.ColourRed, "Error fetching members: %v", err)
 		return
@@ -177,7 +177,7 @@ func (a *Admin) allContributors(ctx *bcr.Context) (err error) {
 	// this is inefficient, but it should only run once anyway
 	for _, m := range members {
 		for _, r := range m.RoleIDs {
-			cat := a.DB.CategoryFromRole(r)
+			cat := bot.DB.CategoryFromRole(r)
 			if cat == nil {
 				continue
 			}
@@ -187,7 +187,7 @@ func (a *Admin) allContributors(ctx *bcr.Context) (err error) {
 				name = m.Nick
 			}
 
-			err = a.DB.AddContributor(cat.ID, m.User.ID, name)
+			err = bot.DB.AddContributor(cat.ID, m.User.ID, name)
 			if err != nil {
 				_, err = ctx.Replyc(bcr.ColourRed, "Error adding %v to category %v: %v", m.Mention(), cat.Name, err)
 				return

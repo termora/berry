@@ -14,7 +14,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *commands) explanation(ctx bcr.Contexter) (err error) {
+func (bot *Bot) explanation(ctx bcr.Contexter) (err error) {
 	name := ctx.GetStringFlag("explanation")
 	if name == "" {
 		if v, ok := ctx.(*bcr.Context); ok {
@@ -23,12 +23,12 @@ func (c *commands) explanation(ctx bcr.Contexter) (err error) {
 	}
 
 	var text string
-	err = c.DB.QueryRow(context.Background(), "select description from explanations where $1 ilike any(aliases) or $1 ilike name", name).Scan(&text)
+	err = bot.DB.QueryRow(context.Background(), "select description from explanations where $1 ilike any(aliases) or $1 ilike name", name).Scan(&text)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
-			return c.listAllExplanations(ctx)
+			return bot.listAllExplanations(ctx)
 		}
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	v, ok := ctx.(*bcr.Context)
@@ -47,10 +47,10 @@ func (c *commands) explanation(ctx bcr.Contexter) (err error) {
 	return ctx.SendX(text)
 }
 
-func (c *commands) listAllExplanations(ctx bcr.Contexter) (err error) {
-	ex, err := c.DB.GetAllExplanations()
+func (bot *Bot) listAllExplanations(ctx bcr.Contexter) (err error) {
+	ex, err := bot.DB.GetAllExplanations()
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	s := []string{}

@@ -16,7 +16,7 @@ var greetings = []string{"Hello", "Heya", "Hi", "Hiya"}
 // yeah this won't work on any other instance of the bot sadly
 var emotes = []string{"👋", "<:MenheraWave:807587508623507456>", "<a:ameowcomfywave:807587518857216021>"}
 
-func (c *Commands) hello(ctx *bcr.Context) (err error) {
+func (bot *Bot) hello(ctx *bcr.Context) (err error) {
 	// sleep for a second to give PK time to process the message
 	time.Sleep(1 * time.Second)
 

@@ -7,8 +7,8 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) prefixes(ctx *bcr.Context) (err error) {
-	prefixes := append(c.Router.Prefixes, c.PrefixesFor(ctx.Message.GuildID)...)
+func (bot *Bot) prefixes(ctx *bcr.Context) (err error) {
+	prefixes := append(bot.Router.Prefixes, bot.PrefixesFor(ctx.Message.GuildID)...)
 
 	// remove the first prefix, as the first two prefixes show up identical in the client
 	prefixes = prefixes[1:]

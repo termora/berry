@@ -8,7 +8,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *Admin) update(ctx *bcr.Context) (err error) {
+func (bot *Bot) update(ctx *bcr.Context) (err error) {
 	_, err = ctx.Send("Updating Git repository...")
 	if err != nil {
 		return err

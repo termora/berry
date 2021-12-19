@@ -8,7 +8,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *commands) blacklistAdd(ctx *bcr.Context) (err error) {
+func (bot *Bot) blacklistAdd(ctx *bcr.Context) (err error) {
 	if ctx.CheckMinArgs(1); err != nil {
 		_, err = ctx.Send("You need to provide a channel.")
 		return err
@@ -30,21 +30,21 @@ func (c *commands) blacklistAdd(ctx *bcr.Context) (err error) {
 		ch = append(ch, c.ID.String())
 	}
 
-	err = c.DB.AddToBlacklist(ctx.Message.GuildID.String(), ch)
+	err = bot.DB.AddToBlacklist(ctx.Message.GuildID.String(), ch)
 	if err != nil {
 		if err == db.ErrorAlreadyBlacklisted {
 			_, err = ctx.Send("One or more channels is already blacklisted.")
 			return err
 		}
 
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Added %v to the blacklist.", strings.Join(mapString(ch, func(s string) string { return "<#" + s + ">" }), ", "))
 	return
 }
 
-func (c *commands) blacklistRemove(ctx *bcr.Context) (err error) {
+func (bot *Bot) blacklistRemove(ctx *bcr.Context) (err error) {
 	if ctx.CheckMinArgs(1); err != nil {
 		_, err = ctx.Send("You need to provide a channel.")
 		return err
@@ -57,21 +57,21 @@ func (c *commands) blacklistRemove(ctx *bcr.Context) (err error) {
 			return err
 		}
 
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 	if ch.GuildID != ctx.Message.GuildID {
 		_, err = ctx.Sendf("The given channel (%v) isn't in this server.", ch.Mention())
 		return err
 	}
 
-	err = c.DB.RemoveFromBlacklist(ctx.Message.GuildID.String(), ch.ID.String())
+	err = bot.DB.RemoveFromBlacklist(ctx.Message.GuildID.String(), ch.ID.String())
 	if err != nil {
 		if err == db.ErrorNotBlacklisted {
 			_, err = ctx.Send("That channel isn't blacklisted.")
 			return err
 		}
 
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Removed %v from the blacklist.", ch.Mention())

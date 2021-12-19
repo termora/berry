@@ -11,16 +11,16 @@ import (
 	"github.com/termora/berry/db/search"
 )
 
-func (c *commands) list(ctx *bcr.Context) (err error) {
-	cat, terms, err := c.termCat(strings.Join(ctx.Args, " "))
+func (bot *Bot) list(ctx *bcr.Context) (err error) {
+	cat, terms, err := bot.termCat(strings.Join(ctx.Args, " "))
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	showFullList, _ := ctx.Flags.GetBool("full")
 	showAsFile, _ := ctx.Flags.GetBool("file")
 	if showFullList {
-		return c.fullList(ctx, terms, showAsFile)
+		return bot.fullList(ctx, terms, showAsFile)
 	}
 
 	if showAsFile {
@@ -52,19 +52,19 @@ func (c *commands) list(ctx *bcr.Context) (err error) {
 	return err
 }
 
-func (c *commands) termCat(cat string) (s *db.Category, t []*db.Term, err error) {
+func (bot *Bot) termCat(cat string) (s *db.Category, t []*db.Term, err error) {
 	if cat != "" {
-		id, err := c.DB.CategoryID(cat)
+		id, err := bot.DB.CategoryID(cat)
 		if err == nil {
-			t, err = c.DB.GetCategoryTerms(id, search.FlagSearchHidden)
-			return c.DB.CategoryFromID(id), t, err
+			t, err = bot.DB.GetCategoryTerms(id, search.FlagSearchHidden)
+			return bot.DB.CategoryFromID(id), t, err
 		}
 	}
-	t, err = c.DB.GetTerms(search.FlagSearchHidden)
+	t, err = bot.DB.GetTerms(search.FlagSearchHidden)
 	return nil, t, err
 }
 
-func (c *commands) fullList(ctx *bcr.Context, terms []*db.Term, showAsFile bool) (err error) {
+func (bot *Bot) fullList(ctx *bcr.Context, terms []*db.Term, showAsFile bool) (err error) {
 	if showAsFile {
 		var buf string
 

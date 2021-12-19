@@ -9,7 +9,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *Admin) updateTags(ctx *bcr.Context) (err error) {
+func (bot *Bot) updateTags(ctx *bcr.Context) (err error) {
 	if len(ctx.Message.Attachments) == 0 {
 		_, err = ctx.Send("No attachments given.")
 		return
@@ -80,26 +80,26 @@ func (c *Admin) updateTags(ctx *bcr.Context) (err error) {
 	}
 
 	for _, t := range toUpdate {
-		con, cancel := c.DB.Context()
+		con, cancel := bot.DB.Context()
 		defer cancel()
 
-		_, err = c.DB.Exec(con, "update terms set tags = $1 where id = $2", t.Tags, t.ID)
+		_, err = bot.DB.Exec(con, "update terms set tags = $1 where id = $2", t.Tags, t.ID)
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		}
-		c.Sugar.Debugf("Updated %v's tags to %v", t.ID, t.Tags)
+		bot.Sugar.Debugf("Updated %v's tags to %v", t.ID, t.Tags)
 	}
 
 	// hehe numbers
 	var count int64
 	for _, t := range displayTags {
-		con, cancel := c.DB.Context()
+		con, cancel := bot.DB.Context()
 		defer cancel()
 
-		ct, err := c.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
+		ct, err := bot.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(t), t)
 		if err != nil {
-			c.Sugar.Errorf("Error adding tag: %v", err)
+			bot.Sugar.Errorf("Error adding tag: %v", err)
 		}
 
 		count += ct.RowsAffected()

@@ -9,14 +9,14 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *Commands) credits(ctx *bcr.Context) (err error) {
-	c.memberMu.RLock()
-	defer c.memberMu.RUnlock()
+func (bot *Bot) credits(ctx *bcr.Context) (err error) {
+	bot.memberMu.RLock()
+	defer bot.memberMu.RUnlock()
 
 	// return if there's no credit fields
-	if len(c.Config.Bot.CreditFields) == 0 &&
-		(len(c.Config.ContributorRoles) == 0 ||
-			len(c.SupportServerMembers) == 0) {
+	if len(bot.Config.Bot.CreditFields) == 0 &&
+		(len(bot.Config.ContributorRoles) == 0 ||
+			len(bot.SupportServerMembers) == 0) {
 		return nil
 	}
 
@@ -24,7 +24,7 @@ func (c *Commands) credits(ctx *bcr.Context) (err error) {
 		Color:       db.EmbedColour,
 		Title:       "Credits",
 		Description: fmt.Sprintf("These are the people who helped create %v!", ctx.Bot.Username),
-		Fields:      c.Config.Bot.CreditFields,
+		Fields:      bot.Config.Bot.CreditFields,
 	}}
 
 	e := discord.Embed{
@@ -33,14 +33,14 @@ func (c *Commands) credits(ctx *bcr.Context) (err error) {
 		Description: fmt.Sprintf("These are the people who have contributed to %v in some capacity!", ctx.Bot.Username),
 	}
 
-	cats, err := c.DB.ContributorCategories()
+	cats, err := bot.DB.ContributorCategories()
 	if err != nil {
 		_, err = ctx.PagedEmbed(embeds, false)
 		return err
 	}
 
 	for _, cat := range cats {
-		contributors, err := c.DB.Contributors(cat.ID)
+		contributors, err := bot.DB.Contributors(cat.ID)
 		if err != nil {
 			_, err = ctx.PagedEmbed(embeds, false)
 			return err
@@ -91,8 +91,8 @@ func (c *Commands) credits(ctx *bcr.Context) (err error) {
 	return err
 }
 
-func (c *Commands) filterByRole(rID discord.RoleID) (members []discord.Member) {
-	for _, m := range c.SupportServerMembers {
+func (bot *Bot) filterByRole(rID discord.RoleID) (members []discord.Member) {
+	for _, m := range bot.SupportServerMembers {
 		for _, id := range m.RoleIDs {
 			if id == rID {
 				members = append(members, m)

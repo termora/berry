@@ -10,7 +10,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) term(ctx *bcr.Context) (err error) {
+func (bot *Bot) term(ctx *bcr.Context) (err error) {
 	if ctx.RawArgs == "" {
 		_, err = ctx.Send("You didn't give a term name or ID.")
 		return
@@ -23,22 +23,22 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 
 	id, err := strconv.Atoi(ctx.RawArgs)
 	if err == nil {
-		term, err = c.DB.GetTerm(id)
+		term, err = bot.DB.GetTerm(id)
 		if err != nil {
 			if errors.Cause(err) == pgx.ErrNoRows {
 				_, err = ctx.Sendf("No term with that ID found.")
 				return
 			}
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		}
 		exact = true
 	} else {
-		terms, err := c.DB.TermName(ctx.RawArgs)
+		terms, err := bot.DB.TermName(ctx.RawArgs)
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		} else if err == nil && len(terms) > 0 {
 			if len(terms) > 1 {
-				return c.search(ctx)
+				return bot.search(ctx)
 			}
 
 			exact = true
@@ -47,9 +47,9 @@ func (c *commands) term(ctx *bcr.Context) (err error) {
 		}
 
 		{
-			terms, err := c.DB.Search(ctx.RawArgs, 1, nil)
+			terms, err := bot.DB.Search(ctx.RawArgs, 1, nil)
 			if err != nil {
-				return c.DB.InternalError(ctx, err)
+				return bot.DB.InternalError(ctx, err)
 			}
 			if len(terms) == 0 {
 				_, err = ctx.Sendf("No term found.")
@@ -67,13 +67,13 @@ found:
 		m = m.Content("I couldn't find a term exactly matching that name, but here's the closest match:")
 	}
 
-	e := c.DB.TermEmbed(term)
+	e := bot.DB.TermEmbed(term)
 
 	_, err = m.Embeds(e).Send()
 	return
 }
 
-func (c *commands) termSlash(ctx bcr.Contexter) (err error) {
+func (bot *Bot) termSlash(ctx bcr.Contexter) (err error) {
 	query := ctx.GetStringFlag("query")
 
 	if query == "" {
@@ -87,21 +87,21 @@ func (c *commands) termSlash(ctx bcr.Contexter) (err error) {
 
 	id, err := strconv.Atoi(query)
 	if err == nil {
-		term, err = c.DB.GetTerm(id)
+		term, err = bot.DB.GetTerm(id)
 		if err != nil {
 			if errors.Cause(err) == pgx.ErrNoRows {
 				return ctx.SendEphemeral("No term with that ID found.")
 			}
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		}
 		exact = true
 	} else {
-		terms, err := c.DB.TermName(query)
+		terms, err := bot.DB.TermName(query)
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		} else if err == nil && len(terms) > 0 {
 			if len(terms) > 1 {
-				return c.searchSlash(ctx)
+				return bot.searchSlash(ctx)
 			}
 
 			exact = true
@@ -110,9 +110,9 @@ func (c *commands) termSlash(ctx bcr.Contexter) (err error) {
 		}
 
 		{
-			terms, err := c.DB.Search(query, 1, nil)
+			terms, err := bot.DB.Search(query, 1, nil)
 			if err != nil {
-				return c.DB.InternalError(ctx, err)
+				return bot.DB.InternalError(ctx, err)
 			}
 			if len(terms) == 0 {
 				return ctx.SendEphemeral("No term found.")
@@ -129,7 +129,7 @@ found:
 		s = "I couldn't find a term exactly matching that name, but here's the closest match:"
 	}
 
-	e := c.DB.TermEmbed(term)
+	e := bot.DB.TermEmbed(term)
 
 	return ctx.SendX(s, e)
 }

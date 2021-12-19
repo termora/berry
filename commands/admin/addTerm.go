@@ -10,7 +10,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
+func (bot *Bot) addTerm(ctx *bcr.Context) (err error) {
 	t := &db.Term{}
 
 	names := strings.Split(ctx.RawArgs, "\n")
@@ -69,7 +69,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 
 	t.Source = m.Content
 
-	_, err = ctx.Edit(info, "Adding a new term; to cancel at any time, type `cancel`.\nPlease send a list of tags, separated by newlines.\n__Note that the first tag needs to be a valid category name__.", true, c.DB.TermEmbed(t))
+	_, err = ctx.Edit(info, "Adding a new term; to cancel at any time, type `cancel`.\nPlease send a list of tags, separated by newlines.\n__Note that the first tag needs to be a valid category name__.", true, bot.DB.TermEmbed(t))
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 	}
 
 	tags := strings.Split(m.Content, "\n")
-	category, err := c.DB.CategoryID(tags[0])
+	category, err := bot.DB.CategoryID(tags[0])
 	if err != nil {
 		_, err = ctx.Sendf(":x: Couldn't find a category with that name (``%v``).", tags[0])
 	}
@@ -97,17 +97,17 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 	for _, tag := range tags {
 		t.Tags = append(t.Tags, strings.ToLower(strings.TrimSpace(tag)))
 
-		con, cancel := c.DB.Context()
+		con, cancel := bot.DB.Context()
 		defer cancel()
 
-		_, err = c.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
+		_, err = bot.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(strings.TrimSpace(tag)), tag)
 		if err != nil {
-			c.Sugar.Errorf("Error adding tag: %v", err)
+			bot.Sugar.Errorf("Error adding tag: %v", err)
 		}
 	}
 
-	_, err = ctx.Edit(info, "Are you sure you want to add this term?", true, c.DB.TermEmbed(t))
+	_, err = ctx.Edit(info, "Are you sure you want to add this term?", true, bot.DB.TermEmbed(t))
 	if err != nil {
 		return err
 	}
@@ -123,14 +123,14 @@ func (c *Admin) addTerm(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	t, err = c.DB.AddTerm(t)
+	t, err = bot.DB.AddTerm(t)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
-	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.CreateAction, nil, t, ctx.Author.ID, nil)
+	_, err = bot.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.CreateAction, nil, t, ctx.Author.ID, nil)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Added term with ID %v.", t.ID)

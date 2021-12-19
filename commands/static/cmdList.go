@@ -10,17 +10,17 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *Commands) commandList(ctx *bcr.Context) (err error) {
+func (bot *Bot) commandList(ctx *bcr.Context) (err error) {
 	embeds := make([]discord.Embed, 0)
 
 	// get an accurate page count, modules with 0 non-hidden commands don't show up at all
 	var modCount int
-	for _, m := range c.Modules {
+	for _, m := range bot.Modules {
 		modCount += commandCount(m)
 	}
 
 	// create a list of commands per module
-	for i, mod := range c.Modules {
+	for i, mod := range bot.Modules {
 		cmds := make([]string, 0)
 		for _, cmd := range mod.Commands() {
 			if cmd.Hidden {

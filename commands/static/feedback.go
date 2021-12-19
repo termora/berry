@@ -8,13 +8,13 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *Commands) feedback(ctx *bcr.Context) (err error) {
-	if c.Config.Bot.FeedbackChannel == 0 {
+func (bot *Bot) feedback(ctx *bcr.Context) (err error) {
+	if bot.Config.Bot.FeedbackChannel == 0 {
 		_, err = ctx.Send("Sorry, but we're not currently accepting feedback through this command. Feel free to join the support server though!")
 		return
 	}
 
-	for _, u := range c.Config.Bot.FeedbackBlockedUsers {
+	for _, u := range bot.Config.Bot.FeedbackBlockedUsers {
 		if u == ctx.Author.ID {
 			_, err = ctx.Send("You are blocked from submitting feedback through this command. If you believe this is an error, please contact the developers.")
 			return
@@ -66,9 +66,9 @@ func (c *Commands) feedback(ctx *bcr.Context) (err error) {
 		e.Footer.Text = fmt.Sprintf("Guild: %v (%v)", ctx.Guild.Name, ctx.Guild.ID)
 	}
 
-	_, err = ctx.State.SendEmbeds(c.Config.Bot.FeedbackChannel, e)
+	_, err = ctx.State.SendEmbeds(bot.Config.Bot.FeedbackChannel, e)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	if ctx.Message.GuildID.IsValid() {

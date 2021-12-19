@@ -13,8 +13,8 @@ import (
 	"github.com/termora/berry/commands/admin/auditlog"
 )
 
-// Admin ...
-type Admin struct {
+// Bot ...
+type Bot struct {
 	*bot.Bot
 
 	stopStatus chan bool
@@ -24,27 +24,27 @@ type Admin struct {
 	AuditLog *auditlog.AuditLog
 }
 
-func (bot *Admin) guildCreate(ev *gateway.GuildCreateEvent) {
+func (bot *Bot) guildCreate(ev *gateway.GuildCreateEvent) {
 	bot.GuildsMu.Lock()
 	bot.Guilds[ev.ID] = ev.Guild
 	bot.GuildsMu.Unlock()
 	return
 }
 
-func (bot *Admin) guildDelete(ev *gateway.GuildDeleteEvent) {
+func (bot *Bot) guildDelete(ev *gateway.GuildDeleteEvent) {
 	bot.GuildsMu.Lock()
 	delete(bot.Guilds, ev.ID)
 	bot.GuildsMu.Unlock()
 }
 
 // Init ...
-func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
-	c := &Admin{Bot: bot}
-	c.stopStatus = make(chan bool, 1)
-	c.AuditLog = auditlog.New(bot)
+func Init(b *bot.Bot) (m string, out []*bcr.Command) {
+	bot := &Bot{Bot: b}
+	bot.stopStatus = make(chan bool, 1)
+	bot.AuditLog = auditlog.New(b)
 
-	admins := bot.Router.RequireRole("Bot Admin", c.Config.Bot.Permissions.Admins...)
-	directors := bot.Router.RequireRole("Director", append(c.Config.Bot.Permissions.Admins, c.Config.Bot.Permissions.Directors...)...)
+	admins := bot.Router.RequireRole("Bot Admin", bot.Config.Bot.Permissions.Admins...)
+	directors := bot.Router.RequireRole("Director", append(bot.Config.Bot.Permissions.Admins, bot.Config.Bot.Permissions.Directors...)...)
 
 	a := bot.Router.AddCommand(&bcr.Command{
 		Name:    "admin",
@@ -69,7 +69,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 
 		CustomPermissions: directors,
 
-		Command: c.addTerm,
+		Command: bot.addTerm,
 	}).AddSubcommand(&bcr.Command{
 		Name:    "all-in-one",
 		Aliases: []string{"aio", "allinone"},
@@ -78,7 +78,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<name> <category> <description> <aliases, comma separated> <source>",
 
 		CustomPermissions: admins,
-		Command:           c.aio,
+		Command:           bot.aio,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -88,7 +88,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<id>",
 
 		CustomPermissions: admins,
-		Command:           c.delTerm,
+		Command:           bot.delTerm,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -98,7 +98,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<name>",
 
 		CustomPermissions: admins,
-		Command:           c.addCategory,
+		Command:           bot.addCategory,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -108,7 +108,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<subjective>/<objective>/<poss. determiner>/<poss. pronoun>/<reflexive>",
 
 		CustomPermissions: directors,
-		Command:           c.addPronouns,
+		Command:           bot.addPronouns,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -118,7 +118,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<names...>(newline)<explanation>",
 
 		CustomPermissions: directors,
-		Command:           c.addExplanation,
+		Command:           bot.addExplanation,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -128,7 +128,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<id> <bool>",
 
 		CustomPermissions: admins,
-		Command:           c.toggleExplanationCmd,
+		Command:           bot.toggleExplanationCmd,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -137,7 +137,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<id> <flag mask>",
 
 		CustomPermissions: directors,
-		Command:           c.setFlags,
+		Command:           bot.setFlags,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -146,7 +146,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<id> <content warning>",
 
 		CustomPermissions: directors,
-		Command:           c.setCW,
+		Command:           bot.setCW,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -155,7 +155,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<id> <note>",
 
 		CustomPermissions: directors,
-		Command:           c.setNote,
+		Command:           bot.setNote,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -165,7 +165,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<part to edit> <id> <text>",
 
 		CustomPermissions: directors,
-		Command:           c.editTerm,
+		Command:           bot.editTerm,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -173,7 +173,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Update the bot",
 
 		OwnerOnly: true,
-		Command:   c.update,
+		Command:   bot.update,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -182,7 +182,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<error ID>",
 
 		CustomPermissions: admins,
-		Command:           c.error,
+		Command:           bot.error,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -191,7 +191,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:   "<channel> <date>",
 
 		CustomPermissions: admins,
-		Command:           c.changelog,
+		Command:           bot.changelog,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -199,7 +199,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Bulk update a list of term's tags. Input in CSV format",
 
 		CustomPermissions: admins,
-		Command:           c.updateTags,
+		Command:           bot.updateTags,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -215,7 +215,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		},
 
 		CustomPermissions: directors,
-		Command:           c.importFromMessage,
+		Command:           bot.importFromMessage,
 	})
 
 	a.AddSubcommand(&bcr.Command{
@@ -223,7 +223,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Summary: "Upload a file",
 
 		CustomPermissions: directors,
-		Command:           c.upload,
+		Command:           bot.upload,
 	})
 
 	contributors := a.AddSubcommand(&bcr.Command{
@@ -239,14 +239,14 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Name:              "category",
 		Summary:           "List contributor categories",
 		CustomPermissions: directors,
-		Command:           c.listContributorCategories,
+		Command:           bot.listContributorCategories,
 	}).AddSubcommand(&bcr.Command{
 		Name:              "add",
 		Summary:           "Add a contributor category",
 		Usage:             "<name> [role]",
 		Args:              bcr.MinArgs(1),
 		CustomPermissions: admins,
-		Command:           c.addContributorCategory,
+		Command:           bot.addContributorCategory,
 	})
 
 	contributors.AddSubcommand(&bcr.Command{
@@ -255,7 +255,7 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:             "<user> <category>",
 		Args:              bcr.MinArgs(2),
 		CustomPermissions: directors,
-		Command:           c.addContributor,
+		Command:           bot.addContributor,
 	})
 
 	contributors.AddSubcommand(&bcr.Command{
@@ -264,21 +264,21 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		Usage:             "<user> <new name|-clear>",
 		Args:              bcr.MinArgs(2),
 		CustomPermissions: directors,
-		Command:           c.overrideContributor,
+		Command:           bot.overrideContributor,
 	})
 
 	contributors.AddSubcommand(&bcr.Command{
 		Name:      "import",
 		Summary:   "Import all existing contributors (by role)",
 		OwnerOnly: true,
-		Command:   c.allContributors,
+		Command:   bot.allContributors,
 	})
 
 	i := bot.Router.AddCommand(bot.Router.AliasMust("ai", nil, []string{"admin", "import"}, nil))
 	i.Args = bcr.MinArgs(1)
 
-	bot.Router.AddHandler(c.guildCreate)
-	bot.Router.AddHandler(c.guildDelete)
+	bot.Router.AddHandler(bot.guildCreate)
+	bot.Router.AddHandler(bot.guildDelete)
 
 	bot.Router.ShardManager.ForEach(func(s shard.Shard) {
 		state := s.(*state.State)
@@ -286,12 +286,12 @@ func Init(bot *bot.Bot) (m string, out []*bcr.Command) {
 		state.AddHandler(func(_ *gateway.ReadyEvent) {
 			var o sync.Once
 			o.Do(func() {
-				go c.setStatusLoop(state)
+				go bot.setStatusLoop(state)
 			})
 		})
 	})
 
-	auditlog.Init(bot, directors)
+	auditlog.Init(b, directors)
 	out = append(out, a)
 	return "Bot admin commands", out
 }

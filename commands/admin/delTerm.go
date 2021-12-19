@@ -7,7 +7,7 @@ import (
 	"github.com/termora/berry/commands/admin/auditlog"
 )
 
-func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
+func (bot *Bot) delTerm(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckRequiredArgs(1); err != nil {
 		_, err = ctx.Send("No term ID provided.")
 		return err
@@ -15,15 +15,15 @@ func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 
 	id, err := strconv.Atoi(ctx.Args[0])
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
-	t, err := c.DB.GetTerm(id)
+	t, err := bot.DB.GetTerm(id)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
-	m, err := ctx.Send("Are you sure you want to delete this term? React with ✅ to delete it, or with ❌ to cancel.", c.DB.TermEmbed(t))
+	m, err := ctx.Send("Are you sure you want to delete this term? React with ✅ to delete it, or with ❌ to cancel.", bot.DB.TermEmbed(t))
 	if err != nil {
 		return err
 	}
@@ -34,21 +34,21 @@ func (c *Admin) delTerm(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	err = c.DB.RemoveTerm(id)
+	err = bot.DB.RemoveTerm(id)
 	if err != nil {
-		c.Sugar.Error("Error removing term:", err)
-		c.DB.InternalError(ctx, err)
+		bot.Sugar.Error("Error removing term:", err)
+		bot.DB.InternalError(ctx, err)
 		return
 	}
 
-	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.DeleteAction, t, nil, ctx.Author.ID, nil)
+	_, err = bot.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.DeleteAction, t, nil, ctx.Author.ID, nil)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Send("✅ Term deleted.")
 	if err != nil {
-		c.Sugar.Error("Error sending message:", err)
+		bot.Sugar.Error("Error sending message:", err)
 	}
 	return nil
 }

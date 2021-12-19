@@ -9,7 +9,7 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *Admin) aio(ctx *bcr.Context) (err error) {
+func (bot *Bot) aio(ctx *bcr.Context) (err error) {
 	// this command requires 5 arguments exactly
 	if ctx.CheckRequiredArgs(5); err != nil {
 		_, err = ctx.Send("Too few or too many arguments supplied.")
@@ -37,7 +37,7 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 
 	source := ctx.Args[4]
 
-	category, err := c.DB.CategoryID(catName)
+	category, err := bot.DB.CategoryID(catName)
 	if err != nil {
 		_, err = ctx.Send("Could not find that category, cancelled.")
 		return
@@ -53,22 +53,22 @@ func (c *Admin) aio(ctx *bcr.Context) (err error) {
 		Description: description,
 		Aliases:     aliases,
 		Source:      source,
-		Tags:        []string{c.DB.CategoryFromID(category).Name},
+		Tags:        []string{bot.DB.CategoryFromID(category).Name},
 	}
 
-	t, err = c.DB.AddTerm(t)
+	t, err = bot.DB.AddTerm(t)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
-	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.CreateAction, nil, t, ctx.Author.ID, nil)
+	_, err = bot.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.CreateAction, nil, t, ctx.Author.ID, nil)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("Added term with ID %v.", t.ID), c.DB.TermEmbed(t))
+	_, err = ctx.Send(fmt.Sprintf("Added term with ID %v.", t.ID), bot.DB.TermEmbed(t))
 	if err != nil {
-		c.Report(ctx, err)
+		bot.Report(ctx, err)
 	}
 	return err
 }

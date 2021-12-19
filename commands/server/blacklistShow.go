@@ -9,10 +9,10 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *commands) blacklist(ctx *bcr.Context) (err error) {
-	b, err := c.DB.GetBlacklist(ctx.Message.GuildID.String())
+func (bot *Bot) blacklist(ctx *bcr.Context) (err error) {
+	b, err := bot.DB.GetBlacklist(ctx.Message.GuildID.String())
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	var x string

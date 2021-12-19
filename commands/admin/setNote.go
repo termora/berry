@@ -10,10 +10,10 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *Admin) setNote(ctx *bcr.Context) (err error) {
+func (bot *Bot) setNote(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
 		var notes string
-		for k := range c.Config.QuickNotes {
+		for k := range bot.Config.QuickNotes {
 			notes += fmt.Sprintf("`%v`\n", k)
 		}
 		if notes == "" {
@@ -30,12 +30,12 @@ func (c *Admin) setNote(ctx *bcr.Context) (err error) {
 
 	id, err := strconv.Atoi(ctx.Args[0])
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
-	t, err := c.DB.GetTerm(id)
+	t, err := bot.DB.GetTerm(id)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	note := strings.TrimSpace(strings.TrimPrefix(ctx.RawArgs, ctx.Args[0]))
@@ -44,7 +44,7 @@ func (c *Admin) setNote(ctx *bcr.Context) (err error) {
 		note = ""
 	}
 
-	if n, ok := c.Bot.Config.QuickNotes[note]; ok && n != "" {
+	if n, ok := bot.Config.QuickNotes[note]; ok && n != "" {
 		note = n
 	}
 
@@ -53,9 +53,9 @@ func (c *Admin) setNote(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	err = c.DB.SetNote(t.ID, note)
+	err = bot.DB.SetNote(t.ID, note)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Send(fmt.Sprintf("Updated note for %v.", id), discord.Embed{

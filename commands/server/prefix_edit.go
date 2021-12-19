@@ -8,16 +8,16 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *commands) addPrefix(ctx *bcr.Context) (err error) {
+func (bot *Bot) addPrefix(ctx *bcr.Context) (err error) {
 	prefix := strings.ToLower(ctx.RawArgs)
-	current := c.PrefixesFor(ctx.Message.GuildID)
+	current := bot.PrefixesFor(ctx.Message.GuildID)
 
 	if ctx.RawArgs == "" {
 		_, err = ctx.Send("You didn't give a prefix to add.")
 		return
 	}
 
-	if strings.Contains(prefix, c.Router.Bot.ID.String()) {
+	if strings.Contains(prefix, bot.Router.Bot.ID.String()) {
 		_, err = ctx.Send("Can't add mentioning the bot as a prefix.")
 		return
 	}
@@ -31,34 +31,34 @@ func (c *commands) addPrefix(ctx *bcr.Context) (err error) {
 
 	prefixes := append(current, prefix)
 
-	con, cancel := c.DB.Context()
+	con, cancel := bot.DB.Context()
 	defer cancel()
 
-	err = c.DB.QueryRow(con, "update public.servers set prefixes = $1 where id = $2 returning prefixes", prefixes, ctx.Message.GuildID.String()).Scan(&prefixes)
+	err = bot.DB.QueryRow(con, "update public.servers set prefixes = $1 where id = $2 returning prefixes", prefixes, ctx.Message.GuildID.String()).Scan(&prefixes)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Send("", discord.Embed{
 		Title: "New prefixes",
 		Description: strings.Join(
-			append([]string{fmt.Sprintf("<@%v>", c.Router.Bot.ID)}, prefixes...), "\n",
+			append([]string{fmt.Sprintf("<@%v>", bot.Router.Bot.ID)}, prefixes...), "\n",
 		),
-		Color: c.Router.EmbedColor,
+		Color: bot.Router.EmbedColor,
 	})
 	return
 }
 
-func (c *commands) removePrefix(ctx *bcr.Context) (err error) {
+func (bot *Bot) removePrefix(ctx *bcr.Context) (err error) {
 	prefix := strings.ToLower(ctx.RawArgs)
-	current := c.PrefixesFor(ctx.Message.GuildID)
+	current := bot.PrefixesFor(ctx.Message.GuildID)
 
 	if ctx.RawArgs == "" {
 		_, err = ctx.Send("You didn't give a prefix to remove.")
 		return
 	}
 
-	if strings.Contains(prefix, c.Router.Bot.ID.String()) {
+	if strings.Contains(prefix, bot.Router.Bot.ID.String()) {
 		_, err = ctx.Send("Can't remove mentioning the bot as a prefix.")
 		return
 	}
@@ -82,20 +82,20 @@ func (c *commands) removePrefix(ctx *bcr.Context) (err error) {
 		}
 	}
 
-	con, cancel := c.DB.Context()
+	con, cancel := bot.DB.Context()
 	defer cancel()
 
-	err = c.DB.QueryRow(con, "update public.servers set prefixes = $1 where id = $2 returning prefixes", prefixes, ctx.Message.GuildID.String()).Scan(&prefixes)
+	err = bot.DB.QueryRow(con, "update public.servers set prefixes = $1 where id = $2 returning prefixes", prefixes, ctx.Message.GuildID.String()).Scan(&prefixes)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Send("", discord.Embed{
 		Title: "New prefixes",
 		Description: strings.Join(
-			append([]string{fmt.Sprintf("<@%v>", c.Router.Bot.ID)}, prefixes...), "\n",
+			append([]string{fmt.Sprintf("<@%v>", bot.Router.Bot.ID)}, prefixes...), "\n",
 		),
-		Color: c.Router.EmbedColor,
+		Color: bot.Router.EmbedColor,
 	})
 	return
 }

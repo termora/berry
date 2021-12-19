@@ -7,7 +7,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *Admin) setCW(ctx *bcr.Context) (err error) {
+func (bot *Bot) setCW(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
 		_, err = ctx.Send("Not enough arguments provided: need ID and CW (or \"clear\")")
 		return err
@@ -15,12 +15,12 @@ func (c *Admin) setCW(ctx *bcr.Context) (err error) {
 
 	id, err := strconv.Atoi(ctx.Args[0])
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
-	t, err := c.DB.GetTerm(id)
+	t, err := bot.DB.GetTerm(id)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	// h
@@ -36,10 +36,10 @@ func (c *Admin) setCW(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	err = c.DB.SetCW(t.ID, cw)
+	err = bot.DB.SetCW(t.ID, cw)
 	if err != nil {
-		c.Sugar.Errorf("Error setting CW for %v: %v", id, err)
-		return c.DB.InternalError(ctx, err)
+		bot.Sugar.Errorf("Error setting CW for %v: %v", id, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Updated CW for %v.", id)

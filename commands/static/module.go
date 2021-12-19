@@ -12,7 +12,7 @@ import (
 )
 
 // Commands ...
-type Commands struct {
+type Bot struct {
 	*bot.Bot
 
 	start time.Time
@@ -24,9 +24,9 @@ type Commands struct {
 }
 
 // Init ...
-func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
-	c := &Commands{
-		Bot:                  bot,
+func Init(b *bot.Bot) (m string, o []*bcr.Command) {
+	bot := &Bot{
+		Bot:                  b,
 		start:                time.Now().UTC(),
 		SupportServerMembers: map[discord.UserID]discord.Member{},
 	}
@@ -38,7 +38,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		SlashCommand:  c.ping,
+		SlashCommand:  bot.ping,
 	}))
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
@@ -49,7 +49,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		SlashCommand:  c.about,
+		SlashCommand:  bot.about,
 		Options:       &[]discord.CommandOption{},
 	}))
 
@@ -60,7 +60,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.feedback,
+		Command:       bot.feedback,
 	}))
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
@@ -70,7 +70,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.credits,
+		Command:       bot.credits,
 	}))
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
@@ -81,7 +81,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       c.hello,
+		Command:       bot.hello,
 	}))
 
 	help := bot.Router.AddCommand(&bcr.Command{
@@ -94,7 +94,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown:    1 * time.Second,
 
 		Blacklistable: true,
-		SlashCommand:  c.help,
+		SlashCommand:  bot.help,
 		Options:       &[]discord.CommandOption{},
 	})
 
@@ -106,7 +106,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		SlashCommand:  c.perms,
+		SlashCommand:  bot.perms,
 	})
 
 	help.AddSubcommand(&bcr.Command{
@@ -117,7 +117,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		SlashCommand:  c.privacy,
+		SlashCommand:  bot.privacy,
 	})
 
 	help.AddSubcommand(&bcr.Command{
@@ -138,7 +138,7 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		SlashCommand:  c.cmdInvite,
+		SlashCommand:  bot.cmdInvite,
 		Options:       &[]discord.CommandOption{},
 	}))
 
@@ -147,21 +147,21 @@ func Init(bot *bot.Bot) (m string, o []*bcr.Command) {
 		Summary: "Export all terms in a DM",
 		Usage:   "[--compress|-x]",
 
-		Command: c.export,
+		Command: bot.export,
 	})
 
 	export.AddSubcommand(&bcr.Command{
 		Name:    "csv",
 		Summary: "Export terms as a CSV file",
 
-		Command: c.exportCSV,
+		Command: bot.exportCSV,
 	})
 
 	export.AddSubcommand(&bcr.Command{
 		Name:    "xlsx",
 		Summary: "Export terms as a XLSX file",
 
-		Command: c.exportXLSX,
+		Command: bot.exportXLSX,
 	})
 
 	o = append(o, help, export)

@@ -11,33 +11,33 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *Commands) perms(ctx bcr.Contexter) (err error) {
+func (bot *Bot) perms(ctx bcr.Contexter) (err error) {
 	return ctx.SendX("", discord.Embed{
 		Title:       "Required permissions",
-		Description: c.permText(ctx),
+		Description: bot.permText(ctx),
 		Color:       db.EmbedColour,
 	})
 }
 
-func (c *Commands) permText(ctx bcr.Contexter) string {
+func (bot *Bot) permText(ctx bcr.Contexter) string {
 	return fmt.Sprintf(`%v requires the following permissions to function correctly:
 - **Read Messages** & **Send Messages**: to respond to commands
 - **Read Message History**: for the %vsearch command to work
 - **Manage Messages**: to delete reactions on menus
 - **Embed Links**: to send responses for most commands
 - **Add Reactions**: for menus to work
-- **Use External Emojis**: to use custom emotes in a couple of commands`, c.Router.Bot.Username, c.Config.Bot.Prefixes[0])
+- **Use External Emojis**: to use custom emotes in a couple of commands`, bot.Router.Bot.Username, bot.Config.Bot.Prefixes[0])
 }
 
-func (c *Commands) privacy(ctx bcr.Contexter) (err error) {
+func (bot *Bot) privacy(ctx bcr.Contexter) (err error) {
 	return ctx.SendX("", discord.Embed{
 		Title:       "Privacy",
-		Description: c.privacyText(ctx),
+		Description: bot.privacyText(ctx),
 		Color:       db.EmbedColour,
 	})
 }
 
-func (c *Commands) privacyText(ctx bcr.Contexter) string {
+func (bot *Bot) privacyText(ctx bcr.Contexter) string {
 	return fmt.Sprintf(`We're not lawyers, we don't want to write a document that no one will (or even can) read.
 
 	By continuing to use %v's commands, you consent to us processing the data listed below in a manner compliant with the GDPR.
@@ -65,23 +65,23 @@ func (c *Commands) privacyText(ctx bcr.Contexter) string {
 	
 	To delete server information from the database, simply have the bot leave the server, through kicking or banning it. Do note that this does *not* delete server information from database backups, only the live database (and any later backups). Contact us (on the support server, or [here](%vcontact)) if you want that deleted too, or have any other requests regarding your data. We'll comply with these within 30 days.
 	
-	%v is open source, and its source code is available [on GitHub](%v). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, c.Router.Bot.Username, c.Router.Bot.Username, c.Router.Bot.Username, c.Router.Bot.Username, c.Router.Bot.Username, c.Config.Bot.Website, c.Router.Bot.Username, c.Config.Bot.Git)
+	%v is open source, and its source code is available [on GitHub](%v). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Config.Bot.Website, bot.Router.Bot.Username, bot.Config.Bot.Git)
 }
 
-func (c *Commands) autopost(ctx bcr.Contexter) (err error) {
+func (bot *Bot) autopost(ctx bcr.Contexter) (err error) {
 	_, err = ctx.Send("", discord.Embed{
 		Title:       "Autopost",
-		Description: c.autopostText(ctx),
+		Description: bot.autopostText(ctx),
 		Color:       db.EmbedColour,
 	})
 	return
 }
 
-func (c *Commands) autopostText(ctx bcr.Contexter) string {
-	return fmt.Sprintf("To automatically post terms at a set interval, you can use the `/autopost` (or `%vautopost`) command. Check out `%vautopost help` for how to use it.\n\nNote: this command previously recommended using a bot such as YAGPDB.xyz to automatically post terms. This still works for now, but please switch over to the built-in command.", c.Config.Bot.Prefixes[0], c.Config.Bot.Prefixes[0])
+func (bot *Bot) autopostText(ctx bcr.Contexter) string {
+	return fmt.Sprintf("To automatically post terms at a set interval, you can use the `/autopost` (or `%vautopost`) command. Check out `%vautopost help` for how to use it.\n\nNote: this command previously recommended using a bot such as YAGPDB.xyz to automatically post terms. This still works for now, but please switch over to the built-in command.", bot.Config.Bot.Prefixes[0], bot.Config.Bot.Prefixes[0])
 }
 
-func (c *Commands) help(ctx bcr.Contexter) (err error) {
+func (bot *Bot) help(ctx bcr.Contexter) (err error) {
 	// help for commands
 	if v, ok := ctx.(*bcr.Context); ok {
 		if len(v.Args) > 0 {
@@ -103,7 +103,7 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 			},
 			{
 				Name:  "Pronouns",
-				Value: fmt.Sprintf("`pronouns`: see how pronouns are used in a sentence! (optionally with your name)\n`pronouns list`: list all pronouns known to %v!\n`pronouns submit`: submit a pronoun set to be added!", c.Router.Bot.Username),
+				Value: fmt.Sprintf("`pronouns`: see how pronouns are used in a sentence! (optionally with your name)\n`pronouns list`: list all pronouns known to %v!\n`pronouns submit`: submit a pronoun set to be added!", bot.Router.Bot.Username),
 			},
 			{
 				Name:  "For staff",
@@ -116,8 +116,8 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 	}
 
 	// if custom help fields are defined, add those
-	if len(c.Config.Bot.HelpFields) != 0 {
-		e.Fields = append(e.Fields, c.Config.Bot.HelpFields...)
+	if len(bot.Config.Bot.HelpFields) != 0 {
+		e.Fields = append(e.Fields, bot.Config.Bot.HelpFields...)
 	}
 
 	components := discord.Components(
@@ -127,17 +127,17 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 			Options: []discord.SelectOption{
 				{
 					Label:       "Permissions",
-					Description: fmt.Sprintf("Show all the permissions %v needs!", c.Router.Bot.Username),
+					Description: fmt.Sprintf("Show all the permissions %v needs!", bot.Router.Bot.Username),
 					Value:       "permissions",
 				},
 				{
 					Label:       "Privacy",
-					Description: fmt.Sprintf("Show %v's privacy policy!", c.Router.Bot.Username),
+					Description: fmt.Sprintf("Show %v's privacy policy!", bot.Router.Bot.Username),
 					Value:       "privacy",
 				},
 				{
 					Label:       "Automatically posting terms",
-					Description: fmt.Sprintf("How to make %v automatically post terms!", c.Router.Bot.Username),
+					Description: fmt.Sprintf("How to make %v automatically post terms!", bot.Router.Bot.Username),
 					Value:       "autopost",
 				},
 			},
@@ -166,11 +166,11 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 		s := ""
 		switch data.Values[0] {
 		case "permissions":
-			s = c.permText(ctx)
+			s = bot.permText(ctx)
 		case "privacy":
-			s = c.privacyText(ctx)
+			s = bot.privacyText(ctx)
 		case "autopost":
-			s = c.autopostText(ctx)
+			s = bot.autopostText(ctx)
 		default:
 			ctx.Session().RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
 				Type: api.UpdateMessage,
@@ -203,8 +203,8 @@ func (c *Commands) help(ctx bcr.Contexter) (err error) {
 	return err
 }
 
-func (c *Commands) cmdInvite(ctx bcr.Contexter) (err error) {
-	s := fmt.Sprintf("Use this link to invite me to your server: <%v>", c.invite())
+func (bot *Bot) cmdInvite(ctx bcr.Contexter) (err error) {
+	s := fmt.Sprintf("Use this link to invite me to your server: <%v>", bot.invite())
 	if _, ok := ctx.(*bcr.Context); ok {
 		s += "\n\nYou can use the `help permissions` command to get a detailed explanation of all permissions required."
 	}

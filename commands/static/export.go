@@ -32,26 +32,26 @@ type e struct {
 	Pronouns     []*db.PronounSet  `json:"pronouns,omitempty"`
 }
 
-func (c *Commands) export(ctx *bcr.Context) (err error) {
+func (bot *Bot) export(ctx *bcr.Context) (err error) {
 	fs := pflag.NewFlagSet("", pflag.ContinueOnError)
 	var gz bool
 	fs.BoolVarP(&gz, "compress", "x", false, "Compress the output with gzip")
 
 	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		c.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		bot.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
 		return
 	}
 
-	export, err := export.New(c.DB)
+	export, err := export.New(bot.DB)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	b, err := json.MarshalIndent(export, "", "  ")
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 	fn := fmt.Sprintf("export-%v.json", time.Now().Format("2006-01-02-15-04-05"))
 
@@ -62,11 +62,11 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 		zw.Name = fn
 		_, err = zw.Write(b)
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		}
 		err = zw.Close()
 		if err != nil {
-			return c.DB.InternalError(ctx, err)
+			return bot.DB.InternalError(ctx, err)
 		}
 		fn = fn + ".gz"
 	} else {
@@ -84,9 +84,9 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 		}},
 	}
 
-	if c.Config.Bot.LicenseLink != "" {
+	if bot.Config.Bot.LicenseLink != "" {
 		data.Embeds = append(data.Embeds, discord.Embed{
-			Description: fmt.Sprintf("Make sure to follow the [license](%v).", c.Config.Bot.LicenseLink),
+			Description: fmt.Sprintf("Make sure to follow the [license](%v).", bot.Config.Bot.LicenseLink),
 			Color:       db.EmbedColour,
 		})
 	}
@@ -103,15 +103,15 @@ func (c *Commands) export(ctx *bcr.Context) (err error) {
 	return err
 }
 
-func (c *Commands) exportCSV(ctx *bcr.Context) (err error) {
-	terms, err := c.DB.GetTerms(0)
+func (bot *Bot) exportCSV(ctx *bcr.Context) (err error) {
+	terms, err := bot.DB.GetTerms(0)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		c.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		bot.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
 		return
 	}
@@ -134,7 +134,7 @@ func (c *Commands) exportCSV(ctx *bcr.Context) (err error) {
 
 	err = w.Error()
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	data := api.SendMessageData{
@@ -145,9 +145,9 @@ func (c *Commands) exportCSV(ctx *bcr.Context) (err error) {
 		}},
 	}
 
-	if c.Config.Bot.LicenseLink != "" {
+	if bot.Config.Bot.LicenseLink != "" {
 		data.Embeds = append(data.Embeds, discord.Embed{
-			Description: fmt.Sprintf("Make sure to follow the [license](%v).", c.Config.Bot.LicenseLink),
+			Description: fmt.Sprintf("Make sure to follow the [license](%v).", bot.Config.Bot.LicenseLink),
 			Color:       db.EmbedColour,
 		})
 	}
@@ -164,15 +164,15 @@ func (c *Commands) exportCSV(ctx *bcr.Context) (err error) {
 	return err
 }
 
-func (c *Commands) exportXLSX(ctx *bcr.Context) (err error) {
-	terms, err := c.DB.GetTerms(0)
+func (bot *Bot) exportXLSX(ctx *bcr.Context) (err error) {
+	terms, err := bot.DB.GetTerms(0)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		c.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		bot.Sugar.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
 		return
 	}
@@ -208,7 +208,7 @@ func (c *Commands) exportXLSX(ctx *bcr.Context) (err error) {
 
 	buf, err := f.WriteToBuffer()
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	data := api.SendMessageData{
@@ -219,9 +219,9 @@ func (c *Commands) exportXLSX(ctx *bcr.Context) (err error) {
 		}},
 	}
 
-	if c.Config.Bot.LicenseLink != "" {
+	if bot.Config.Bot.LicenseLink != "" {
 		data.Embeds = append(data.Embeds, discord.Embed{
-			Description: fmt.Sprintf("Make sure to follow the [license](%v).", c.Config.Bot.LicenseLink),
+			Description: fmt.Sprintf("Make sure to follow the [license](%v).", bot.Config.Bot.LicenseLink),
 			Color:       db.EmbedColour,
 		})
 	}

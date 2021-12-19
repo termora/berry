@@ -9,8 +9,8 @@ import (
 	"github.com/termora/berry/db"
 )
 
-func (c *commands) submit(ctx *bcr.Context) (err error) {
-	if c.Config.Bot.Support.PronounChannel == 0 {
+func (bot *Bot) submit(ctx *bcr.Context) (err error) {
+	if bot.Config.Bot.Support.PronounChannel == 0 {
 		_, err = ctx.Send("We aren't accepting new pronoun submissions through the bot. You might be able to ask in the bot support server.")
 		return err
 	}
@@ -34,19 +34,19 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 		p[i] = strings.ToLower(strings.TrimSpace(p[i]))
 	}
 
-	_, err = c.DB.GetPronoun(p...)
+	_, err = bot.DB.GetPronoun(p...)
 	if err == nil {
 		_, err = ctx.Send("That pronoun set already exists!")
 		return
 	}
 
-	con, cancel := c.DB.Context()
+	con, cancel := bot.DB.Context()
 	defer cancel()
 
 	found := false
-	err = c.DB.QueryRow(con, "select exists(select * from pronoun_msgs where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 and reflexive = $5)", p[0], p[1], p[2], p[3], p[4]).Scan(&found)
+	err = bot.DB.QueryRow(con, "select exists(select * from pronoun_msgs where subjective = $1 and objective = $2 and poss_det = $3 and poss_pro = $4 and reflexive = $5)", p[0], p[1], p[2], p[3], p[4]).Scan(&found)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	if found {
@@ -54,7 +54,7 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	msg, err := ctx.NewMessage().Channel(c.Config.Bot.Support.PronounChannel).
+	msg, err := ctx.NewMessage().Channel(bot.Config.Bot.Support.PronounChannel).
 		Embeds(discord.Embed{
 			Author: &discord.EmbedAuthor{
 				Name: fmt.Sprintf("%v#%v (%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),
@@ -70,26 +70,26 @@ func (c *commands) submit(ctx *bcr.Context) (err error) {
 			Timestamp: discord.NowTimestamp(),
 		}).Send()
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
-	con, cancel = c.DB.Context()
+	con, cancel = bot.DB.Context()
 	defer cancel()
 
-	_, err = c.DB.Exec(con, "insert into pronoun_msgs (message_id, subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5, $6)", msg.ID, p[0], p[1], p[2], p[3], p[4])
+	_, err = bot.DB.Exec(con, "insert into pronoun_msgs (message_id, subjective, objective, poss_det, poss_pro, reflexive) values ($1, $2, $3, $4, $5, $6)", msg.ID, p[0], p[1], p[2], p[3], p[4])
 	if err == nil {
 		// if the error's non-nil, the message was still sent
 		// so don't just return immediately
 		ctx.State.React(msg.ChannelID, msg.ID, "✅")
 	} else {
-		c.Sugar.Errorf("Error adding submission message %v to database: %v", msg.ID, err)
+		bot.Sugar.Errorf("Error adding submission message %v to database: %v", msg.ID, err)
 	}
 
 	_, err = ctx.NewMessage().Content(
 		fmt.Sprintf("Successfully submitted the pronoun set **%v**.", strings.Join(p[:5], "/")),
 	).BlockMentions().Send()
 	if err != nil {
-		c.Report(ctx, err)
+		bot.Report(ctx, err)
 		return err
 	}
 

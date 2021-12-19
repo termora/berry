@@ -9,7 +9,7 @@ import (
 	"github.com/termora/berry/db/search"
 )
 
-func (c *Admin) setFlags(ctx *bcr.Context) (err error) {
+func (bot *Bot) setFlags(ctx *bcr.Context) (err error) {
 	// if there's not enough arguments, return the help
 	if err = ctx.CheckRequiredArgs(2); err != nil {
 		_, err = ctx.Send("", discord.Embed{
@@ -38,9 +38,9 @@ func (c *Admin) setFlags(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	err = c.DB.SetFlags(id, search.TermFlag(flags))
+	err = bot.DB.SetFlags(id, search.TermFlag(flags))
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Updated the flags for %v to %v.", id, flags)

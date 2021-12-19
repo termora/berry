@@ -10,7 +10,7 @@ import (
 	"github.com/starshine-sys/bcr"
 )
 
-func (c *Admin) upload(ctx *bcr.Context) (err error) {
+func (bot *Bot) upload(ctx *bcr.Context) (err error) {
 	if len(ctx.Message.Attachments) == 0 {
 		_, err = ctx.Replyc(bcr.ColourRed, "No files attached.")
 		return
@@ -32,7 +32,7 @@ func (c *Admin) upload(ctx *bcr.Context) (err error) {
 
 	resp, err := http.Get(a.URL)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 	defer resp.Body.Close()
 
@@ -40,12 +40,12 @@ func (c *Admin) upload(ctx *bcr.Context) (err error) {
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
-	f, err := c.DB.AddFile(a.Filename, contentType, data)
+	f, err := bot.DB.AddFile(a.Filename, contentType, data)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	link := ""

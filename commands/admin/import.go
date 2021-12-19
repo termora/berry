@@ -15,7 +15,7 @@ var msgRegex = regexp.MustCompile(`(?i)\*?\*?Name:?\*?\*?:?(.*)\n\*?\*?Category:
 
 var tagsRegex = regexp.MustCompile(`(?i)\*?\*?Tags:\*?\*? (.*)`)
 
-func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
+func (bot *Bot) importFromMessage(ctx *bcr.Context) (err error) {
 	flag, _ := ctx.Flags.GetString("category")
 	rawSource, _ := ctx.Flags.GetBool("raw-source")
 
@@ -55,7 +55,7 @@ func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 			case "Source":
 				t.Source = f.Value
 			case "What category does your term fall under? Pick the most relevant one.":
-				if cat, err := c.DB.CategoryID(f.Value); err == nil {
+				if cat, err := bot.DB.CategoryID(f.Value); err == nil {
 					t.Category = cat
 					t.CategoryName = f.Value
 				}
@@ -68,7 +68,7 @@ func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 
 	// otherwise we'll have to parse the content
 	if !msgRegex.MatchString(msg.Content) {
-		ctx.SendfX("⚠️ The message you gave didn't match the expected input. You might have to add it manually with ``%vadmin addterm``.", c.Config.Bot.Prefixes[0])
+		ctx.SendfX("⚠️ The message you gave didn't match the expected input. You might have to add it manually with ``%vadmin addterm``.", bot.Config.Bot.Prefixes[0])
 
 		// the message didn't match, so don't bother parsing everything
 		goto done
@@ -88,7 +88,7 @@ func (c *Admin) importFromMessage(ctx *bcr.Context) (err error) {
 		}
 
 		// category
-		cat, err := c.DB.CategoryID(strings.TrimSpace(groups[2]))
+		cat, err := bot.DB.CategoryID(strings.TrimSpace(groups[2]))
 		if err == nil {
 			t.Category = cat
 			t.CategoryName = groups[2]
@@ -124,7 +124,7 @@ done:
 			return
 		}
 
-		cat, err := c.DB.CategoryID(flag)
+		cat, err := bot.DB.CategoryID(flag)
 		if err != nil {
 			_, err = ctx.Sendf("That category (``%v``) could not be found.", bcr.EscapeBackticks(flag))
 		}
@@ -132,7 +132,7 @@ done:
 	}
 
 	// add the category to the tags, if it's not already in there
-	cat := c.DB.CategoryFromID(t.Category)
+	cat := bot.DB.CategoryFromID(t.Category)
 	t.CategoryName = cat.Name
 
 	catInTags := false
@@ -151,7 +151,7 @@ done:
 
 	yes, timeout := ctx.ConfirmButton(ctx.Author.ID, bcr.ConfirmData{
 		Message:   "Do you want to add this term?",
-		Embeds:    []discord.Embed{c.DB.TermEmbed(t)},
+		Embeds:    []discord.Embed{bot.DB.TermEmbed(t)},
 		YesPrompt: "Add term",
 		YesStyle:  discord.SuccessButtonStyle(),
 	})
@@ -165,22 +165,22 @@ done:
 	}
 
 	for i := range t.Tags {
-		con, cancel := c.DB.Context()
+		con, cancel := bot.DB.Context()
 		defer cancel()
 
-		_, err = c.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
+		_, err = bot.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(t.Tags[i]), t.Tags[i])
 		if err != nil {
-			c.Sugar.Errorf("Error adding tag: %v", err)
+			bot.Sugar.Errorf("Error adding tag: %v", err)
 		}
 
 		t.DisplayTags = append(t.DisplayTags, t.Tags[i])
 		t.Tags[i] = strings.ToLower(t.Tags[i])
 	}
 
-	t, err = c.DB.AddTerm(t)
+	t, err = bot.DB.AddTerm(t)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 
 	_, err = ctx.Sendf("Added term with ID %v.", t.ID)
@@ -197,9 +197,9 @@ done:
 	ctx.State.React(msg.ChannelID, msg.ID, "yes:822929172669136966")
 
 	// if logging terms is enabled, log this
-	_, err = c.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.CreateAction, nil, t, ctx.Author.ID, nil)
+	_, err = bot.AuditLog.SendLog(t.ID, auditlog.TermEntry, auditlog.CreateAction, nil, t, ctx.Author.ID, nil)
 	if err != nil {
-		return c.DB.InternalError(ctx, err)
+		return bot.DB.InternalError(ctx, err)
 	}
 	return err
 }
