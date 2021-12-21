@@ -17,9 +17,9 @@ import (
 )
 
 type api struct {
-	db    *db.DB
-	conf  conf
-	sugar *zap.SugaredLogger
+	db   *db.DB
+	conf conf
+	log  *zap.SugaredLogger
 }
 
 type conf struct {
@@ -54,7 +54,7 @@ func main() {
 	sugar.Info("Connected to database.")
 
 	// create the API
-	r := api{db: d, conf: c, sugar: sugar}
+	r := api{db: d, conf: c, log: sugar}
 
 	// create the router
 	e := echo.New()

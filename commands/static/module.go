@@ -19,8 +19,6 @@ type Bot struct {
 
 	memberMu             sync.RWMutex
 	SupportServerMembers map[discord.UserID]discord.Member
-	// is set to true once we receive the first GuildMembersChunk event
-	guildMembersChunked bool
 }
 
 // Init ...
@@ -128,7 +126,7 @@ func Init(b *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       bot.CommandList,
+		Command:       bot.commandList,
 	})
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{

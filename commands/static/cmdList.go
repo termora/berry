@@ -6,7 +6,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
-	"github.com/termora/berry/bot"
+	"github.com/starshine-sys/bcr/bot"
 	"github.com/termora/berry/db"
 )
 

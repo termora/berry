@@ -68,15 +68,6 @@ func (bot *Bot) privacyText(ctx bcr.Contexter) string {
 	%v is open source, and its source code is available [on GitHub](%v). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Config.Bot.Website, bot.Router.Bot.Username, bot.Config.Bot.Git)
 }
 
-func (bot *Bot) autopost(ctx bcr.Contexter) (err error) {
-	_, err = ctx.Send("", discord.Embed{
-		Title:       "Autopost",
-		Description: bot.autopostText(ctx),
-		Color:       db.EmbedColour,
-	})
-	return
-}
-
 func (bot *Bot) autopostText(ctx bcr.Contexter) string {
 	return fmt.Sprintf("To automatically post terms at a set interval, you can use the `/autopost` (or `%vautopost`) command. Check out `%vautopost help` for how to use it.\n\nNote: this command previously recommended using a bot such as YAGPDB.xyz to automatically post terms. This still works for now, but please switch over to the built-in command.", bot.Config.Bot.Prefixes[0], bot.Config.Bot.Prefixes[0])
 }
@@ -172,7 +163,7 @@ func (bot *Bot) help(ctx bcr.Contexter) (err error) {
 		case "autopost":
 			s = bot.autopostText(ctx)
 		default:
-			ctx.Session().RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
+			_ = ctx.Session().RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
 				Type: api.UpdateMessage,
 				Data: &api.InteractionResponseData{
 					Components: &components,
@@ -180,7 +171,7 @@ func (bot *Bot) help(ctx bcr.Contexter) (err error) {
 			})
 		}
 
-		ctx.Session().RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
+		_ = ctx.Session().RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
 			Type: api.MessageInteractionWithSource,
 			Data: &api.InteractionResponseData{
 				Embeds: &[]discord.Embed{{
@@ -190,11 +181,10 @@ func (bot *Bot) help(ctx bcr.Contexter) (err error) {
 				Flags: api.EphemeralResponse,
 			},
 		})
-		return
 	})
 
 	time.AfterFunc(5*time.Minute, func() {
-		ctx.Session().EditMessageComplex(msg.ChannelID, msg.ID, api.EditMessageData{
+		_, _ = ctx.Session().EditMessageComplex(msg.ChannelID, msg.ID, api.EditMessageData{
 			Components: discord.ComponentsPtr(),
 		})
 		rm()

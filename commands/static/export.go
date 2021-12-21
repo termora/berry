@@ -20,18 +20,6 @@ import (
 	"github.com/termora/berry/db"
 )
 
-const eVersion = 3
-
-type e struct {
-	Version      int               `json:"export_version"`
-	ExportDate   time.Time         `json:"export_date"`
-	Categories   []*db.Category    `json:"categories"`
-	Terms        []*db.Term        `json:"terms"`
-	Tags         []string          `json:"tags"`
-	Explanations []*db.Explanation `json:"explanations,omitempty"`
-	Pronouns     []*db.PronounSet  `json:"pronouns,omitempty"`
-}
-
 func (bot *Bot) export(ctx *bcr.Context) (err error) {
 	fs := pflag.NewFlagSet("", pflag.ContinueOnError)
 	var gz bool
@@ -119,9 +107,9 @@ func (bot *Bot) exportCSV(ctx *bcr.Context) (err error) {
 	var b bytes.Buffer
 
 	w := csv.NewWriter(&b)
-	w.Write([]string{"ID", "Term", "Description", "Coined by", "Tags"})
+	_ = w.Write([]string{"ID", "Term", "Description", "Coined by", "Tags"})
 	for _, t := range terms {
-		w.Write([]string{
+		_ = w.Write([]string{
 			strconv.Itoa(t.ID),
 			strings.Join(append([]string{t.Name}, t.Aliases...), ", "),
 			t.Description,
@@ -180,27 +168,27 @@ func (bot *Bot) exportXLSX(ctx *bcr.Context) (err error) {
 	f := excelize.NewFile()
 
 	// set header
-	f.SetCellValue("Sheet1", "A1", "ID")
-	f.SetCellValue("Sheet1", "B1", "Term")
-	f.SetCellValue("Sheet1", "C1", "Description")
-	f.SetCellValue("Sheet1", "D1", "Coined by")
-	f.SetCellValue("Sheet1", "E1", "Tags")
+	_ = f.SetCellValue("Sheet1", "A1", "ID")
+	_ = f.SetCellValue("Sheet1", "B1", "Term")
+	_ = f.SetCellValue("Sheet1", "C1", "Description")
+	_ = f.SetCellValue("Sheet1", "D1", "Coined by")
+	_ = f.SetCellValue("Sheet1", "E1", "Tags")
 
 	for i, t := range terms {
-		f.SetCellValue("Sheet1", fmt.Sprintf("A%v", i+2), t.ID)
-		f.SetCellValue(
+		_ = f.SetCellValue("Sheet1", fmt.Sprintf("A%v", i+2), t.ID)
+		_ = f.SetCellValue(
 			"Sheet1", fmt.Sprintf("B%v", i+2),
 			strings.Join(append([]string{t.Name}, t.Aliases...), ", "),
 		)
-		f.SetCellValue(
+		_ = f.SetCellValue(
 			"Sheet1", fmt.Sprintf("C%v", i+2),
 			t.Description,
 		)
-		f.SetCellValue(
+		_ = f.SetCellValue(
 			"Sheet1", fmt.Sprintf("D%v", i+2),
 			t.Source,
 		)
-		f.SetCellValue(
+		_ = f.SetCellValue(
 			"Sheet1", fmt.Sprintf("E%v", i+2),
 			strings.Join(t.DisplayTags, ", "),
 		)

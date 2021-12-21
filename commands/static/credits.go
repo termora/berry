@@ -2,7 +2,6 @@ package static
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
@@ -89,29 +88,4 @@ func (bot *Bot) credits(ctx *bcr.Context) (err error) {
 
 	_, err = ctx.PagedEmbed(embeds, false)
 	return err
-}
-
-func (bot *Bot) filterByRole(rID discord.RoleID) (members []discord.Member) {
-	for _, m := range bot.SupportServerMembers {
-		for _, id := range m.RoleIDs {
-			if id == rID {
-				members = append(members, m)
-				break
-			}
-		}
-	}
-
-	sort.Slice(members, func(i, j int) bool {
-		name1 := members[i].Nick
-		name2 := members[j].Nick
-		if name1 == "" {
-			name1 = members[i].User.Username
-		}
-		if name2 == "" {
-			name2 = members[j].User.Username
-		}
-		return name1 < name2
-	})
-
-	return members
 }

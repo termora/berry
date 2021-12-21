@@ -39,12 +39,6 @@ type Bot struct {
 	Helper *helper.Helper
 }
 
-// Module is a single module/category of commands
-type Module interface {
-	String() string
-	Commands() []*bcr.Command
-}
-
 // New creates a new instance of Bot
 func New(
 	bot *bcrbot.Bot,

@@ -2,7 +2,6 @@ package static
 
 import (
 	"fmt"
-	"net/url"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -181,12 +180,4 @@ func (bot *Bot) invite() string {
 		discord.PermissionAddReactions
 
 	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&scope=applications.commands%%20bot", bot.Router.Bot.ID, perms)
-}
-
-func urlParse(s string) string {
-	u, err := url.Parse(s)
-	if err != nil {
-		return s
-	}
-	return u.Host
 }
