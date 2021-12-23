@@ -51,7 +51,7 @@ type Term struct {
 	Flags TermFlag `json:"flags"`
 
 	// Rank is only populated with db.Search()
-	Rank float64 `json:"rank,omitempty"`
+	Rank float64 `json:"rank"`
 	// Headline is only populated with db.Search()
 	Headline string `json:"headline,omitempty"`
 }
