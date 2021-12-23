@@ -4,133 +4,97 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
 	"github.com/termora/berry/db"
 	"github.com/termora/berry/db/search"
 
 	"github.com/jackc/pgx/v4"
-	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 
-func (a *api) list(c echo.Context) (err error) {
+func (s *Server) list(w http.ResponseWriter, r *http.Request) {
 	flags := search.FlagListHidden
-	if c.QueryParam("flags") != "" {
-		f, _ := strconv.Atoi(c.QueryParam("flags"))
+	if s := chi.URLParam(r, "flags"); s != "" {
+		f, _ := strconv.Atoi(s)
 		flags = search.TermFlag(f)
 	}
 
-	terms, err := a.db.GetTerms(flags)
+	terms, err := s.db.GetTerms(flags)
 	if err != nil {
-		// if no rows were returned, return no content
 		if errors.Cause(err) == pgx.ErrNoRows {
-			return c.NoContent(http.StatusNoContent)
+			w.WriteHeader(http.StatusNotFound)
+			return
 		}
-		// otherwise, internal server error
-		a.log.Errorf("Error getting terms: %v", err)
-		return c.NoContent(http.StatusInternalServerError)
+		s.log.Errorf("Error getting terms: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	// if no rows were returned, return no content
-	if len(terms) == 0 {
-		return c.NoContent(http.StatusNoContent)
-	}
-	return c.JSON(http.StatusOK, terms)
+	render.JSON(w, r, terms)
 }
 
-func (a *api) listCategory(c echo.Context) (err error) {
+func (s *Server) listCategory(w http.ResponseWriter, r *http.Request) {
 	// parse the ID
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.NoContent(http.StatusBadRequest)
-	}
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 
 	// get all terms from that category
-	terms, err := a.db.GetCategoryTerms(id, search.FlagListHidden)
+	terms, err := s.db.GetCategoryTerms(id, search.FlagListHidden)
 	if err != nil {
-		// if no rows were returned, return no content
 		if errors.Cause(err) == pgx.ErrNoRows {
-			return c.NoContent(http.StatusNoContent)
+			w.WriteHeader(http.StatusNotFound)
+			return
 		}
-		a.log.Errorf("Error getting terms: %v", err)
-		return c.NoContent(http.StatusInternalServerError)
+		s.log.Errorf("Error getting terms in category %v: %v", id, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	// if no rows were returned, return no content
-	if len(terms) == 0 {
-		return c.NoContent(http.StatusNoContent)
-	}
-	return c.JSON(http.StatusOK, terms)
+	render.JSON(w, r, terms)
 }
 
-func (a *api) categories(c echo.Context) (err error) {
+func (s *Server) categories(w http.ResponseWriter, r *http.Request) {
 	// get all categories
-	categories, err := a.db.GetCategories()
+	categories, err := s.db.GetCategories()
 	if err != nil {
-		// if no rows were returned, return no content
-		if errors.Cause(err) == pgx.ErrNoRows {
-			return c.NoContent(http.StatusNoContent)
-		}
-		a.log.Errorf("Error getting categories: %v", err)
-		return c.NoContent(http.StatusInternalServerError)
-	}
-	if len(categories) == 0 {
-		return c.NoContent(http.StatusNoContent)
+		s.log.Errorf("Error getting categories: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	// if no rows were returned, return no content
-	return c.JSON(http.StatusOK, categories)
+	render.JSON(w, r, categories)
 }
 
-func (a *api) explanations(c echo.Context) (err error) {
+func (s *Server) explanations(w http.ResponseWriter, r *http.Request) {
 	// get all explanations
-	explanations, err := a.db.GetAllExplanations()
+	explanations, err := s.db.GetAllExplanations()
 	if err != nil {
-		// if no rows were returned, return no content
-		if errors.Cause(err) == pgx.ErrNoRows {
-			return c.NoContent(http.StatusNoContent)
-		}
-		a.log.Errorf("Error getting explanations: %v", err)
-		return c.NoContent(http.StatusInternalServerError)
+		s.log.Errorf("Error getting explanations: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
-	return c.JSON(http.StatusOK, explanations)
+
+	render.JSON(w, r, explanations)
 }
 
-func (a *api) pronouns(c echo.Context) (err error) {
-	pronouns, err := a.db.Pronouns(db.AlphabeticPronounOrder)
+func (s *Server) pronouns(w http.ResponseWriter, r *http.Request) {
+	pronouns, err := s.db.Pronouns(db.AlphabeticPronounOrder)
 	if err != nil {
-		// if no rows were returned, return no content
-		if errors.Cause(err) == pgx.ErrNoRows {
-			return c.NoContent(http.StatusNoContent)
-		}
-		// otherwise, internal server error
-		a.log.Errorf("Error getting pronouns: %v", err)
-		return c.NoContent(http.StatusInternalServerError)
+		s.log.Errorf("Error getting pronouns: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	// if no rows were returned, return no content
-	if len(pronouns) == 0 {
-		return c.NoContent(http.StatusNoContent)
-	}
-
-	return c.JSON(http.StatusOK, pronouns)
+	render.JSON(w, r, pronouns)
 }
 
-func (a *api) tags(c echo.Context) (err error) {
-	tags, err := a.db.Tags()
+func (s *Server) tags(w http.ResponseWriter, r *http.Request) {
+	tags, err := s.db.Tags()
 	if err != nil {
-		// if no rows were returned, return no content
-		if errors.Cause(err) == pgx.ErrNoRows {
-			return c.NoContent(http.StatusNoContent)
-		}
-		// otherwise, internal server error
-		a.log.Errorf("Error getting tags: %v", err)
-		return c.NoContent(http.StatusInternalServerError)
+		s.log.Errorf("Error getting tags: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	// if no rows were returned, return no content
-	if len(tags) == 0 {
-		return c.NoContent(http.StatusNoContent)
-	}
-
-	return c.JSON(http.StatusOK, tags)
+	render.JSON(w, r, tags)
 }

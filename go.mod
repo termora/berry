@@ -14,6 +14,8 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/georgysavva/scany v0.2.8
 	github.com/getsentry/sentry-go v0.11.0
+	github.com/go-chi/chi/v5 v5.0.0
+	github.com/go-chi/render v1.0.1
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/google/uuid v1.3.0
 	github.com/imdario/mergo v0.3.12 // indirect

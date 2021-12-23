@@ -4,41 +4,47 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
 	"github.com/jackc/pgx/v4"
-	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 
-func (r *api) search(c echo.Context) (err error) {
-	terms, err := r.db.Search(c.Param("term"), 0, []string{})
+func (s *Server) search(w http.ResponseWriter, r *http.Request) {
+	query := chi.URLParam(r, "term")
+
+	terms, err := s.db.Search(query, 0, []string{})
 	if err != nil {
-		if errors.Cause(err) == pgx.ErrNoRows {
-			return c.NoContent(http.StatusNoContent)
-		}
-		return c.NoContent(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	if len(terms) == 0 {
-		return c.NoContent(http.StatusNoContent)
+		w.WriteHeader(http.StatusNoContent)
+		return
 	}
 
-	return c.JSON(http.StatusOK, terms)
+	render.JSON(w, r, terms)
 }
 
-func (r *api) term(c echo.Context) (err error) {
+func (s *Server) term(w http.ResponseWriter, r *http.Request) {
 	// parse the id
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		return c.NoContent(http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	term, err := r.db.GetTerm(id)
+	term, err := s.db.GetTerm(id)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
-			return c.NoContent(http.StatusNotFound)
+			w.WriteHeader(http.StatusNotFound)
+			return
 		}
-		return c.NoContent(http.StatusInternalServerError)
+		s.log.Errorf("Error getting term ID %v: %v", id, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	return c.JSON(http.StatusOK, term)
+	render.JSON(w, r, term)
 }
