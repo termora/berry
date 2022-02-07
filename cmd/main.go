@@ -9,12 +9,14 @@ import (
 	"github.com/termora/berry/cmd/bot"
 	"github.com/termora/berry/cmd/export"
 	"github.com/termora/berry/cmd/site"
+	"github.com/termora/berry/common"
 	"github.com/urfave/cli/v2"
 )
 
 var app = &cli.App{
-	Name:  "Termora",
-	Usage: "A searchable glossary bot and website",
+	Name:    "Termora",
+	Usage:   "A searchable glossary bot and website",
+	Version: common.Version,
 
 	Commands: []*cli.Command{
 		bot.Command,

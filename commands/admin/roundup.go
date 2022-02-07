@@ -7,6 +7,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 )
 
@@ -55,7 +56,7 @@ func (bot *Bot) changelog(ctx *bcr.Context) (err error) {
 	// check perms in the channel
 	perms, err := ctx.State.Permissions(ch.ID, ctx.Author.ID)
 	if err != nil {
-		bot.Log.Errorf("Error getting perms for %v in %v: %v", ctx.Author.ID, ch.ID, err)
+		log.Errorf("Error getting perms for %v in %v: %v", ctx.Author.ID, ch.ID, err)
 		_, err = ctx.Sendf(
 			"❌ An error occurred while trying to get permissions.\nIf this issue persists, please contact the bot developer.",
 		)
@@ -105,7 +106,7 @@ func (bot *Bot) changelog(ctx *bcr.Context) (err error) {
 	if ch.Type == discord.GuildNews {
 		_, err = ctx.State.CrosspostMessage(m.ChannelID, m.ID)
 		if err != nil {
-			bot.Log.Errorf("Error crossposting message: %v", err)
+			log.Errorf("Error crossposting message: %v", err)
 		}
 	}
 
@@ -125,7 +126,7 @@ func (bot *Bot) changelog(ctx *bcr.Context) (err error) {
 			if ch.Type == discord.GuildNews {
 				_, err = ctx.State.CrosspostMessage(msg.ChannelID, msg.ID)
 				if err != nil {
-					bot.Log.Errorf("Error crossposting message: %v", err)
+					log.Errorf("Error crossposting message: %v", err)
 				}
 			}
 		}

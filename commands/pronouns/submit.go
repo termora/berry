@@ -6,6 +6,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 )
 
@@ -82,7 +83,7 @@ func (bot *Bot) submit(ctx *bcr.Context) (err error) {
 		// so don't just return immediately
 		ctx.State.React(msg.ChannelID, msg.ID, "✅")
 	} else {
-		bot.Log.Errorf("Error adding submission message %v to database: %v", msg.ID, err)
+		log.Errorf("Error adding submission message %v to database: %v", msg.ID, err)
 	}
 
 	_, err = ctx.NewMessage().Content(

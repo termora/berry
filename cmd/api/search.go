@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
+	"github.com/termora/berry/common/log"
 )
 
 func (s *Server) search(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +42,7 @@ func (s *Server) term(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
-		s.log.Errorf("Error getting term ID %v: %v", id, err)
+		log.Errorf("Error getting term ID %v: %v", id, err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

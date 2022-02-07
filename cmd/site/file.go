@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"github.com/starshine-sys/snowflake/v2"
+	"github.com/termora/berry/common/log"
 )
 
 func (s *site) file(c echo.Context) (err error) {
@@ -25,7 +26,7 @@ func (s *site) file(c echo.Context) (err error) {
 			return c.NoContent(http.StatusNotFound)
 		}
 
-		s.sugar.Errorf("Error getting file %v: %v", i, err)
+		log.Errorf("Error getting file %v: %v", i, err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 

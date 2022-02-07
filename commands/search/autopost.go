@@ -15,6 +15,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 	"github.com/termora/berry/db/search"
 )
@@ -235,7 +236,7 @@ func (bot *Bot) autopostLoop() {
 
 			err := pgxscan.Select(context.Background(), bot.DB, &aps, "select * from autopost where next_post < $1 limit 5", time.Now().UTC())
 			if err != nil {
-				bot.Log.Errorf("Error getting autopost info: %v", err)
+				log.Errorf("Error getting autopost info: %v", err)
 				time.Sleep(time.Second)
 				continue
 			}
@@ -243,7 +244,7 @@ func (bot *Bot) autopostLoop() {
 			for _, ap := range aps {
 				err = bot.doAutopost(ap)
 				if err != nil {
-					bot.Log.Errorf("Error running autopost in %v: %v", ap.ChannelID, err)
+					log.Errorf("Error running autopost in %v: %v", ap.ChannelID, err)
 				}
 			}
 
@@ -263,7 +264,7 @@ func (bot *Bot) doAutopost(ap Autopost) (err error) {
 	}
 
 	if !perms.Has(discord.PermissionViewChannel | discord.PermissionSendMessages) {
-		bot.Log.Errorf("Can't send messages in %v (guild %v), disabling autopost there.", ap.ChannelID, ap.GuildID)
+		log.Errorf("Can't send messages in %v (guild %v), disabling autopost there.", ap.ChannelID, ap.GuildID)
 		return bot.setAutopost(0, ap.ChannelID, nil, nil, 0)
 	}
 

@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/commands/admin/auditlog"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 )
 
@@ -275,7 +276,7 @@ func (bot *Bot) editTermTags(ctx *bcr.Context, t *db.Term) (err error) {
 		_, err = bot.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(tags[i]), tags[i])
 		if err != nil {
-			bot.Log.Errorf("Error adding tag: %v", err)
+			log.Errorf("Error adding tag: %v", err)
 		}
 		tags[i] = strings.ToLower(tags[i])
 	}

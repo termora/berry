@@ -8,6 +8,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/commands/admin/auditlog"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 )
 
@@ -171,7 +172,7 @@ done:
 		_, err = bot.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(t.Tags[i]), t.Tags[i])
 		if err != nil {
-			bot.Log.Errorf("Error adding tag: %v", err)
+			log.Errorf("Error adding tag: %v", err)
 		}
 
 		t.DisplayTags = append(t.DisplayTags, t.Tags[i])

@@ -7,6 +7,7 @@ import (
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db/search"
 	"github.com/termora/tsclient"
 	"github.com/termora/tsclient/utils/jsonutil"
@@ -19,7 +20,7 @@ func (c *Client) SearchCat(input string, cat, limit int, ignore []string) (terms
 		filterBy = "category:" + strconv.Itoa(cat)
 	}
 
-	c.Debug("Searching for \"%v\"", input)
+	log.Debugf("Searching for \"%v\"", input)
 
 	resp, err := c.ts.Search("terms", tsclient.SearchData{
 		NoPreSegmentedQuery:     true,
@@ -53,13 +54,13 @@ func (c *Client) SearchCat(input string, cat, limit int, ignore []string) (terms
 		var doc tsTerm
 		err = hit.UnmarshalTo(&doc)
 		if err != nil {
-			c.Debug("Error getting term index %v: %v", i, err)
+			log.Errorf("Error getting term index %v: %v", i, err)
 			continue
 		}
 
 		t, err := c.getTerm(ctx, conn, doc.ID)
 		if err != nil {
-			c.Debug("Error getting term ID %v: %v", doc.ID, err)
+			log.Errorf("Error getting term ID %v: %v", doc.ID, err)
 			return nil, err
 		}
 

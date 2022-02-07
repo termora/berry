@@ -7,13 +7,14 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/common/log"
 )
 
 func (bot *Bot) initExplanations(r *bcr.Router) (out []*bcr.Command) {
 	// get explanations *that are marked as being able to be invoked as commands*
 	explanations, err := bot.DB.GetCmdExplanations()
 	if err != nil {
-		bot.Log.Error("Error getting explanations:", err)
+		log.Error("Error getting explanations:", err)
 		return
 	}
 

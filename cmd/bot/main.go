@@ -17,8 +17,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/utils/ws"
 	"github.com/getsentry/sentry-go"
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	bcrbot "github.com/starshine-sys/bcr/bot"
 	"github.com/termora/berry/bot"
@@ -27,6 +25,7 @@ import (
 	"github.com/termora/berry/commands/search"
 	"github.com/termora/berry/commands/server"
 	"github.com/termora/berry/commands/static"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 	dbsearch "github.com/termora/berry/db/search"
 	"github.com/termora/berry/db/search/typesense"
@@ -60,44 +59,22 @@ var Command = &cli.Command{
 func run(ctx *cli.Context) error {
 	rand.Seed(time.Now().UnixNano())
 
-	// set up a logger
-	zcfg := zap.NewProductionConfig()
-	zcfg.Encoding = "console"
-	zcfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	zcfg.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	zcfg.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
-	zcfg.EncoderConfig.EncodeDuration = zapcore.StringDurationEncoder
+	c := getConfig()
 
 	if ctx.Bool("debug") {
-		zcfg.Level.SetLevel(zapcore.DebugLevel)
-	} else {
-		zcfg.Level.SetLevel(zapcore.InfoLevel)
-	}
-
-	logger, err := zcfg.Build(zap.AddStacktrace(zapcore.ErrorLevel))
-	if err != nil {
-		panic(err)
-	}
-
-	zap.RedirectStdLog(logger)
-	sugar := logger.Sugar()
-
-	c := getConfig(sugar)
-
-	if ctx.Bool("debug") {
-		ws.WSDebug = sugar.Debug
-		db.Debug = sugar.Debugf
+		ws.WSDebug = log.Debug
+		db.Debug = log.Debugf
 	}
 
 	// create a Sentry config
 	if c.UseSentry {
-		err = sentry.Init(sentry.ClientOptions{
+		err := sentry.Init(sentry.ClientOptions{
 			Dsn: c.Auth.SentryURL,
 		})
 		if err != nil {
-			sugar.Fatalf("sentry.Init: %s", err)
+			log.Fatalf("sentry.Init: %s", err)
 		}
-		sugar.Infof("Initialised Sentry")
+		log.Infof("Initialised Sentry")
 		// defer this to flush buffered events
 		defer sentry.Flush(2 * time.Second)
 	}
@@ -107,43 +84,43 @@ func run(ctx *cli.Context) error {
 	}
 
 	// connect to the database
-	d, err := db.Init(c.Auth.DatabaseURL, sugar)
+	d, err := db.Init(c.Auth.DatabaseURL)
 	if err != nil {
-		sugar.Fatalf("Error connecting to database: %v", err)
+		log.Fatalf("Error connecting to database: %v", err)
 	}
 	d.SetSentry(hub)
 	d.Config = &c
 	d.TermBaseURL = c.TermBaseURL()
 	defer func() {
 		d.Pool.Close()
-		sugar.Infof("Closed database connection.")
+		log.Infof("Closed database connection.")
 	}()
 
 	if c.Auth.TypesenseURL != "" && c.Auth.TypesenseKey != "" {
-		d.Searcher, err = typesense.New(c.Auth.TypesenseURL, c.Auth.TypesenseKey, d.Pool, db.Debug)
+		d.Searcher, err = typesense.New(c.Auth.TypesenseURL, c.Auth.TypesenseKey, d.Pool)
 		if err != nil {
-			sugar.Fatalf("Error connecting to Typesense: %v", err)
+			log.Fatalf("Error connecting to Typesense: %v", err)
 		}
 	}
 
 	// sync terms
 	terms, err := d.GetTerms(dbsearch.FlagSearchHidden)
 	if err != nil {
-		sugar.Fatalf("Couldn't fetch all terms: %v", err)
+		log.Fatalf("Couldn't fetch all terms: %v", err)
 	}
 
 	err = d.SyncTerms(terms)
 	if err != nil {
-		sugar.Fatalf("Couldn't synchronize terms: %v", err)
+		log.Fatalf("Couldn't synchronize terms: %v", err)
 	}
-	sugar.Info("Synchronized terms with search instance!")
+	log.Info("Synchronized terms with search instance!")
 
-	sugar.Info("Connected to database.")
+	log.Info("Connected to database.")
 
 	// create a new state
 	b, err := bcrbot.New(c.Auth.Token)
 	if err != nil {
-		sugar.Fatalf("Error creating bot: %v", err)
+		log.Fatalf("Error creating bot: %v", err)
 	}
 	b.Router.ShardManager.ForEach(func(s shard.Shard) {
 		state := s.(*state.State)
@@ -151,7 +128,7 @@ func run(ctx *cli.Context) error {
 		state.Cabinet.MessageStore = store.Noop
 
 		state.AddHandler(func(err error) {
-			sugar.Errorf("Gateway error: %v", err)
+			log.Errorf("Gateway error: %v", err)
 		})
 	})
 
@@ -163,7 +140,7 @@ func run(ctx *cli.Context) error {
 
 	// create the bot instance
 	bot := bot.New(
-		b, sugar, &c, d, hub)
+		b, &c, d, hub)
 	// add search commands
 	bot.Add(search.Init)
 	// add pronoun commands
@@ -182,33 +159,33 @@ func run(ctx *cli.Context) error {
 
 	// open a connection to Discord
 	if err = bot.Start(context.Background()); err != nil {
-		sugar.Fatal("Failed to connect:", err)
+		log.Fatal("Failed to connect:", err)
 	}
 
 	// Defer this to make sure that things are always cleanly shutdown even in the event of a crash
 	defer func() {
 		bot.Router.ShardManager.Close()
-		sugar.Infof("Disconnected from Discord.")
+		log.Infof("Disconnected from Discord.")
 	}()
 
-	sugar.Info("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
-	sugar.Infof("User: %v (%v)", botUser.Tag(), botUser.ID)
+	log.Info("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
+	log.Infof("User: %v (%v)", botUser.Tag(), botUser.ID)
 
 	if c.Bot.SlashCommands.Enabled {
 		if len(c.Bot.SlashCommands.Guilds) > 0 {
-			sugar.Infof("Syncing commands in %v...", c.Bot.SlashCommands.Guilds)
+			log.Infof("Syncing commands in %v...", c.Bot.SlashCommands.Guilds)
 		} else {
-			sugar.Info("Syncing slash commands...")
+			log.Info("Syncing slash commands...")
 		}
 		err = bot.Router.SyncCommands(c.Bot.SlashCommands.Guilds...)
 		if err != nil {
-			sugar.Errorf("Couldn't sync commands: %v", err)
+			log.Errorf("Couldn't sync commands: %v", err)
 		} else {
-			sugar.Info("Synced commands!")
+			log.Info("Synced commands!")
 		}
 	}
 
-	go timer(sugar)
+	go timer()
 
 	cctx, stop := signal.NotifyContext(ctx.Context, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	defer stop()
@@ -217,7 +194,7 @@ func run(ctx *cli.Context) error {
 	if !ctx.Bool("noloop") {
 		eventCh := make(chan interface{}, 100)
 
-		go eventThing(ctx, sugar, eventCh, exitCh)
+		go eventThing(ctx, eventCh, exitCh)
 
 		bot.Router.AddHandler(eventCh)
 	}
@@ -229,7 +206,7 @@ func run(ctx *cli.Context) error {
 		shutdownFromNoEvents = true
 	}
 
-	sugar.Infof("Interrupt signal received. Shutting down...")
+	log.Infof("Interrupt signal received. Shutting down...")
 
 	if c.Bot.StartStopLog.ID.IsValid() {
 		wh := webhook.New(c.Bot.StartStopLog.ID, c.Bot.StartStopLog.Token)
@@ -247,7 +224,7 @@ func run(ctx *cli.Context) error {
 	return nil
 }
 
-func timer(sugar *zap.SugaredLogger) {
+func timer() {
 	t := time.Now().UTC()
 	ch := time.Tick(10 * time.Minute)
 
@@ -257,7 +234,7 @@ func timer(sugar *zap.SugaredLogger) {
 	for {
 		select {
 		case <-ch:
-			sugar.Debugf("Tick received, %s since last tick.", time.Since(t))
+			log.Debugf("Tick received, %s since last tick.", time.Since(t))
 			t = time.Now().UTC()
 		case <-ctx.Done():
 			return
@@ -265,7 +242,7 @@ func timer(sugar *zap.SugaredLogger) {
 	}
 }
 
-func eventThing(ctx *cli.Context, s *zap.SugaredLogger, ch <-chan interface{}, out chan<- struct{}) {
+func eventThing(ctx *cli.Context, ch <-chan interface{}, out chan<- struct{}) {
 	cctx, stop := signal.NotifyContext(ctx.Context, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	defer stop()
 
@@ -277,7 +254,7 @@ func eventThing(ctx *cli.Context, s *zap.SugaredLogger, ch <-chan interface{}, o
 		select {
 		case ev := <-ch:
 			if ctx.Bool("more-debug") {
-				s.Debugf("Received event %s", reflect.ValueOf(ev).Elem().Type().Name())
+				log.Debugf("Received event %s", reflect.ValueOf(ev).Elem().Type().Name())
 			}
 			t.Stop()
 			t = time.AfterFunc(5*time.Minute, func() {

@@ -16,10 +16,10 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 	"github.com/termora/berry/db/search/typesense"
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
 
@@ -45,9 +45,8 @@ var Command = &cli.Command{
 }
 
 type site struct {
-	db    *db.DB
-	conf  conf
-	sugar *zap.SugaredLogger
+	db   *db.DB
+	conf conf
 }
 
 // T ...
@@ -116,41 +115,35 @@ func run(ctx *cli.Context) error {
 			ParseFS(tmpls, "templates/*.html")),
 	}
 
-	logger, err := zap.NewDevelopment()
-	if err != nil {
-		return err
-	}
-	sugar := logger.Sugar()
-
 	var c conf
 
 	configFile, err := ioutil.ReadFile("config.site.yaml")
 	if err != nil {
-		sugar.Fatal(err)
+		log.Fatal(err)
 	}
 	err = yaml.Unmarshal(configFile, &c)
 	if err != nil {
-		sugar.Fatalf("Error loading configuration file: %v", err)
+		log.Fatalf("Error loading configuration file: %v", err)
 	}
-	sugar.Info("Loaded configuration file.")
+	log.Info("Loaded configuration file.")
 
-	d, err := db.Init(c.DatabaseURL, sugar)
+	d, err := db.Init(c.DatabaseURL)
 	if err != nil {
-		sugar.Fatalf("Error connecting to database: %v", err)
+		log.Fatalf("Error connecting to database: %v", err)
 	}
 	d.TermBaseURL = "/term/"
-	sugar.Info("Connected to database.")
+	log.Info("Connected to database.")
 
 	// Typesense requires a bot running to sync terms
 	if c.Typesense.URL != "" && c.Typesense.Key != "" {
-		d.Searcher, err = typesense.New(c.Typesense.URL, c.Typesense.Key, d.Pool, sugar.Debugf)
+		d.Searcher, err = typesense.New(c.Typesense.URL, c.Typesense.Key, d.Pool)
 		if err != nil {
-			sugar.Fatalf("Couldn't connect to Typesense: %v", err)
+			log.Fatalf("Couldn't connect to Typesense: %v", err)
 		}
-		sugar.Info("Connected to Typesense server")
+		log.Info("Connected to Typesense server")
 	}
 
-	s := site{db: d, conf: c, sugar: sugar}
+	s := site{db: d, conf: c}
 
 	e := echo.New()
 	e.Renderer = t
@@ -187,7 +180,7 @@ Disallow: /static`)
 
 	go func() {
 		if err := e.Start(":" + port); err != nil {
-			sugar.Info("Shutting down server")
+			log.Info("Shutting down server")
 		}
 	}()
 
@@ -197,7 +190,7 @@ Disallow: /static`)
 	cctx, cancel := context.WithTimeout(ctx.Context, 10*time.Second)
 	defer cancel()
 	if err := e.Shutdown(cctx); err != nil {
-		sugar.Fatal(err)
+		log.Fatal(err)
 	}
 	return err
 }

@@ -14,18 +14,16 @@ import (
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/starshine-sys/bcr"
 	bcrbot "github.com/starshine-sys/bcr/bot"
+	"github.com/termora/berry/common"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 	"github.com/termora/berry/helper"
-	"github.com/termora/berry/structs"
-	"go.uber.org/zap"
 )
 
 // Bot is the main bot struct
 type Bot struct {
 	*bcrbot.Bot
-
-	Log    *zap.SugaredLogger
-	Config *structs.BotConfig
+	Config *common.BotConfig
 	DB     *db.DB
 
 	Sentry    *sentry.Hub
@@ -42,12 +40,10 @@ type Bot struct {
 // New creates a new instance of Bot
 func New(
 	bot *bcrbot.Bot,
-	s *zap.SugaredLogger,
-	config *structs.BotConfig,
+	config *common.BotConfig,
 	db *db.DB, hub *sentry.Hub) *Bot {
 	b := &Bot{
 		Bot:       bot,
-		Log:       s,
 		Config:    config,
 		DB:        db,
 		Sentry:    hub,
@@ -73,9 +69,9 @@ func New(
 	b.setupStats()
 
 	if config.Bot.Support.Token != "" {
-		h, err := helper.New(config.Bot.Support.Token, config.Bot.Support.GuildID, db, s)
+		h, err := helper.New(config.Bot.Support.Token, config.Bot.Support.GuildID, db)
 		if err != nil {
-			s.Errorf("Error creating helper: %v", err)
+			log.Errorf("Error creating helper: %v", err)
 		}
 		b.Helper = h
 	}
@@ -114,12 +110,11 @@ func (bot *Bot) guildCount() int {
 
 func (bot *Bot) setupStats() {
 	if bot.Config.Auth.InfluxDB.URL != "" {
-		bot.Log.Infof("Setting up InfluxDB client")
+		log.Infof("Setting up InfluxDB client")
 
 		bot.Stats = &StatsClient{
 			Client:     influxdb2.NewClient(bot.Config.Auth.InfluxDB.URL, bot.Config.Auth.InfluxDB.Token).WriteAPI(bot.Config.Auth.InfluxDB.Org, bot.Config.Auth.InfluxDB.Bucket),
 			guildCount: bot.guildCount,
-			log:        bot.Log,
 		}
 
 		bot.Router.ShardManager.ForEach(func(s shard.Shard) {

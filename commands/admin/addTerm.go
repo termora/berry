@@ -7,6 +7,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/commands/admin/auditlog"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 )
 
@@ -103,7 +104,7 @@ func (bot *Bot) addTerm(ctx *bcr.Context) (err error) {
 		_, err = bot.DB.Exec(con, `insert into public.tags (normalized, display) values ($1, $2)
 		on conflict (normalized) do update set display = $2`, strings.ToLower(strings.TrimSpace(tag)), tag)
 		if err != nil {
-			bot.Log.Errorf("Error adding tag: %v", err)
+			log.Errorf("Error adding tag: %v", err)
 		}
 	}
 

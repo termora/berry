@@ -8,10 +8,7 @@ import (
 )
 
 // New returns a new Searcher
-func New(dsn, apiKey string, pg *pgxpool.Pool, debugFunc func(string, ...interface{})) (search.Searcher, error) {
-	if debugFunc == nil {
-		debugFunc = func(string, ...interface{}) {}
-	}
+func New(dsn, apiKey string, pg *pgxpool.Pool) (search.Searcher, error) {
 
 	c, err := tsclient.New(dsn, apiKey)
 	if err != nil {
@@ -19,9 +16,8 @@ func New(dsn, apiKey string, pg *pgxpool.Pool, debugFunc func(string, ...interfa
 	}
 
 	return &Client{
-		ts:    c,
-		pg:    pg,
-		Debug: debugFunc,
+		ts: c,
+		pg: pg,
 	}, nil
 }
 
@@ -31,6 +27,4 @@ var _ search.Searcher = (*Client)(nil)
 type Client struct {
 	ts *tsclient.Client
 	pg *pgxpool.Pool
-
-	Debug func(string, ...interface{})
 }

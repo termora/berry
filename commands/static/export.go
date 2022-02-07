@@ -17,6 +17,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/commands/static/export"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 )
 
@@ -27,7 +28,7 @@ func (bot *Bot) export(ctx *bcr.Context) (err error) {
 
 	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		bot.Log.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		log.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
 		return
 	}
@@ -99,7 +100,7 @@ func (bot *Bot) exportCSV(ctx *bcr.Context) (err error) {
 
 	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		bot.Log.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		log.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
 		return
 	}
@@ -160,7 +161,7 @@ func (bot *Bot) exportXLSX(ctx *bcr.Context) (err error) {
 
 	u, err := ctx.State.CreatePrivateChannel(ctx.Author.ID)
 	if err != nil {
-		bot.Log.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
+		log.Errorf("Error creating user channel for %v: %v", ctx.Author.ID, err)
 		_, err = ctx.Send("There was an error opening a DM channel. Are you sure your DMs are open?")
 		return
 	}

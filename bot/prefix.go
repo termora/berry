@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/termora/berry/common/log"
 )
 
 // Prefixer ...
@@ -28,7 +29,7 @@ func (bot *Bot) PrefixesFor(id discord.GuildID) (s []string) {
 
 	err := bot.DB.QueryRow(ctx, "select prefixes from public.servers where id = $1", id.String()).Scan(&s)
 	if err != nil {
-		bot.Log.Errorf("Error getting prefixes for %v: %v", id, err)
+		log.Errorf("Error getting prefixes for %v: %v", id, err)
 		// return the default prefixes
 		return bot.Config.Bot.Prefixes
 	}

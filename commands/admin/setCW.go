@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/common/log"
 )
 
 func (bot *Bot) setCW(ctx *bcr.Context) (err error) {
@@ -38,7 +39,7 @@ func (bot *Bot) setCW(ctx *bcr.Context) (err error) {
 
 	err = bot.DB.SetCW(t.ID, cw)
 	if err != nil {
-		bot.Log.Errorf("Error setting CW for %v: %v", id, err)
+		log.Errorf("Error setting CW for %v: %v", id, err)
 		return bot.DB.InternalError(ctx, err)
 	}
 

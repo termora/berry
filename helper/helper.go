@@ -6,8 +6,8 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/session"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
-	"go.uber.org/zap"
 )
 
 // Helper ...
@@ -16,20 +16,18 @@ type Helper struct {
 
 	GuildID discord.GuildID
 	DB      *db.DB
-	Log     *zap.SugaredLogger
 }
 
 const intents = gateway.IntentGuildMembers | gateway.IntentGuildMessages
 
 // New creates a new Helper, adds the required intents and event handlers, and opens the connection.
-func New(token string, id discord.GuildID, db *db.DB, log *zap.SugaredLogger) (*Helper, error) {
+func New(token string, id discord.GuildID, db *db.DB) (*Helper, error) {
 	s := session.NewWithIntents("Bot "+token, intents)
 
 	h := &Helper{
 		Session: s,
 		DB:      db,
 		GuildID: id,
-		Log:     log,
 	}
 
 	h.AddHandler(h.memberUpdate)
@@ -53,6 +51,6 @@ func (bot *Helper) memberUpdate(ev *gateway.GuildMemberUpdateEvent) {
 
 	err := bot.DB.UpdateContributorName(ev.User.ID, name)
 	if err != nil {
-		bot.Log.Errorf("Error updating name for contributor: %v", err)
+		log.Errorf("Error updating name for contributor: %v", err)
 	}
 }

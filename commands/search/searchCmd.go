@@ -14,6 +14,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 )
 
@@ -353,7 +354,7 @@ func (bot *Bot) searchSlash(ctx bcr.Contexter) (err error) {
 			},
 		})
 		if err != nil {
-			bot.Log.Errorf("Error responding to interaction: %v", err)
+			log.Errorf("Error responding to interaction: %v", err)
 		}
 
 		return false

@@ -8,7 +8,6 @@ import (
 	"github.com/termora/berry/commands/static/export"
 	"github.com/termora/berry/db"
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
 )
 
 var Command = &cli.Command{
@@ -62,7 +61,7 @@ func run(c *cli.Context) error {
 		return errors.Sentinel("no database url provided")
 	}
 
-	db, err := db.Init(url, zap.S())
+	db, err := db.Init(url)
 	if err != nil {
 		return err
 	}

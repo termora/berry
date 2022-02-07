@@ -4,6 +4,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/termora/berry/common/log"
 )
 
 func (bot *Bot) doAutocomplete(ev *gateway.InteractionCreateEvent) {
@@ -26,7 +27,7 @@ func (bot *Bot) doAutocomplete(ev *gateway.InteractionCreateEvent) {
 	if dat.Name == "explain" {
 		exs, err := bot.DB.GetAllExplanations()
 		if err != nil {
-			bot.Log.Errorf("Error getting explanations: %v", err)
+			log.Errorf("Error getting explanations: %v", err)
 			return
 		}
 
@@ -60,7 +61,7 @@ func (bot *Bot) doAutocomplete(ev *gateway.InteractionCreateEvent) {
 
 	terms, err := bot.DB.Autocomplete(searchTerm)
 	if err != nil {
-		bot.Log.Errorf("Error doing autocomplete search: %v", err)
+		log.Errorf("Error doing autocomplete search: %v", err)
 		return
 	}
 

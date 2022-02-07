@@ -11,7 +11,7 @@ import (
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
-	"go.uber.org/zap"
+	"github.com/termora/berry/common/log"
 )
 
 // StatsClient is an InfluxDB client
@@ -28,8 +28,6 @@ type StatsClient struct {
 	apiCalls   uint32
 
 	guildCount func() int
-
-	log *zap.SugaredLogger
 }
 
 // IncQuery increments the query count by one
@@ -94,7 +92,7 @@ func (c *StatsClient) submitInner() {
 		return
 	}
 
-	c.log.Info("Submitting metrics to InfluxDB")
+	log.Info("Submitting metrics to InfluxDB")
 
 	c.queriesMu.Lock()
 	queries := c.queries

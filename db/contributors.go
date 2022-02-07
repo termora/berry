@@ -7,6 +7,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4"
+	"github.com/termora/berry/common/log"
 )
 
 // ContributorCategory is a category of contributors, optionally with a role.
@@ -36,7 +37,7 @@ func (db *DB) CategoryFromRole(id discord.RoleID) *ContributorCategory {
 	err := pgxscan.Get(context.Background(), db, &c, "select * from contributor_categories where role_id = $1", id)
 	if err != nil {
 		if errors.Cause(err) != pgx.ErrNoRows {
-			db.Log.Errorf("Error getting contributor category: %v", err)
+			log.Errorf("Error getting contributor category: %v", err)
 		}
 		return nil
 	}
@@ -57,7 +58,7 @@ func (db *DB) ContributorCategory(name string) *ContributorCategory {
 	err := pgxscan.Get(context.Background(), db, &c, "select * from contributor_categories where $1 ilike name", name)
 	if err != nil {
 		if errors.Cause(err) != pgx.ErrNoRows {
-			db.Log.Errorf("Error getting contributor category: %v", err)
+			log.Errorf("Error getting contributor category: %v", err)
 		}
 		return nil
 	}

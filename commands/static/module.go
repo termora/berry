@@ -1,6 +1,7 @@
 package static
 
 import (
+	"log"
 	"os"
 	"sync"
 	"time"
@@ -171,12 +172,12 @@ func Init(b *bot.Bot) (m string, o []*bcr.Command) {
 
 	bytes, err := os.ReadFile("custom_commands.json")
 	if err != nil {
-		bot.Log.Fatalf("Error reading custom commands file: %v", err)
+		log.Fatalf("Error reading custom commands file: %v", err)
 	}
 
 	cmds, err := cc.ParseBytes(bytes)
 	if err != nil {
-		bot.Log.Fatalf("Error parsing custom commands file: %v", err)
+		log.Fatalf("Error parsing custom commands file: %v", err)
 	}
 
 	for _, c := range cmds {

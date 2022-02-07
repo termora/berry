@@ -13,6 +13,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 )
 
@@ -152,7 +153,7 @@ func (bot *Bot) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name strin
 			},
 		})
 		if err != nil {
-			bot.Log.Errorf("Error responding to interaction: %v", err)
+			log.Errorf("Error responding to interaction: %v", err)
 		}
 
 		return false
@@ -249,7 +250,7 @@ func (bot *Bot) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name strin
 			},
 		})
 		if err != nil {
-			bot.Log.Errorf("Error responding to interaction: %v", err)
+			log.Errorf("Error responding to interaction: %v", err)
 		}
 
 		_, _, err = ctx.ButtonPages(e, 15*time.Minute)
@@ -260,7 +261,7 @@ func (bot *Bot) pronounList(ctx bcr.Contexter, sets []*db.PronounSet, name strin
 
 	err = ctx.Session().DeleteMessage(msg.ChannelID, msg.ID, "")
 	if err != nil {
-		bot.Log.Errorf("Error deleting message: %v", err)
+		log.Errorf("Error deleting message: %v", err)
 	}
 	return nil
 }

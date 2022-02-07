@@ -11,6 +11,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/georgysavva/scany/pgxscan"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 )
 
@@ -193,7 +194,7 @@ func (bot *AuditLog) desc(entry Entry) string {
 	case TermEntry:
 		term, err := entry.BeforeTerm()
 		if err != nil {
-			bot.DB.Log.Errorf("Error unmarshaling term: %v", err)
+			log.Errorf("Error unmarshaling term: %v", err)
 		}
 
 		desc += " term **"

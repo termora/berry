@@ -10,10 +10,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 	"github.com/termora/berry/db/search/typesense"
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
 
@@ -26,7 +26,6 @@ var Command = &cli.Command{
 type Server struct {
 	db   *db.DB
 	conf conf
-	log  *zap.SugaredLogger
 }
 
 type conf struct {
@@ -37,12 +36,6 @@ type conf struct {
 }
 
 func run(*cli.Context) error {
-	logger, err := zap.NewDevelopment()
-	if err != nil {
-		panic(err)
-	}
-	log := logger.Sugar()
-
 	// read config
 	var c conf
 
@@ -57,17 +50,17 @@ func run(*cli.Context) error {
 
 	log.Info("Loaded configuration file.")
 
-	s := &Server{conf: c, log: log}
+	s := &Server{conf: c}
 
 	// connect to the database
-	s.db, err = db.Init(c.DatabaseURL, log)
+	s.db, err = db.Init(c.DatabaseURL)
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 	log.Info("Connected to database")
 
 	if s.conf.TypesenseURL != "" && s.conf.TypesenseKey != "" {
-		s.db.Searcher, err = typesense.New(s.conf.TypesenseURL, s.conf.TypesenseKey, s.db.Pool, s.log.Debugf)
+		s.db.Searcher, err = typesense.New(s.conf.TypesenseURL, s.conf.TypesenseKey, s.db.Pool)
 		if err != nil {
 			log.Fatalf("Error connecting to Typesense: %v", err)
 		}

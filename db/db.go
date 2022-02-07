@@ -15,10 +15,10 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/starshine-sys/snowflake/v2"
+	"github.com/termora/berry/common"
+	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db/search"
 	"github.com/termora/berry/db/search/pg"
-	"github.com/termora/berry/structs"
-	"go.uber.org/zap"
 
 	// pgx driver for migrations
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -33,10 +33,9 @@ type DB struct {
 	search.Searcher
 	*pgxpool.Pool
 
-	Log        *zap.SugaredLogger
 	GuildCache *ttlcache.Cache
 
-	Config *structs.BotConfig
+	Config *common.BotConfig
 
 	Snowflake *snowflake.Generator
 
@@ -51,23 +50,22 @@ type DB struct {
 }
 
 // Init ...
-func Init(url string, sugar *zap.SugaredLogger) (db *DB, err error) {
+func Init(url string) (db *DB, err error) {
 	guildCache := ttlcache.NewCache()
 	guildCache.SetCacheSizeLimit(100)
 	guildCache.SetTTL(10 * time.Minute)
 
-	err = runMigrations(url, sugar)
+	err = runMigrations(url)
 	if err != nil {
 		return nil, err
 	}
 
-	logger := sugar.Desugar()
 	conf, err := pgxpool.ParseConfig(url)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to parse config: %w", err)
 	}
 	conf.ConnConfig.LogLevel = pgx.LogLevelWarn
-	conf.ConnConfig.Logger = zapadapter.NewLogger(logger)
+	conf.ConnConfig.Logger = zapadapter.NewLogger(log.Logger)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -79,7 +77,6 @@ func Init(url string, sugar *zap.SugaredLogger) (db *DB, err error) {
 	db = &DB{
 		Snowflake:  snowflake.NewGen(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
 		Pool:       pool,
-		Log:        sugar,
 		GuildCache: guildCache,
 		Timeout:    10 * time.Second,
 		Searcher:   pg.New(pool, Debug),
@@ -92,7 +89,7 @@ func Init(url string, sugar *zap.SugaredLogger) (db *DB, err error) {
 //go:embed migrations
 var fs embed.FS
 
-func runMigrations(url string, sugar *zap.SugaredLogger) (err error) {
+func runMigrations(url string) (err error) {
 	db, err := sql.Open("pgx", url)
 	if err != nil {
 		return err
@@ -114,7 +111,7 @@ func runMigrations(url string, sugar *zap.SugaredLogger) (err error) {
 	}
 
 	if n != 0 {
-		sugar.Infof("Performed %v migrations!", n)
+		log.Infof("Performed %v migrations!", n)
 	}
 
 	err = db.Close()

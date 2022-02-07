@@ -1,12 +1,15 @@
 package typesense
 
-import "github.com/termora/tsclient"
+import (
+	"github.com/termora/berry/common/log"
+	"github.com/termora/tsclient"
+)
 
 const autocompleteLimit = 25
 
 // Autocomplete ...
 func (c *Client) Autocomplete(input string) (terms []string, err error) {
-	c.Debug("Invoking autocomplete for \"%v\"", input)
+	log.Debugf("Invoking autocomplete for \"%v\"", input)
 
 	resp, err := c.ts.Search("terms", tsclient.SearchData{
 		Query:            input,
@@ -23,7 +26,7 @@ func (c *Client) Autocomplete(input string) (terms []string, err error) {
 		var doc tsTerm
 		err = hit.UnmarshalTo(&doc)
 		if err != nil {
-			c.Debug("Error getting term index %v: %v", i, err)
+			log.Errorf("Error getting term index %v: %v", i, err)
 			continue
 		}
 		terms = append(terms, doc.Names[0])

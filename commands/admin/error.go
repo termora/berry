@@ -5,6 +5,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
+	"github.com/termora/berry/common/log"
 )
 
 func (bot *Bot) error(ctx *bcr.Context) (err error) {
@@ -15,7 +16,7 @@ func (bot *Bot) error(ctx *bcr.Context) (err error) {
 
 	e, err := bot.DB.Error(ctx.RawArgs)
 	if err != nil {
-		bot.Log.Errorf("Error when retrieving error with ID %v: %v", ctx.RawArgs, err)
+		log.Errorf("Error when retrieving error with ID %v: %v", ctx.RawArgs, err)
 		_, err = ctx.Send("Error with that ID not found, or another error occurred.")
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/commands/admin/auditlog"
+	"github.com/termora/berry/common/log"
 )
 
 func (bot *Bot) delTerm(ctx *bcr.Context) (err error) {
@@ -36,7 +37,7 @@ func (bot *Bot) delTerm(ctx *bcr.Context) (err error) {
 
 	err = bot.DB.RemoveTerm(id)
 	if err != nil {
-		bot.Log.Error("Error removing term:", err)
+		log.Error("Error removing term:", err)
 		bot.DB.InternalError(ctx, err)
 		return
 	}
@@ -48,7 +49,7 @@ func (bot *Bot) delTerm(ctx *bcr.Context) (err error) {
 
 	_, err = ctx.Send("✅ Term deleted.")
 	if err != nil {
-		bot.Log.Error("Error sending message:", err)
+		log.Error("Error sending message:", err)
 	}
 	return nil
 }
