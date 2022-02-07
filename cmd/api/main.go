@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"io/ioutil"
@@ -12,9 +12,16 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/termora/berry/db"
 	"github.com/termora/berry/db/search/typesense"
+	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
+
+var Command = &cli.Command{
+	Name:   "api",
+	Usage:  "Run the API",
+	Action: run,
+}
 
 type Server struct {
 	db   *db.DB
@@ -29,7 +36,7 @@ type conf struct {
 	Port         string `yaml:"port"`
 }
 
-func main() {
+func run(*cli.Context) error {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		panic(err)
@@ -39,7 +46,7 @@ func main() {
 	// read config
 	var c conf
 
-	configFile, err := ioutil.ReadFile("config.yaml")
+	configFile, err := ioutil.ReadFile("config.api.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,7 +93,7 @@ func main() {
 		r.Get("/pronouns", s.pronouns)
 	})
 
-	mx.Get("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
+	mx.Get("/robots.txt", func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write([]byte(`User-agent: *
 Disallow: /`))
 	})
@@ -119,4 +126,5 @@ Disallow: /`))
 	case err := <-e:
 		log.Errorf("Error serving API: %v", err)
 	}
+	return nil
 }

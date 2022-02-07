@@ -1,7 +1,6 @@
-package main
+package bot
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"os"
 
@@ -13,27 +12,18 @@ import (
 func getConfig(sugar *zap.SugaredLogger) structs.BotConfig {
 	var config structs.BotConfig
 
-	fn := "config"
+	fn := "config.bot"
 	if os.Getenv("TERMBOT_CONFIG") != "" {
 		fn = os.Getenv("TERMBOT_CONFIG")
 	}
 
 	fullName := fn + ".toml"
-	format := "toml"
-	if _, err := os.Stat(fn + ".toml"); os.IsNotExist(err) {
-		fullName = fn + ".json"
-		format = "json"
-	}
 	configFile, err := ioutil.ReadFile(fullName)
 	if err != nil {
 		sugar.Fatalf("Couldn't find or open file: %v", err)
 	}
-	switch format {
-	case "toml":
-		err = toml.Unmarshal(configFile, &config)
-	case "json":
-		err = json.Unmarshal(configFile, &config)
-	}
+
+	err = toml.Unmarshal(configFile, &config)
 	if err != nil {
 		sugar.Fatalf("Couldn't unmarshal config file: %v", err)
 	}

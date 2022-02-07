@@ -1,4 +1,4 @@
-package main
+package bot
 
 import (
 	"context"
@@ -16,10 +16,10 @@ import (
 	"github.com/diamondburned/arikawa/v3/state/store"
 	"github.com/diamondburned/arikawa/v3/utils/ws"
 	"github.com/getsentry/sentry-go"
+	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/spf13/pflag"
 	bcrbot "github.com/starshine-sys/bcr/bot"
 	"github.com/termora/berry/bot"
 	"github.com/termora/berry/commands/admin"
@@ -32,16 +32,32 @@ import (
 	"github.com/termora/berry/db/search/typesense"
 )
 
-var debug, disableEventLoop, moreDebug bool
-
-func init() {
-	pflag.BoolVarP(&debug, "debug", "d", true, "Debug logging")
-	pflag.BoolVarP(&disableEventLoop, "noloop", "N", false, "Disable event loop that will kill bot after 5 minutes of no events")
-	pflag.BoolVarP(&moreDebug, "more-debug", "", false, "Even MORE debug logs (very spammy)")
-	pflag.Parse()
+var Command = &cli.Command{
+	Name:   "bot",
+	Usage:  "Run the bot",
+	Action: run,
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:    "debug",
+			Aliases: []string{"d"},
+			Usage:   "Debug logging",
+			Value:   true,
+		},
+		&cli.BoolFlag{
+			Name:    "noloop",
+			Aliases: []string{"N"},
+			Value:   false,
+			Usage:   "Disable event loop that will kill bot after 5 minutes of no events",
+		},
+		&cli.BoolFlag{
+			Name:  "more-debug",
+			Value: false,
+			Usage: "Even MORE debug logs (very spammy)",
+		},
+	},
 }
 
-func main() {
+func run(ctx *cli.Context) error {
 	rand.Seed(time.Now().UnixNano())
 
 	// set up a logger
@@ -52,7 +68,7 @@ func main() {
 	zcfg.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 	zcfg.EncoderConfig.EncodeDuration = zapcore.StringDurationEncoder
 
-	if debug {
+	if ctx.Bool("debug") {
 		zcfg.Level.SetLevel(zapcore.DebugLevel)
 	} else {
 		zcfg.Level.SetLevel(zapcore.InfoLevel)
@@ -68,7 +84,7 @@ func main() {
 
 	c := getConfig(sugar)
 
-	if debug {
+	if ctx.Bool("debug") {
 		ws.WSDebug = sugar.Debug
 		db.Debug = sugar.Debugf
 	}
@@ -194,21 +210,21 @@ func main() {
 
 	go timer(sugar)
 
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	cctx, stop := signal.NotifyContext(ctx.Context, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	defer stop()
 
 	exitCh := make(chan struct{})
-	if !disableEventLoop {
+	if !ctx.Bool("noloop") {
 		eventCh := make(chan interface{}, 100)
 
-		go eventThing(sugar, eventCh, exitCh)
+		go eventThing(ctx, sugar, eventCh, exitCh)
 
 		bot.Router.AddHandler(eventCh)
 	}
 
 	shutdownFromNoEvents := false
 	select {
-	case <-ctx.Done():
+	case <-cctx.Done():
 	case <-exitCh:
 		shutdownFromNoEvents = true
 	}
@@ -227,6 +243,8 @@ func main() {
 			Content:   fmt.Sprintf("Shutting down at <t:%v:D> <t:%v:T>\nShutting down due to no events? %v", s, s, shutdownFromNoEvents),
 		})
 	}
+
+	return nil
 }
 
 func timer(sugar *zap.SugaredLogger) {
@@ -247,8 +265,8 @@ func timer(sugar *zap.SugaredLogger) {
 	}
 }
 
-func eventThing(s *zap.SugaredLogger, ch <-chan interface{}, out chan<- struct{}) {
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+func eventThing(ctx *cli.Context, s *zap.SugaredLogger, ch <-chan interface{}, out chan<- struct{}) {
+	cctx, stop := signal.NotifyContext(ctx.Context, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	defer stop()
 
 	t := time.AfterFunc(5*time.Minute, func() {
@@ -258,14 +276,14 @@ func eventThing(s *zap.SugaredLogger, ch <-chan interface{}, out chan<- struct{}
 	for {
 		select {
 		case ev := <-ch:
-			if moreDebug {
+			if ctx.Bool("more-debug") {
 				s.Debugf("Received event %s", reflect.ValueOf(ev).Elem().Type().Name())
 			}
 			t.Stop()
 			t = time.AfterFunc(5*time.Minute, func() {
 				out <- struct{}{}
 			})
-		case <-ctx.Done():
+		case <-cctx.Done():
 			// break if we're shutting down
 			break
 		}

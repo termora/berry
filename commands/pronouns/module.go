@@ -1,7 +1,7 @@
 package pronouns
 
 import (
-	"io/ioutil"
+	"embed"
 	"strings"
 	"text/template"
 	"time"
@@ -13,12 +13,15 @@ import (
 	"github.com/termora/berry/bot"
 )
 
-var templates = template.Must(template.New("").Funcs(funcs()).ParseGlob("pronoun-examples/*"))
+//go:embed examples/*
+var fs embed.FS
+
+var templates = template.Must(template.New("").Funcs(funcs()).ParseFS(fs, "examples/*"))
 var tmplCount int
 
 // initialise number of templates
 func init() {
-	files, err := ioutil.ReadDir("pronoun-examples")
+	files, err := fs.ReadDir("examples")
 	if err != nil {
 		panic(err)
 	}

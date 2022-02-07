@@ -1,41 +1,75 @@
-// Package main is a simple utility to export a Berry/Termora database
-package main
+package export
 
 import (
 	"encoding/json"
 	"os"
 
-	flag "github.com/spf13/pflag"
+	"emperror.dev/errors"
 	"github.com/termora/berry/commands/static/export"
 	"github.com/termora/berry/db"
+	"github.com/urfave/cli/v2"
+	"go.uber.org/zap"
 )
 
-func main() {
-	var (
-		url            string
-		escape, indent bool
+var Command = &cli.Command{
+	Name:   "export",
+	Usage:  "Export the database",
+	Action: run,
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:    "url",
+			Aliases: []string{"u"},
+			Usage:   "Database URL",
+		},
+		&cli.BoolFlag{
+			Name:    "escape",
+			Aliases: []string{"e"},
+			Value:   false,
+			Usage:   "Escape HTML characters",
+		},
+		&cli.BoolFlag{
+			Name:    "indent",
+			Aliases: []string{"i"},
+			Value:   false,
+			Usage:   "Indent the output (human-readable)",
+		},
+		&cli.BoolFlag{
+			Name:    "pronouns",
+			Aliases: []string{"p"},
+			Value:   false,
+			Usage:   "Export pronouns",
+		},
+		&cli.BoolFlag{
+			Name:    "explanations",
+			Aliases: []string{"x"},
+			Value:   false,
+			Usage:   "Export explanations",
+		},
+	},
+}
 
-		pronouns, explanations bool
+func run(c *cli.Context) error {
+	var (
+		url    = c.String("url")
+		escape = c.Bool("escape")
+		indent = c.Bool("indent")
+
+		pronouns     = c.Bool("pronouns")
+		explanations = c.Bool("explanations")
 	)
 
-	flag.StringVarP(&url, "url", "u", "", "Database URL")
-	flag.BoolVarP(&escape, "escape", "e", false, "Escape HTML characters")
-	flag.BoolVarP(&indent, "indent", "i", false, "Indent the output (human-readable)")
-	flag.BoolVarP(&pronouns, "pronouns", "p", false, "Export pronouns")
-	flag.BoolVarP(&explanations, "explanations", "x", false, "Export explanations")
-	flag.Parse()
 	if url == "" {
-		panic("no database url provided")
+		return errors.Sentinel("no database url provided")
 	}
 
-	db, err := db.Init(url, nil)
+	db, err := db.Init(url, zap.S())
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	export, err := export.New(db)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if !pronouns {
@@ -52,6 +86,7 @@ func main() {
 	}
 
 	if err = enc.Encode(export); err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }

@@ -1,9 +1,11 @@
-package main
+package site
 
 import (
 	"context"
+	"embed"
 	"html/template"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -16,9 +18,31 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/termora/berry/db"
 	"github.com/termora/berry/db/search/typesense"
+	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
+
+//go:embed templates/*
+var tmpls embed.FS
+
+//go:embed static
+var staticFS embed.FS
+
+func mustSub(f fs.FS, path string) fs.FS {
+	sub, err := fs.Sub(f, path)
+	if err != nil {
+		panic(err)
+	}
+	return sub
+}
+
+var Command = &cli.Command{
+	Name:    "site",
+	Aliases: []string{"web"},
+	Usage:   "Run the website",
+	Action:  run,
+}
 
 type site struct {
 	db    *db.DB
@@ -84,21 +108,23 @@ func (r *renderData) parse(c echo.Context) renderData {
 	return *r
 }
 
-func main() {
+func run(ctx *cli.Context) error {
 	t := &T{
 		templates: template.Must(template.New("").
 			Funcs(sprig.FuncMap()).
 			Funcs(funcMap()).
-			ParseGlob("templates/*.html")),
+			ParseFS(tmpls, "templates/*.html")),
 	}
 
-	logger, _ := zap.NewDevelopment()
-	defer logger.Sync() // flushes buffer, if any
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		return err
+	}
 	sugar := logger.Sugar()
 
 	var c conf
 
-	configFile, err := ioutil.ReadFile("config.yaml")
+	configFile, err := ioutil.ReadFile("config.site.yaml")
 	if err != nil {
 		sugar.Fatal(err)
 	}
@@ -129,7 +155,10 @@ func main() {
 	e := echo.New()
 	e.Renderer = t
 	e.Use(middleware.Logger())
-	e.Static("/static", "static")
+
+	e.GET("/static/*", echo.WrapHandler(
+		http.StripPrefix("/static/", http.FileServer(http.FS(mustSub(staticFS, "static")))),
+	))
 
 	e.GET("/dark", setDarkPreferences)
 
@@ -165,9 +194,10 @@ Disallow: /static`)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	cctx, cancel := context.WithTimeout(ctx.Context, 10*time.Second)
 	defer cancel()
-	if err := e.Shutdown(ctx); err != nil {
+	if err := e.Shutdown(cctx); err != nil {
 		sugar.Fatal(err)
 	}
+	return err
 }
