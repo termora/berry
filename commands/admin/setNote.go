@@ -13,7 +13,7 @@ import (
 func (bot *Bot) setNote(ctx *bcr.Context) (err error) {
 	if err = ctx.CheckMinArgs(2); err != nil {
 		var notes string
-		for k := range bot.Config.QuickNotes {
+		for k := range bot.Config.Bot.QuickNotes {
 			notes += fmt.Sprintf("`%v`\n", k)
 		}
 		if notes == "" {
@@ -44,7 +44,7 @@ func (bot *Bot) setNote(ctx *bcr.Context) (err error) {
 		note = ""
 	}
 
-	if n, ok := bot.Config.QuickNotes[note]; ok && n != "" {
+	if n, ok := bot.Config.Bot.QuickNotes[note]; ok && n != "" {
 		note = n
 	}
 

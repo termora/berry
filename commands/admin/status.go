@@ -131,7 +131,7 @@ func (bot *Bot) postGuildCount(s *state.State, count int) (err error) {
 		return
 	}
 
-	if bot.Config.BotLists.TopGG != "" {
+	if bot.Config.Bot.TopGG != "" {
 		url := fmt.Sprintf("https://top.gg/api/bots/%v/stats", u.ID)
 
 		log.Infof("Posting guild count (%v) to top.gg's API", count)
@@ -144,7 +144,7 @@ func (bot *Bot) postGuildCount(s *state.State, count int) (err error) {
 		}
 
 		req.Header.Add("Content-Type", "application/json")
-		req.Header.Add("Authorization", bot.Config.BotLists.TopGG)
+		req.Header.Add("Authorization", bot.Config.Bot.TopGG)
 
 		resp, err := (&http.Client{}).Do(req)
 		if err != nil {
@@ -155,7 +155,7 @@ func (bot *Bot) postGuildCount(s *state.State, count int) (err error) {
 		log.Infof("Posted guild count to top.gg's API")
 	}
 
-	if bot.Config.BotLists.BotsGG != "" {
+	if bot.Config.Bot.BotsGG != "" {
 		url := fmt.Sprintf("https://discord.bots.gg/api/v1/bots/%v/stats", u.ID)
 
 		log.Infof("Posting guild count (%v) to discord.bots.gg's API", count)
@@ -169,11 +169,11 @@ func (bot *Bot) postGuildCount(s *state.State, count int) (err error) {
 
 		site := bot.Config.Bot.Website
 		if site == "" {
-			site = bot.Config.Bot.Git
+			site = bot.Config.Core.Git
 		}
 		req.Header["User-Agent"] = []string{fmt.Sprintf("%v-%v/v6 (Arikawa; +%v) DBots/%v", u.Username, u.Discriminator, site, u.ID)}
 		req.Header.Add("Content-Type", "application/json")
-		req.Header.Add("Authorization", bot.Config.BotLists.BotsGG)
+		req.Header.Add("Authorization", bot.Config.Bot.BotsGG)
 
 		resp, err := (&http.Client{}).Do(req)
 		if err != nil {

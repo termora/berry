@@ -1,7 +1,6 @@
 package api
 
 import (
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,11 +9,11 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/termora/berry/common"
 	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 	"github.com/termora/berry/db/search/typesense"
 	"github.com/urfave/cli/v2"
-	"gopkg.in/yaml.v3"
 )
 
 var Command = &cli.Command{
@@ -24,43 +23,26 @@ var Command = &cli.Command{
 }
 
 type Server struct {
-	db   *db.DB
-	conf conf
+	db *db.DB
 }
 
-type conf struct {
-	DatabaseURL  string `yaml:"database_url"`
-	TypesenseURL string `yaml:"typesense_url"`
-	TypesenseKey string `yaml:"typesense_key"`
-	Port         string `yaml:"port"`
-}
-
-func run(*cli.Context) error {
+func run(*cli.Context) (err error) {
 	// read config
-	var c conf
-
-	configFile, err := ioutil.ReadFile("config.api.yaml")
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = yaml.Unmarshal(configFile, &c)
-	if err != nil {
-		log.Fatal(err)
-	}
+	c := common.ReadConfig()
 
 	log.Info("Loaded configuration file.")
 
-	s := &Server{conf: c}
+	s := &Server{}
 
 	// connect to the database
-	s.db, err = db.Init(c.DatabaseURL)
+	s.db, err = db.Init(c.Core.DatabaseURL)
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 	log.Info("Connected to database")
 
-	if s.conf.TypesenseURL != "" && s.conf.TypesenseKey != "" {
-		s.db.Searcher, err = typesense.New(s.conf.TypesenseURL, s.conf.TypesenseKey, s.db.Pool)
+	if c.Core.TypesenseURL != "" && c.Core.TypesenseKey != "" {
+		s.db.Searcher, err = typesense.New(c.Core.TypesenseURL, c.Core.TypesenseKey, s.db.Pool)
 		if err != nil {
 			log.Fatalf("Error connecting to Typesense: %v", err)
 		}
@@ -92,7 +74,7 @@ Disallow: /`))
 	})
 
 	// get port
-	port := c.Port
+	port := c.API.Port
 	if port == "" {
 		port = ":1300"
 	}

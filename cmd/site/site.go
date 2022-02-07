@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"io"
 	"io/fs"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,11 +15,11 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/termora/berry/common"
 	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 	"github.com/termora/berry/db/search/typesense"
 	"github.com/urfave/cli/v2"
-	"gopkg.in/yaml.v3"
 )
 
 //go:embed templates/*
@@ -45,8 +44,8 @@ var Command = &cli.Command{
 }
 
 type site struct {
-	db   *db.DB
-	conf conf
+	db     *db.DB
+	Config common.SiteConfig
 }
 
 // T ...
@@ -59,31 +58,8 @@ func (t *T) Render(w io.Writer, name string, data interface{}, c echo.Context) e
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
-type conf struct {
-	DatabaseURL string `yaml:"database_url"`
-	Port        string
-
-	SiteName string `yaml:"site_name"`
-	BaseURL  string `yaml:"base_url"`
-	Invite   string `yaml:"invite_url"`
-	Git      string
-	Contact  bool
-	// Optional description shown in embeds, when not linking to a term page
-	Description string
-
-	Plausible struct {
-		Domain string
-		URL    string
-	}
-
-	Typesense struct {
-		URL string
-		Key string
-	}
-}
-
 type renderData struct {
-	Conf  conf
+	Conf  common.SiteConfig
 	Path  string
 	Dark  string
 	Tag   string
@@ -115,19 +91,9 @@ func run(ctx *cli.Context) error {
 			ParseFS(tmpls, "templates/*.html")),
 	}
 
-	var c conf
+	c := common.ReadConfig()
 
-	configFile, err := ioutil.ReadFile("config.site.yaml")
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = yaml.Unmarshal(configFile, &c)
-	if err != nil {
-		log.Fatalf("Error loading configuration file: %v", err)
-	}
-	log.Info("Loaded configuration file.")
-
-	d, err := db.Init(c.DatabaseURL)
+	d, err := db.Init(c.Core.DatabaseURL)
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
@@ -135,15 +101,15 @@ func run(ctx *cli.Context) error {
 	log.Info("Connected to database.")
 
 	// Typesense requires a bot running to sync terms
-	if c.Typesense.URL != "" && c.Typesense.Key != "" {
-		d.Searcher, err = typesense.New(c.Typesense.URL, c.Typesense.Key, d.Pool)
+	if c.Core.TypesenseURL != "" && c.Core.TypesenseKey != "" {
+		d.Searcher, err = typesense.New(c.Core.TypesenseURL, c.Core.TypesenseKey, d.Pool)
 		if err != nil {
 			log.Fatalf("Couldn't connect to Typesense: %v", err)
 		}
 		log.Info("Connected to Typesense server")
 	}
 
-	s := site{db: d, conf: c}
+	s := site{db: d, Config: c.Site}
 
 	e := echo.New()
 	e.Renderer = t
@@ -170,7 +136,7 @@ Disallow: /static`)
 	})
 
 	// get port
-	port := c.Port
+	port := c.Site.Port
 
 	if port == "" {
 		port = "1300"

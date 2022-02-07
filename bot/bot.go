@@ -23,7 +23,7 @@ import (
 // Bot is the main bot struct
 type Bot struct {
 	*bcrbot.Bot
-	Config *common.BotConfig
+	Config common.Config
 	DB     *db.DB
 
 	Sentry    *sentry.Hub
@@ -40,7 +40,7 @@ type Bot struct {
 // New creates a new instance of Bot
 func New(
 	bot *bcrbot.Bot,
-	config *common.BotConfig,
+	config common.Config,
 	db *db.DB, hub *sentry.Hub) *Bot {
 	b := &Bot{
 		Bot:       bot,
@@ -68,8 +68,8 @@ func New(
 	// setup stats if metrics are enabled
 	b.setupStats()
 
-	if config.Bot.Support.Token != "" {
-		h, err := helper.New(config.Bot.Support.Token, config.Bot.Support.GuildID, db)
+	if config.Bot.SupportToken != "" {
+		h, err := helper.New(config.Bot.SupportToken, config.Bot.SupportGuildID, db)
 		if err != nil {
 			log.Errorf("Error creating helper: %v", err)
 		}
@@ -109,11 +109,11 @@ func (bot *Bot) guildCount() int {
 }
 
 func (bot *Bot) setupStats() {
-	if bot.Config.Auth.InfluxDB.URL != "" {
+	if bot.Config.Bot.InfluxDB.URL != "" {
 		log.Infof("Setting up InfluxDB client")
 
 		bot.Stats = &StatsClient{
-			Client:     influxdb2.NewClient(bot.Config.Auth.InfluxDB.URL, bot.Config.Auth.InfluxDB.Token).WriteAPI(bot.Config.Auth.InfluxDB.Org, bot.Config.Auth.InfluxDB.Bucket),
+			Client:     influxdb2.NewClient(bot.Config.Bot.InfluxDB.URL, bot.Config.Bot.InfluxDB.Token).WriteAPI(bot.Config.Bot.InfluxDB.Org, bot.Config.Bot.InfluxDB.Bucket),
 			guildCount: bot.guildCount,
 		}
 

@@ -43,8 +43,8 @@ func Init(b *bot.Bot) (m string, out []*bcr.Command) {
 	bot.stopStatus = make(chan bool, 1)
 	bot.AuditLog = auditlog.New(b)
 
-	admins := bot.Router.RequireRole("Bot Admin", bot.Config.Bot.Permissions.Admins...)
-	directors := bot.Router.RequireRole("Director", append(bot.Config.Bot.Permissions.Admins, bot.Config.Bot.Permissions.Directors...)...)
+	admins := bot.Router.RequireRole("Bot Admin", bot.Config.Bot.Admins...)
+	directors := bot.Router.RequireRole("Director", append(bot.Config.Bot.Admins, bot.Config.Bot.Directors...)...)
 
 	a := bot.Router.AddCommand(&bcr.Command{
 		Name:    "admin",

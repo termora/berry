@@ -65,7 +65,7 @@ func (bot *Bot) privacyText(ctx bcr.Contexter) string {
 	
 	To delete server information from the database, simply have the bot leave the server, through kicking or banning it. Do note that this does *not* delete server information from database backups, only the live database (and any later backups). Contact us (on the support server, or [here](%vcontact)) if you want that deleted too, or have any other requests regarding your data. We'll comply with these within 30 days.
 	
-	%v is open source, and its source code is available [on GitHub](%v). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Config.Bot.Website, bot.Router.Bot.Username, bot.Config.Bot.Git)
+	%v is open source, and its source code is available [on GitHub](%v). While we cannot *prove* that this is the code powering the bot, we promise that it is.`, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Router.Bot.Username, bot.Config.Bot.Website, bot.Router.Bot.Username, bot.Config.Core.Git)
 }
 
 func (bot *Bot) autopostText(ctx bcr.Contexter) string {

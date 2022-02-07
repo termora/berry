@@ -9,11 +9,11 @@ import (
 )
 
 func (bot *AuditLog) sendPublicEmbed(e Entry, description string) (id discord.MessageID, err error) {
-	if !bot.Config.Bot.AuditLog.Public.IsValid() {
+	if !bot.Config.Bot.AuditLogPublic.IsValid() {
 		return
 	}
 
-	msg, err := bot.State.SendEmbeds(bot.Config.Bot.AuditLog.Public, bot.publicEmbed(e, description))
+	msg, err := bot.State.SendEmbeds(bot.Config.Bot.AuditLogPublic, bot.publicEmbed(e, description))
 	if err != nil {
 		return
 	}
@@ -47,11 +47,11 @@ func (bot *AuditLog) publicEmbed(e Entry, description string) discord.Embed {
 }
 
 func (bot *AuditLog) sendPrivateEmbed(e Entry) (id discord.MessageID, err error) {
-	if !bot.Config.Bot.AuditLog.Private.IsValid() {
+	if !bot.Config.Bot.AuditLogPrivate.IsValid() {
 		return
 	}
 
-	msg, err := bot.State.SendEmbeds(bot.Config.Bot.AuditLog.Private, bot.privateEmbeds(e)...)
+	msg, err := bot.State.SendEmbeds(bot.Config.Bot.AuditLogPrivate, bot.privateEmbeds(e)...)
 	if err != nil {
 		return
 	}

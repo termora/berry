@@ -25,7 +25,7 @@ func (s *site) tag(c echo.Context) (err error) {
 	}
 
 	return c.Render(http.StatusOK, "terms.html", (&renderData{
-		Conf:  s.conf,
+		Conf:  s.Config,
 		Tag:   tag,
 		Terms: terms,
 	}).parse(c))

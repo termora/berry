@@ -11,7 +11,7 @@ import (
 )
 
 func (bot *Bot) submit(ctx *bcr.Context) (err error) {
-	if bot.Config.Bot.Support.PronounChannel == 0 {
+	if bot.Config.Bot.PronounChannel == 0 {
 		_, err = ctx.Send("We aren't accepting new pronoun submissions through the bot. You might be able to ask in the bot support server.")
 		return err
 	}
@@ -55,7 +55,7 @@ func (bot *Bot) submit(ctx *bcr.Context) (err error) {
 		return
 	}
 
-	msg, err := ctx.NewMessage().Channel(bot.Config.Bot.Support.PronounChannel).
+	msg, err := ctx.NewMessage().Channel(bot.Config.Bot.PronounChannel).
 		Embeds(discord.Embed{
 			Author: &discord.EmbedAuthor{
 				Name: fmt.Sprintf("%v#%v (%v)", ctx.Author.Username, ctx.Author.Discriminator, ctx.Author.ID),

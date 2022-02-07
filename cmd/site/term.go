@@ -56,7 +56,7 @@ func (s *site) term(c echo.Context) (err error) {
 	t.ContentWarnings = s.db.LinkTerms(t.ContentWarnings)
 
 	return c.Render(http.StatusOK, "term.html", (&renderData{
-		Conf: s.conf,
+		Conf: s.Config,
 		Term: t,
 	}).parse(c))
 }

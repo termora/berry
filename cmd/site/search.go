@@ -14,13 +14,13 @@ func (s *site) search(c echo.Context) (err error) {
 
 	if err != nil || len(terms) == 0 {
 		return c.Render(http.StatusNotFound, "noQuery.html", (&renderData{
-			Conf:  s.conf,
+			Conf:  s.Config,
 			Query: q,
 		}).parse(c))
 	}
 
 	return c.Render(http.StatusOK, "results.html", (&renderData{
-		Conf:  s.conf,
+		Conf:  s.Config,
 		Terms: terms,
 		Query: q,
 	}).parse(c))

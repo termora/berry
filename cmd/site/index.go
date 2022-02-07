@@ -13,7 +13,7 @@ func (s *site) index(c echo.Context) (err error) {
 	}
 
 	return c.Render(http.StatusOK, "index.html", (&renderData{
-		Conf: s.conf,
+		Conf: s.Config,
 		Tags: tags,
 	}).parse(c))
 }

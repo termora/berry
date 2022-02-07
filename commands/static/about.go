@@ -139,7 +139,7 @@ func (bot *Bot) about(ctx bcr.Contexter) (err error) {
 			Inline: true,
 		}, discord.EmbedField{
 			Name:   "Source code",
-			Value:  fmt.Sprintf("[GitHub](%v) / [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) license", bot.Config.Bot.Git),
+			Value:  fmt.Sprintf("[GitHub](%v) / [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) license", bot.Config.Core.Git),
 			Inline: true,
 		})
 	}

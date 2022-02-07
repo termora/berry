@@ -46,14 +46,14 @@ func (bot *AuditLog) reason(ctx *bcr.Context) (err error) {
 		return bot.DB.InternalError(ctx, err)
 	}
 
-	if entry.PublicMessageID.IsValid() && bot.Config.Bot.AuditLog.Public.IsValid() {
-		_, err = bot.State.EditEmbeds(bot.Config.Bot.AuditLog.Public, entry.PublicMessageID, bot.publicEmbed(entry, bot.desc(entry)))
+	if entry.PublicMessageID.IsValid() && bot.Config.Bot.AuditLogPublic.IsValid() {
+		_, err = bot.State.EditEmbeds(bot.Config.Bot.AuditLogPublic, entry.PublicMessageID, bot.publicEmbed(entry, bot.desc(entry)))
 		if err != nil {
 			ctx.Replyc(bcr.ColourRed, "Couldn't edit public log entry.")
 		}
 	}
-	if entry.PrivateMessageID.IsValid() && bot.Config.Bot.AuditLog.Private.IsValid() {
-		_, err = bot.State.EditEmbeds(bot.Config.Bot.AuditLog.Private, entry.PrivateMessageID, bot.privateEmbeds(entry)...)
+	if entry.PrivateMessageID.IsValid() && bot.Config.Bot.AuditLogPrivate.IsValid() {
+		_, err = bot.State.EditEmbeds(bot.Config.Bot.AuditLogPrivate, entry.PrivateMessageID, bot.privateEmbeds(entry)...)
 		if err != nil {
 			ctx.Replyc(bcr.ColourRed, "Couldn't edit private log entry.")
 		}

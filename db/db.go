@@ -35,7 +35,7 @@ type DB struct {
 
 	GuildCache *ttlcache.Cache
 
-	Config *common.BotConfig
+	Config common.Config
 
 	Snowflake *snowflake.Generator
 

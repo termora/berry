@@ -11,7 +11,7 @@ import (
 
 func (bot *Bot) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	// if this isn't the pronoun channel, return
-	if m.ChannelID != bot.Config.Bot.Support.PronounChannel || !m.ChannelID.IsValid() {
+	if m.ChannelID != bot.Config.Bot.PronounChannel || !m.ChannelID.IsValid() {
 		return
 	}
 
@@ -48,7 +48,7 @@ func (bot *Bot) reactionAdd(m *gateway.MessageReactionAddEvent) {
 
 	var isStaff bool
 	for _, r := range m.Member.RoleIDs {
-		for _, s := range bot.Config.Bot.Permissions.Directors {
+		for _, s := range bot.Config.Bot.Directors {
 			if r == s {
 				isStaff = true
 				break

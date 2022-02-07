@@ -153,7 +153,7 @@ func (bot *Bot) overrideContributor(ctx *bcr.Context) (err error) {
 }
 
 func (bot *Bot) allContributors(ctx *bcr.Context) (err error) {
-	members, err := bot.Helper.Members(bot.Config.Bot.Support.GuildID, 0)
+	members, err := bot.Helper.Members(bot.Config.Bot.SupportGuildID, 0)
 	if err != nil {
 		_, err = ctx.Replyc(bcr.ColourRed, "Error fetching members: %v", err)
 		return

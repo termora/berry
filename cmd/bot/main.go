@@ -25,6 +25,7 @@ import (
 	"github.com/termora/berry/commands/search"
 	"github.com/termora/berry/commands/server"
 	"github.com/termora/berry/commands/static"
+	"github.com/termora/berry/common"
 	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
 	dbsearch "github.com/termora/berry/db/search"
@@ -59,7 +60,7 @@ var Command = &cli.Command{
 func run(ctx *cli.Context) error {
 	rand.Seed(time.Now().UnixNano())
 
-	c := getConfig()
+	c := common.ReadConfig()
 
 	if ctx.Bool("debug") {
 		ws.WSDebug = log.Debug
@@ -67,9 +68,9 @@ func run(ctx *cli.Context) error {
 	}
 
 	// create a Sentry config
-	if c.UseSentry {
+	if c.Core.UseSentry {
 		err := sentry.Init(sentry.ClientOptions{
-			Dsn: c.Auth.SentryURL,
+			Dsn: c.Core.SentryURL,
 		})
 		if err != nil {
 			log.Fatalf("sentry.Init: %s", err)
@@ -79,25 +80,25 @@ func run(ctx *cli.Context) error {
 		defer sentry.Flush(2 * time.Second)
 	}
 	hub := sentry.CurrentHub()
-	if !c.UseSentry {
+	if !c.Core.UseSentry {
 		hub = nil
 	}
 
 	// connect to the database
-	d, err := db.Init(c.Auth.DatabaseURL)
+	d, err := db.Init(c.Core.DatabaseURL)
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 	d.SetSentry(hub)
-	d.Config = &c
-	d.TermBaseURL = c.TermBaseURL()
+	d.Config = c
+	d.TermBaseURL = c.Bot.TermBaseURL()
 	defer func() {
 		d.Pool.Close()
 		log.Infof("Closed database connection.")
 	}()
 
-	if c.Auth.TypesenseURL != "" && c.Auth.TypesenseKey != "" {
-		d.Searcher, err = typesense.New(c.Auth.TypesenseURL, c.Auth.TypesenseKey, d.Pool)
+	if c.Core.TypesenseURL != "" && c.Core.TypesenseKey != "" {
+		d.Searcher, err = typesense.New(c.Core.TypesenseURL, c.Core.TypesenseKey, d.Pool)
 		if err != nil {
 			log.Fatalf("Error connecting to Typesense: %v", err)
 		}
@@ -118,7 +119,7 @@ func run(ctx *cli.Context) error {
 	log.Info("Connected to database.")
 
 	// create a new state
-	b, err := bcrbot.New(c.Auth.Token)
+	b, err := bcrbot.New(c.Bot.Token)
 	if err != nil {
 		log.Fatalf("Error creating bot: %v", err)
 	}
@@ -140,7 +141,7 @@ func run(ctx *cli.Context) error {
 
 	// create the bot instance
 	bot := bot.New(
-		b, &c, d, hub)
+		b, c, d, hub)
 	// add search commands
 	bot.Add(search.Init)
 	// add pronoun commands
@@ -171,13 +172,13 @@ func run(ctx *cli.Context) error {
 	log.Info("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
 	log.Infof("User: %v (%v)", botUser.Tag(), botUser.ID)
 
-	if c.Bot.SlashCommands.Enabled {
-		if len(c.Bot.SlashCommands.Guilds) > 0 {
-			log.Infof("Syncing commands in %v...", c.Bot.SlashCommands.Guilds)
+	if c.Bot.SlashEnabled {
+		if len(c.Bot.SlashGuilds) > 0 {
+			log.Infof("Syncing commands in %v...", c.Bot.SlashGuilds)
 		} else {
 			log.Info("Syncing slash commands...")
 		}
-		err = bot.Router.SyncCommands(c.Bot.SlashCommands.Guilds...)
+		err = bot.Router.SyncCommands(c.Bot.SlashGuilds...)
 		if err != nil {
 			log.Errorf("Couldn't sync commands: %v", err)
 		} else {

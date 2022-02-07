@@ -14,7 +14,7 @@ func (bot *Bot) credits(ctx *bcr.Context) (err error) {
 
 	// return if there's no credit fields
 	if len(bot.Config.Bot.CreditFields) == 0 &&
-		(len(bot.Config.ContributorRoles) == 0 ||
+		(len(bot.Config.Bot.ContributorRoles) == 0 ||
 			len(bot.SupportServerMembers) == 0) {
 		return nil
 	}
