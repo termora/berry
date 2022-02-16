@@ -10,7 +10,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/ReneKroon/ttlcache/v2 v2.7.0
-	github.com/diamondburned/arikawa/v3 v3.0.0-rc.4
+	github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20220214064026-6dc189519c4e
 	github.com/dustin/go-humanize v1.0.0
 	github.com/georgysavva/scany v0.2.8
 	github.com/getsentry/sentry-go v0.11.0
@@ -33,7 +33,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sirupsen/logrus v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5
-	github.com/starshine-sys/bcr v0.21.1-0.20211219015104-f87242ae8a59
+	github.com/starshine-sys/bcr v0.21.1-0.20220215020904-a068e62c718a
 	github.com/starshine-sys/pkgo v0.3.2
 	github.com/starshine-sys/snowflake/v2 v2.0.0
 	github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942 // indirect
@@ -44,5 +44,4 @@ require (
 	go.uber.org/zap v1.17.0
 	golang.org/x/net v0.0.0-20210525063256-abc453219eb5 // indirect
 	golang.org/x/tools v0.1.1 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )

@@ -30,6 +30,36 @@ func Init(b *bot.Bot) (m string, o []*bcr.Command) {
 		SupportServerMembers: map[discord.UserID]discord.Member{},
 	}
 
+	bot.Router.AddHandler(bot.interactionCreate)
+
+	submit := &bcr.Group{
+		Name:        "submit",
+		Description: "Submit something to the devs!",
+		Subcommands: []*bcr.Command{
+			{
+				Name:          "feedback",
+				Summary:       "Send feedback to the developers!",
+				Blacklistable: false,
+				SlashCommand:  bot.submitFeedback,
+			},
+			// {
+			// 	Name:          "term",
+			// 	Summary:       "Submit a term!",
+			// 	Blacklistable: false,
+			// 	SlashCommand:  bot.submitFeedback,
+			// },
+			// {
+			// 	Name:          "pronouns",
+			// 	Summary:       "Submit a pronoun set!",
+			// 	Cooldown:      1 * time.Second,
+			// 	Blacklistable: true,
+			// 	SlashCommand:  bot.submitFeedback,
+			// },
+		},
+	}
+
+	bot.Router.AddGroup(submit)
+
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name: "ping",
 
