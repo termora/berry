@@ -34,7 +34,7 @@ func (bot *Bot) about(ctx bcr.Contexter) (err error) {
 
 	// this will return 0ms in the first minute after the bot is restarted
 	// can't do much about that though
-	heartbeat := ctx.Session().Gateway().EchoBeat().Sub(ctx.Session().Gateway().SentBeat())
+	heartbeat := ctx.Session().Gateway().EchoBeat().Sub(ctx.Session().Gateway().SentBeat()).Round(time.Millisecond)
 
 	stats := runtime.MemStats{}
 	runtime.ReadMemStats(&stats)

@@ -57,6 +57,8 @@ type CoreConfig struct {
 
 	Git string `toml:"git"`
 
+	Redis string `toml:"redis"` // optional
+
 	// UseSentry: when false, don't use Sentry for logging errors
 	UseSentry bool `toml:"-"`
 }

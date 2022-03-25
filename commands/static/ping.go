@@ -13,7 +13,7 @@ func (bot *Bot) ping(ctx bcr.Contexter) (err error) {
 	t := time.Now()
 	// this will return 0ms in the first minute after the bot is restarted
 	// can't do much about that though
-	heartbeat := ctx.Session().Gateway().EchoBeat().Sub(ctx.Session().Gateway().SentBeat())
+	heartbeat := ctx.Session().Gateway().EchoBeat().Sub(ctx.Session().Gateway().SentBeat()).Round(time.Millisecond)
 
 	s := fmt.Sprintf("🏓 **Pong!**\nHeartbeat: %v", heartbeat)
 

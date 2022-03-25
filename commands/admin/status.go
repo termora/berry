@@ -16,7 +16,7 @@ import (
 
 // this is in admin to better integrate with the `guilds` admin command
 func (bot *Bot) setStatusLoop(s *state.State) {
-	st := fmt.Sprintf("%vhelp", bot.Config.Bot.Prefixes[0])
+	st := "/help"
 
 	// spin off a function to fetch the guild count (well, actually fetch all guilds)
 	// it's also used by `t!admin guilds`, which is why we run this even if the server count isn't shown in the bot's status
