@@ -47,7 +47,21 @@ func (bot *Bot) reactionAdd(m *gateway.MessageReactionAddEvent) {
 	}
 
 	var isStaff bool
+	for _, u := range bot.Config.Bot.BotOwners {
+		if u == m.Member.User.ID {
+			isStaff = true
+			break
+		}
+	}
+
 	for _, r := range m.Member.RoleIDs {
+		for _, s := range bot.Config.Bot.Admins {
+			if r == s {
+				isStaff = true
+				break
+			}
+		}
+
 		for _, s := range bot.Config.Bot.Directors {
 			if r == s {
 				isStaff = true
