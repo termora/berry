@@ -48,13 +48,13 @@ func Init(b *bot.Bot) (m string, o []*bcr.Command) {
 			// 	Blacklistable: false,
 			// 	SlashCommand:  bot.submitFeedback,
 			// },
-			// {
-			// 	Name:          "pronouns",
-			// 	Summary:       "Submit a pronoun set!",
-			// 	Cooldown:      1 * time.Second,
-			// 	Blacklistable: true,
-			// 	SlashCommand:  bot.submitFeedback,
-			// },
+			{
+				Name:          "pronouns",
+				Summary:       "Submit a pronoun set!",
+				Cooldown:      1 * time.Second,
+				Blacklistable: true,
+				SlashCommand:  bot.submitPronouns,
+			},
 		},
 	}
 

@@ -184,6 +184,8 @@ func run(ctx *cli.Context) error {
 		} else {
 			log.Info("Synced commands!")
 		}
+	} else {
+		log.Info("Not syncing slash commands.")
 	}
 
 	go timer()

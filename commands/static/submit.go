@@ -60,6 +60,7 @@ func (bot *Bot) interactionCreate(ic *gateway.InteractionCreateEvent) {
 		err = bot.handleFeedback(ic, data)
 	case "submit-term-modal":
 	case "submit-pronouns-modal":
+		err = bot.handlePronouns(ic, data)
 	}
 	if err != nil {
 		log.Errorf("handling modal interaction: %v", err)
