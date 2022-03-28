@@ -125,7 +125,8 @@ func (bot *Bot) slashReminderMessage(ctx *bcr.Context) {
 
 	e := discord.Embed{
 		Description: fmt.Sprintf(`**Note:** text prefixes (such as `+"`%v`"+`) will no longer be supported as of April 31st.
-Please use mentions (%v) or slash commands instead.`, ctx.Prefix, ctx.Bot.Mention()),
+Please use mentions (%v) or slash commands instead.
+This message will only show up once.`, ctx.Prefix, ctx.Bot.Mention()),
 		Color: db.EmbedColour,
 	}
 
