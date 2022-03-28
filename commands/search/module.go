@@ -205,6 +205,43 @@ func Init(b *bot.Bot) (m string, list []*bcr.Command) {
 		Command:          bot.autopostList,
 	})
 
+	// list commands
+	bot.Router.AddGroup(&bcr.Group{
+		Name:        "list",
+		Description: "List terms and pronouns!",
+		Subcommands: []*bcr.Command{
+			{
+				Name:          "terms",
+				Summary:       "List all terms, optionally filtering by a category",
+				Blacklistable: true,
+				SlashCommand:  bot.listTermsSlash,
+				Options: &[]discord.CommandOption{
+					discord.NewStringOption("category", "The category to list terms from", false),
+					discord.NewBooleanOption("full", "Show all terms with their descriptions", false),
+					discord.NewBooleanOption("file", "Send the list as a file", false),
+				},
+			},
+			{
+				Name:          "pronouns",
+				Summary:       "List all pronouns",
+				Blacklistable: true,
+				SlashCommand:  bot.listPronounsSlash,
+				Options: &[]discord.CommandOption{
+					&discord.StringOption{
+						OptionName:  "sort-by",
+						Description: "How to sort the list",
+						Required:    false,
+						Choices: []discord.StringChoice{
+							{Name: "Sort randomly", Value: "random"},
+							{Name: "Sort alphabetically", Value: "alphabetical"},
+							{Name: "Sort by number of uses", Value: "uses"},
+						},
+					},
+				},
+			},
+		},
+	})
+
 	state, _ := bot.Router.StateFromGuildID(0)
 
 	var o sync.Once

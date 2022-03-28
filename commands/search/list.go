@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 	"github.com/termora/berry/db/search"
@@ -64,7 +65,7 @@ func (bot *Bot) termCat(cat string) (s *db.Category, t []*db.Term, err error) {
 	return nil, t, err
 }
 
-func (bot *Bot) fullList(ctx *bcr.Context, terms []*db.Term, showAsFile bool) (err error) {
+func (bot *Bot) fullList(ctx bcr.Contexter, terms []*db.Term, showAsFile bool) (err error) {
 	if showAsFile {
 		var buf string
 
@@ -81,8 +82,7 @@ func (bot *Bot) fullList(ctx *bcr.Context, terms []*db.Term, showAsFile bool) (e
 			buf += fmt.Sprintf("\n\n%v\n", t.Description)
 		}
 
-		_, err = ctx.NewMessage().AddFile("list.txt", strings.NewReader(buf)).Send()
-		return err
+		return ctx.SendFiles("", sendpart.File{Name: "list.txt", Reader: strings.NewReader(buf)})
 	}
 
 	var (
@@ -142,11 +142,16 @@ func (bot *Bot) fullList(ctx *bcr.Context, terms []*db.Term, showAsFile bool) (e
 		embeds[i].Footer.Text = fmt.Sprintf("Page %v/%v", i+1, len(embeds))
 	}
 
-	m, _, err := ctx.PagedEmbedTimeout(embeds, false, time.Hour)
-	if err != nil {
+	if v, ok := ctx.(*bcr.Context); ok {
+		m, _, err := v.PagedEmbedTimeout(embeds, false, time.Hour)
+		if err != nil {
+			return err
+		}
+
+		err = v.State.React(m.ChannelID, m.ID, "❌")
+		return err
+	} else {
+		_, _, err = ctx.ButtonPages(embeds, time.Hour)
 		return err
 	}
-
-	err = ctx.State.React(m.ChannelID, m.ID, "❌")
-	return
 }

@@ -10,7 +10,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/ReneKroon/ttlcache/v2 v2.7.0
-	github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20220214064026-6dc189519c4e
+	github.com/diamondburned/arikawa/v3 v3.0.0-rc.5.0.20220315203735-eec8fcf719c3
 	github.com/dustin/go-humanize v1.0.0
 	github.com/georgysavva/scany v0.2.8
 	github.com/getsentry/sentry-go v0.11.0
@@ -26,7 +26,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/labstack/echo/v4 v4.3.0
 	github.com/mattn/go-isatty v0.0.13 // indirect
-	github.com/mediocregopher/radix/v4 v4.0.0 // indirect
+	github.com/mediocregopher/radix/v4 v4.0.0
 	github.com/microcosm-cc/bluemonday v1.0.9
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/pkg/errors v0.9.1
