@@ -48,22 +48,20 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 		return
 	}
 
-	// delete the server's database entry
-	err := bot.DB.DeleteServer(g.ID.String())
-	if err != nil {
-		log.Errorf("Error deleting database entry for %v: %v", g.ID, err)
-	}
-
 	s, _ := bot.Router.StateFromGuildID(g.ID)
 
 	guild, err := s.Guild(g.ID)
 	if err != nil {
-		// didn't find the guild, so just run this normally
-		bot.guildDeleteNoState(s, g)
+		// if the guild isn't in the state, we probably don't care about it
 		return
 	}
 
-	// otherwise, use the cached guild
+	// delete the server's database entry
+	err = bot.DB.DeleteServer(g.ID.String())
+	if err != nil {
+		log.Errorf("Error deleting database entry for %v: %v", g.ID, err)
+	}
+
 	log.Infof("Left server %v (%v)", guild.Name, guild.ID)
 
 	// if there's no channel to log joins/leaves to, return
