@@ -5,7 +5,6 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/termora/berry/common/log"
 )
 
@@ -71,26 +70,6 @@ func (bot *Bot) GuildDelete(g *gateway.GuildDeleteEvent) {
 
 	_, err = s.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
 		Content:         fmt.Sprintf("Left server **%v** (%v) :(", guild.Name, guild.ID),
-		AllowedMentions: &api.AllowedMentions{Parse: nil},
-	})
-	if err != nil {
-		log.Errorf("Error sending log message: %v", err)
-	}
-	return
-}
-
-// this is run if the left guild isn't found in the state
-// which gives us almost no info, only the ID
-func (bot *Bot) guildDeleteNoState(s *state.State, g *gateway.GuildDeleteEvent) {
-	log.Infof("Left server %v.", g.ID)
-
-	// if there's no channel to log joins/leaves to, return
-	if bot.Config.Bot.JoinLogChannel == 0 {
-		return
-	}
-
-	_, err := s.SendMessageComplex(bot.Config.Bot.JoinLogChannel, api.SendMessageData{
-		Content:         fmt.Sprintf("Left server **%v** :(", g.ID),
 		AllowedMentions: &api.AllowedMentions{Parse: nil},
 	})
 	if err != nil {
