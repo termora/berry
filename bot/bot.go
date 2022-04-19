@@ -76,6 +76,7 @@ func New(
 	id := 0
 	// add the required handlers
 	b.Router.ShardManager.ForEach(func(s shard.Shard) {
+		sID := id
 		state := s.(*state.State)
 
 		state.PreHandler = handler.New()
@@ -86,33 +87,37 @@ func New(
 		state.PreHandler.AddSyncHandler(b.GuildDelete)
 
 		state.AddHandler(func(ev *ws.CloseEvent) {
-			if state.GatewayIsAlive() {
-				log.Warnf("shard %v closed with code %v, but gateway is still alive, error: %v", id, ev.Code, ev.Err)
-
-				if b.StartStopLog != nil {
-					err := b.StartStopLog.Execute(webhook.ExecuteData{
-						Content: fmt.Sprintf("Shard %v closed, but gateawy is still alive\n```Err: %v\nCode: %v\n```", id, ev.Err, ev.Code),
-					})
-					if err != nil {
-						log.Errorf("error sending log webhook")
-					}
-				}
-			}
-
-			log.Errorf("shard %v gateway closed with code %v: %v", id, ev.Code, ev.Err)
+			log.Errorf("shard %v gateway closed with code %v: %v", sID, ev.Code, ev.Err)
 
 			if b.StartStopLog != nil {
 				err := b.StartStopLog.Execute(webhook.ExecuteData{
-					Content: fmt.Sprintf("Shard %v gateway closed\n```Err: %v\nCode: %v\n```", id, ev.Err, ev.Code),
+					Content: fmt.Sprintf("Shard %v gateway closed\n```Err: %v\nCode: %v\n```", sID, ev.Err, ev.Code),
 				})
 				if err != nil {
-					log.Errorf("error sending log webhook")
+					log.Errorf("error sending log webhook: %v", err)
+				}
+			}
+
+			if state.GatewayIsAlive() {
+				log.Infof("attempting to close shard %v's connetion", sID)
+
+				err := state.Close()
+				if err != nil {
+					log.Errorf("closing shard %v gateway: %v", sID, err)
 				}
 			}
 
 			err := state.Open(context.Background())
 			if err != nil {
-				log.Errorf("reopening shard %v: %v", id, err)
+				log.Errorf("reopening shard %v: %v", sID, err)
+				if b.StartStopLog != nil {
+					err := b.StartStopLog.Execute(webhook.ExecuteData{
+						Content: fmt.Sprintf("Error reopening shard %v:\n```\n%v\n```", sID, err),
+					})
+					if err != nil {
+						log.Errorf("error sending log webhook: %v", err)
+					}
+				}
 			}
 		})
 		id++
