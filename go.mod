@@ -10,7 +10,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/ReneKroon/ttlcache/v2 v2.7.0
-	github.com/diamondburned/arikawa/v3 v3.0.0-rc.5.0.20220315203735-eec8fcf719c3
+	github.com/diamondburned/arikawa/v3 v3.0.0-rc.6.0.20220417094748-df0fa66c29b7
 	github.com/dustin/go-humanize v1.0.0
 	github.com/georgysavva/scany v0.2.8
 	github.com/getsentry/sentry-go v0.11.0

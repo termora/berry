@@ -10,7 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/session/shard"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/state/store"
@@ -202,27 +201,12 @@ func run(ctx *cli.Context) error {
 		bot.Router.AddHandler(eventCh)
 	}
 
-	shutdownFromNoEvents := false
 	select {
 	case <-cctx.Done():
 	case <-exitCh:
-		shutdownFromNoEvents = true
 	}
 
 	log.Infof("Interrupt signal received. Shutting down...")
-
-	if c.Bot.StartStopLog.ID.IsValid() {
-		wh := webhook.New(c.Bot.StartStopLog.ID, c.Bot.StartStopLog.Token)
-
-		t := time.Now().UTC()
-		s := t.Unix()
-
-		wh.Execute(webhook.ExecuteData{
-			Username:  botUser.Username,
-			AvatarURL: botUser.AvatarURL(),
-			Content:   fmt.Sprintf("Shutting down at <t:%v:D> <t:%v:T>\nShutting down due to no events? %v", s, s, shutdownFromNoEvents),
-		})
-	}
 
 	return nil
 }

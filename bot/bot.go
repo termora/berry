@@ -3,14 +3,17 @@ package bot
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"sync"
 
+	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/session/shard"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/handler"
 	"github.com/diamondburned/arikawa/v3/utils/httputil/httpdriver"
+	"github.com/diamondburned/arikawa/v3/utils/ws"
 	"github.com/getsentry/sentry-go"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/mediocregopher/radix/v4"
@@ -36,7 +39,8 @@ type Bot struct {
 
 	Stats *StatsClient
 
-	Helper *helper.Helper
+	Helper       *helper.Helper
+	StartStopLog *webhook.Client
 
 	redis radix.Client
 }
@@ -62,9 +66,14 @@ func New(
 		}
 	}
 
+	if config.Bot.StartStopLog.ID.IsValid() && config.Bot.StartStopLog.Token != "" {
+		b.StartStopLog = webhook.New(config.Bot.StartStopLog.ID, config.Bot.StartStopLog.Token)
+	}
+
 	// set the router's prefixer
 	b.Router.Prefixer = b.Prefixer
 
+	id := 0
 	// add the required handlers
 	b.Router.ShardManager.ForEach(func(s shard.Shard) {
 		state := s.(*state.State)
@@ -75,6 +84,38 @@ func New(
 		state.AddHandler(b.GuildCreate)
 		state.AddHandler(b.reminderInteraction) // TODO: remove once message content intent launches
 		state.PreHandler.AddSyncHandler(b.GuildDelete)
+
+		state.AddHandler(func(ev *ws.CloseEvent) {
+			if state.GatewayIsAlive() {
+				log.Warnf("shard %v closed with code %v, but gateway is still alive, error: %v", id, ev.Code, ev.Err)
+
+				if b.StartStopLog != nil {
+					err := b.StartStopLog.Execute(webhook.ExecuteData{
+						Content: fmt.Sprintf("Shard %v closed, but gateawy is still alive\n```Err: %v\nCode: %v\n```", id, ev.Err, ev.Code),
+					})
+					if err != nil {
+						log.Errorf("error sending log webhook")
+					}
+				}
+			}
+
+			log.Errorf("shard %v gateway closed with code %v: %v", id, ev.Code, ev.Err)
+
+			if b.StartStopLog != nil {
+				err := b.StartStopLog.Execute(webhook.ExecuteData{
+					Content: fmt.Sprintf("Shard %v gateway closed\n```Err: %v\nCode: %v\n```", id, ev.Err, ev.Code),
+				})
+				if err != nil {
+					log.Errorf("error sending log webhook")
+				}
+			}
+
+			err := state.Open(context.Background())
+			if err != nil {
+				log.Errorf("reopening shard %v: %v", id, err)
+			}
+		})
+		id++
 	})
 
 	// setup stats if metrics are enabled
