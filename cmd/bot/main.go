@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/session/shard"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/state/store"
@@ -17,6 +19,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/urfave/cli/v2"
 
+	"github.com/starshine-sys/bcr"
 	bcrbot "github.com/starshine-sys/bcr/bot"
 	"github.com/termora/berry/bot"
 	"github.com/termora/berry/commands/admin"
@@ -117,8 +120,26 @@ func run(ctx *cli.Context) error {
 
 	log.Info("Connected to database.")
 
-	// create a new state
-	b, err := bcrbot.New(c.Bot.Token)
+	// create a new shard manager
+	mgr, err := shard.NewIdentifiedManager(gateway.IdentifyCommand{
+		Token:      "Bot " + c.Bot.Token,
+		Properties: gateway.DefaultIdentity,
+		Shard:      gateway.DefaultShard,
+		Presence: &gateway.UpdatePresenceCommand{
+			Status: discord.OnlineStatus,
+			Activities: []discord.Activity{{
+				Name: "/help",
+				Type: discord.GameActivity,
+			}},
+		},
+	}, state.NewShardFunc(func(_ *shard.Manager, s *state.State) {
+		s.AddIntents(bcr.RequiredIntents)
+	}))
+	if err != nil {
+		log.Fatalf("Error creating shard manager: %v", err)
+	}
+
+	b := bcrbot.NewWithRouter(bcr.New(mgr, []string{}, c.Bot.Prefixes))
 	if err != nil {
 		log.Fatalf("Error creating bot: %v", err)
 	}

@@ -1,12 +1,8 @@
 package admin
 
 import (
-	"sync"
-
 	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/diamondburned/arikawa/v3/session/shard"
-	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/bot"
@@ -279,17 +275,6 @@ func Init(b *bot.Bot) (m string, out []*bcr.Command) {
 
 	bot.Router.AddHandler(bot.guildCreate)
 	bot.Router.AddHandler(bot.guildDelete)
-
-	bot.Router.ShardManager.ForEach(func(s shard.Shard) {
-		state := s.(*state.State)
-
-		state.AddHandler(func(_ *gateway.ReadyEvent) {
-			var o sync.Once
-			o.Do(func() {
-				go bot.setStatusLoop(state)
-			})
-		})
-	})
 
 	auditlog.Init(b, directors)
 	out = append(out, a)

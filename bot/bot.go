@@ -43,6 +43,8 @@ type Bot struct {
 	StartStopLog *webhook.Client
 
 	redis radix.Client
+
+	statuses []*statusThing
 }
 
 // New creates a new instance of Bot
@@ -73,6 +75,7 @@ func New(
 	// set the router's prefixer
 	b.Router.Prefixer = b.Prefixer
 
+	b.statuses = make([]*statusThing, b.Router.ShardManager.NumShards())
 	id := 0
 	// add the required handlers
 	b.Router.ShardManager.ForEach(func(s shard.Shard) {
@@ -86,7 +89,13 @@ func New(
 		state.AddHandler(b.reminderInteraction) // TODO: remove once message content intent launches
 		state.PreHandler.AddSyncHandler(b.GuildDelete)
 
+		state.AddHandler(b.ready)
+
 		state.AddHandler(func(ev *ws.CloseEvent) {
+			if st := b.statuses[sID]; st != nil {
+				st.reset()
+			}
+
 			log.Errorf("shard %v gateway closed with code %v: %v", sID, ev.Code, ev.Err)
 
 			if b.StartStopLog != nil {
