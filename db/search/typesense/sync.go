@@ -16,12 +16,14 @@ func (c *Client) SyncTerms(terms []*search.Term) error {
 
 	_, err = c.ts.CreateCollection("terms", "", []tsclient.CreateFieldData{
 		{
-			Name: "names",
-			Type: "string[]",
+			Name:  "names",
+			Type:  "string[]",
+			Infix: true,
 		},
 		{
-			Name: "description",
-			Type: "string",
+			Name:  "description",
+			Type:  "string",
+			Infix: true,
 		},
 		{
 			Name: "source",

@@ -27,6 +27,7 @@ func (c *Client) SearchCat(input string, cat, limit int, ignore []string) (terms
 		Query:                   input,
 		QueryBy:                 []string{"names", "description", "source"},
 		QueryByWeights:          []int{2, 1, 1},
+		Infix:                   []string{"always", "always", "off"},
 		Prefix:                  []bool{true, false, false},
 		SortBy:                  []string{"_text_match:desc"},
 		NumTypos:                jsonutil.IntPointer(0),
