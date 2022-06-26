@@ -1,0 +1,76 @@
+[core]
+database_url = "postgresql://postgres:postgres@localhost/postgres"
+typesense_url = "http://localhost:8108"
+typesense_key = "apiKey"
+redis = "localhost:6379"
+
+[bot]
+token = "yourBotTokenHere"
+prefixes = ["t;", "t:"]
+slash_commands_enabled = true # set to false to not update slash commands on startup (existing commands will still respond)
+slash_commands_guilds = [] # add one or more guild IDs here to only update slash commands on those guilds
+pronoun_channel = 0 # channel where pronoun submissions are sent to
+feedback_channel = 0 # channel where feedback is sent to
+feedback_blocked_users = [] # list of users that cannot send feedback (due to spam, for example)
+
+# influxdb configuration for metrics
+influxdb = { url = "http://localhost:806", token = "influxTokenHere", org = "termora", bucket = "termora" }
+
+bot_owners = [0, 1, 2, 3] # bot owner user IDs
+admins = [0, 1] # admin role IDs
+directors = [0, 1] # director role IDs
+
+support_invite = "https://discord.gg/invite-link" # support server invite
+
+# helper bot guild and token, for the credits command and, once Discord rolls out the message content intent, message content
+support_guild_id = 0
+support_token = "secondBotTokenHere"
+
+audit_log_public = 0 # private, in-depth audit log (with detailed changes)
+audit_log_private = 0 # public audit log (without detailed changes)
+
+website = "https://termora.org/" # website base URL, for links in term embeds
+custom_invite = "" # custom invite URL used in t;about, if set
+
+show_term_count = true # whether to show term count in status
+show_guild_count = true # whether to show guild count in status
+show_shard = true # whether to show shard number in status
+
+join_log_channel = 0 # channel where bot joins/leaves are logged
+term_changelog_ping = "<@&role ID>" # role that is pinged when using t;admin changelog
+
+# extra fields shown in the help command
+# this can be duplicated for more help fields
+[[bot.help_fields]]
+name = "help field 1"
+value = "description 1"
+
+# extra fields shown in the credits command
+# same as bot.help_fields
+[[bot.credit_fields]]
+name = "credit field 1"
+value = "thanks 1"
+
+# roles used in the credits command
+# requires a support guild ID and token
+# these roles must be in the support guild
+# as with help_fields and credit_fields, more of these can be added below
+[[bot.contributor_roles]] 
+name = "Director"
+id = 0
+
+[[bot.contributor_roles]] 
+name = "Contributor"
+id = 0
+
+[site]
+port = ":5000"
+site_name = "Termora"
+invite = "https://termora.org/invite" # invite link for the Discord bot
+contact = true # whether to show a "contact" link in the footer
+description = "Hi! This is a description" # description shown in embeds when not linking directly to a term page
+
+plausible = { domain = "termora.org", url = "path" } # plausible configuration
+
+[api]
+port = ":5001"

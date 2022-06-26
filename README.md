@@ -4,54 +4,47 @@ Berry is a searchable glossary bot for Discord.
 
 ## Requirements
 
+The easiest way to run Berry is with Docker. To run it on bare metal, you need the following:
+
 - PostgreSQL (only 12.5 tested)
+- Typesense 0.23 or later
 - Go 1.16 or later
 - For the site and API: a reverse proxy (such as Caddy or nginx)
+- Optionally, but strongly recommended: Redis, to not spam users with deprecation warnings for text commands
 
 ## Configuration
 
-Each executable has its own configuration file, located next to the executable.
+All services are configured with a `config.toml` file in the root of this repository.
+An example can be seen in `config.toml.example`.
+
+The following keys are required or strongly recommended to be set (using `.` to indicate nesting):
+- `bot.token`: the Discord bot token
+- `bot.prefixes`: the prefixes the bot will respond to. Will also respond to mentions
+- `bot.bot_owners`: users that have absolute control over the bot
+- `bot.admins`: roles that can do most administrative tasks, such as adding, editing, or deleting terms
+- `bot.directors`: roles that can add and edit terms and pronouns, but cannot delete terms
+
+If you're not using Docker, the following keys are also required or recommended:
+- `core.database_url`: the DSN for the PostgreSQL database (required)
+- `core.typesense_url`: the URL for the Typesense server (required)
+- `core.typesense_key`: the API key for the Typesense server (required)
+- `core.redis`: the URL for the Redis instance
 
 ## Running
 
-This is still very much a WIP. Although we've done our best to not hardcode names and links into the source code, they still show up in some places (notably the site), so we recommend going through the source and fixing all those references before you run it.
+The easiest way to get Berry running is with Docker.
 
-All of these executables are standalone and can be run independently from each other.
+- Clone this repository: `git clone https://github.com/termora/berry`
+- Create a `config.toml` file in the same directory as `docker-compose.yml`, containing at least a `bot.token` field
+- Build the bot: `docker-compose build`
+- Run the bot: `docker-compose up` (or `docker-compose up -d` to run in the background)
 
-### Bot
-
-1. `go build` in the cmd/bot directory
-2. Copy `config.sample.json` to `config.json` and fill it in
-3. Run the executable
-
-#### Required configuration keys
-
-```
-- auth:
-  - token (string): Discord bot token
-  - database_url (string): dsn for the Postgres database
-- bot:
-  - prefixes: ([]string): default prefixes used
-  - bot_owners: ([]int): bot owner IDs, these users can use all commands including admin commands
-```
-
-All other keys are optional but strongly recommended.
-
-### API
-
-1. `go build` in the cmd/bot directory
-2. Copy `config.sample.yaml` to `config.yaml` and fill it in
-3. Run the executable
-
-### Site
-
-1. `go build` in the cmd/bot directory
-2. Copy `config.sample.yaml` to `config.yaml` and fill it in
-3. Run the executable
+If you want to run it on the bare metal, it's a lot more involved and you're mostly on your own.  
+If you get stuck, feel free to ask for help on the [support server](https://termora.org/server).
 
 ## License
 
-Copyright (C) 2021, Starshine System
+Copyright (C) 2022, Starshine System
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
