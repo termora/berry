@@ -1,0 +1,100 @@
+version: "3"
+
+services:
+  bot:
+    image: termora
+    build: .
+    command: ["/app/termora", "bot"]
+    environment:
+      - "DATABASE_URL=postgresql://postgres:postgres@postgres/postgres"
+      - "TYPESENSE_URL=http://typesense:8108"
+      - "TYPESENSE_APIKEY=typesense"
+      - "REDIS=redis:6379"
+    volumes:
+      - "./config.toml:/app/config.toml:ro"
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - default
+
+  api:
+    image: termora
+    command: ["/app/termora", "api"]
+    environment:
+      - "DATABASE_URL=postgresql://postgres:postgres@postgres/postgres"
+      - "TYPESENSE_URL=http://typesense:8108"
+      - "TYPESENSE_APIKEY=typesense"
+      - "REDIS=redis:6379"
+      - "PORT=:5000"
+    volumes:
+      - "./config.toml:/app/config.toml:ro"
+    ports:
+      - "127.0.0.1:2838:5000"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - default
+
+  site:
+    image: termora
+    command: ["/app/termora", "site"]
+    environment:
+      - "DATABASE_URL=postgresql://postgres:postgres@postgres/postgres"
+      - "TYPESENSE_URL=http://typesense:8108"
+      - "TYPESENSE_APIKEY=typesense"
+      - "REDIS=redis:6379"
+      - "PORT=:5000"
+    volumes:
+      - "./config.toml:/app/config.toml:ro"
+    ports:
+      - "127.0.0.1:2839:5000"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - default
+
+  typesense:
+    image: typesense/typesense:0.23.0
+    volumes:
+      - "typesense_data:/data"
+    command: ["typesense-server",
+              "--data-dir", "/data",
+              "--api-key", "typesense"]
+    restart: unless-stopped
+    networks:
+      - default
+
+  postgres:
+    image: postgres:14-alpine
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
+      - "/var/run/postgresql:/var/run/postgresql"
+    command: ["postgres",
+              "-c", "max-connections=1000",
+              "-c", "timezone=Etc/UTC",
+              "-c", "max_wal_size=1GB",
+              "-c", "min_wal_size=80MB",
+              "-c", "shared_buffers=128MB"]
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+    restart: unless-stopped
+    networks:
+      - default
+
+  # this service is temporary until Discord *actually* rolls out the message content intent
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - default
+
+volumes:
+  postgres_data:
+  typesense_data:
+  redis_data:

@@ -28,9 +28,25 @@ func ReadConfig() Config {
 
 	log.Infof("Loaded configuration file %q.", fn)
 
-	if os.Getenv("TERMORA_DATABASE") != "" {
-		config.Core.DatabaseURL = os.Getenv("TERMORA_DATABASE")
+	// get some config keys from environment, for Docker
+	if s := os.Getenv("DATABASE_URL"); s != "" {
+		config.Core.DatabaseURL = s
 	}
+	if s := os.Getenv("TYPESENSE_URL"); s != "" {
+		config.Core.TypesenseURL = s
+	}
+	if s := os.Getenv("TYPESENSE_APIKEY"); s != "" {
+		config.Core.TypesenseKey = s
+	}
+	if s := os.Getenv("REDIS"); s != "" {
+		config.Core.Redis = s
+	}
+	if s := os.Getenv("PORT"); s != "" {
+		// these are always run as separate processes, so it's easier to just have both use the same env var
+		config.Site.Port = s
+		config.API.Port = s
+	}
+
 	config.Core.UseSentry = config.Core.SentryURL != ""
 
 	if config.Core.Git == "" {
