@@ -39,6 +39,8 @@ The easiest way to get Berry running is with Docker.
 - Build the bot: `docker-compose build`
 - Run the bot: `docker-compose up` (or `docker-compose up -d` to run in the background)
 
+The site will listen on `localhost:2839`, and the API will listen on `localhost:2838`.
+
 If you want to run it on the bare metal, it's a lot more involved and you're mostly on your own.  
 If you get stuck, feel free to ask for help on the [support server](https://termora.org/server).
 
