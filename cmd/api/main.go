@@ -56,7 +56,7 @@ func run(*cli.Context) (err error) {
 
 	mx.Route("/v1", func(r chi.Router) {
 		r.Get("/search/{term}", s.search)
-		r.Get(`/id/{id:\d+}`, s.term)
+		r.Get(`/term/{id:\d+}`, s.term)
 
 		r.Get("/list", s.list)
 		r.Get(`/list/{id:\d+}`, s.listCategory)
