@@ -74,10 +74,12 @@ func Init(b *bot.Bot) (m string, list []*bcr.Command) {
 		Name:    "random-pronouns",
 		Aliases: []string{"random-pronoun"},
 		Summary: "Show a random pronoun set",
+		Options: &[]discord.CommandOption{},
 
 		Blacklistable: true,
 		Cooldown:      time.Second,
 		Command:       bot.random,
+		SlashCommand:  bot.randomSlash,
 	}))
 
 	pronouns := bot.Router.AddCommand(&bcr.Command{

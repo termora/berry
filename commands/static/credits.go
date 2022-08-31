@@ -2,13 +2,14 @@ package static
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
 
-func (bot *Bot) credits(ctx *bcr.Context) (err error) {
+func (bot *Bot) credits(ctx bcr.Contexter) (err error) {
 	bot.memberMu.RLock()
 	defer bot.memberMu.RUnlock()
 
@@ -22,26 +23,26 @@ func (bot *Bot) credits(ctx *bcr.Context) (err error) {
 	embeds := []discord.Embed{{
 		Color:       db.EmbedColour,
 		Title:       "Credits",
-		Description: fmt.Sprintf("These are the people who helped create %v!", ctx.Bot.Username),
+		Description: fmt.Sprintf("These are the people who helped create %v!", bot.Router.Bot.Username),
 		Fields:      bot.Config.Bot.CreditFields,
 	}}
 
 	e := discord.Embed{
 		Color:       db.EmbedColour,
 		Title:       "Contributors",
-		Description: fmt.Sprintf("These are the people who have contributed to %v in some capacity!", ctx.Bot.Username),
+		Description: fmt.Sprintf("These are the people who have contributed to %v in some capacity!", bot.Router.Bot.Username),
 	}
 
 	cats, err := bot.DB.ContributorCategories()
 	if err != nil {
-		_, err = ctx.PagedEmbed(embeds, false)
+		_, _, err = ctx.ButtonPages(embeds, 15*time.Minute)
 		return err
 	}
 
 	for _, cat := range cats {
 		contributors, err := bot.DB.Contributors(cat.ID)
 		if err != nil {
-			_, err = ctx.PagedEmbed(embeds, false)
+			_, _, err = ctx.ButtonPages(embeds, 15*time.Minute)
 			return err
 		}
 
@@ -86,6 +87,6 @@ func (bot *Bot) credits(ctx *bcr.Context) (err error) {
 		embeds[0].Description += "\nReact with ➡️ to show everyone who has contributed!"
 	}
 
-	_, err = ctx.PagedEmbed(embeds, false)
+	_, _, err = ctx.ButtonPages(embeds, 15*time.Minute)
 	return err
 }

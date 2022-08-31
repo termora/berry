@@ -99,7 +99,7 @@ func Init(b *bot.Bot) (m string, o []*bcr.Command) {
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
-		Command:       bot.credits,
+		SlashCommand:  bot.credits,
 	}))
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
