@@ -3,6 +3,7 @@ package search
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/jackc/pgx/v4"
@@ -43,6 +44,46 @@ func (bot *Bot) tags(ctx *bcr.Context) (err error) {
 
 	_, err = ctx.PagedEmbed(
 		PaginateStrings(s, 15, fmt.Sprintf("Terms tagged ``%v``", bcr.EscapeBackticks(ctx.RawArgs)), "\n"), false,
+	)
+	return
+}
+
+func (bot *Bot) tagsSlash(ctx bcr.Contexter) (err error) {
+	if ctx.GetStringFlag("tag") == "" {
+		t, err := bot.DB.Tags()
+		if err != nil {
+			return bot.DB.InternalError(ctx, err)
+		}
+
+		for i := range t {
+			t[i] = t[i] + "\n"
+		}
+
+		_, _, err = ctx.ButtonPages(bcr.StringPaginator("Tags", db.EmbedColour, t, 15), 15*time.Minute)
+		return err
+	}
+
+	tag := ctx.GetStringFlag("tag")
+	terms, err := bot.DB.TagTerms(tag)
+	if err != nil {
+		if errors.Cause(err) == pgx.ErrNoRows {
+			return ctx.SendX("I couldn't find any terms with that tag.")
+		}
+		return bot.DB.InternalError(ctx, err)
+	}
+
+	if len(terms) == 0 {
+		_, err = ctx.Send("I couldn't find any terms with that tag.")
+		return
+	}
+
+	var s []string
+	for _, t := range terms {
+		s = append(s, t.Name+"\n")
+	}
+
+	_, _, err = ctx.ButtonPages(
+		bcr.StringPaginator("Terms tagged \""+tag+"\"", db.EmbedColour, s, 15), 15*time.Minute,
 	)
 	return
 }

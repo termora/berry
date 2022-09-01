@@ -150,6 +150,14 @@ func Init(b *bot.Bot) (m string, list []*bcr.Command) {
 		Cooldown:      time.Second,
 		Blacklistable: true,
 		Command:       bot.tags,
+		SlashCommand:  bot.tagsSlash,
+		Options: &[]discord.CommandOption{
+			&discord.StringOption{
+				OptionName:  "tag",
+				Description: "The tag to show terms for",
+				Required:    false,
+			},
+		},
 	}))
 
 	list = append(list, bot.Router.AddCommand(&bcr.Command{
