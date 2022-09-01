@@ -22,8 +22,7 @@ func (bot *Bot) use(ctx bcr.Contexter) (err error) {
 	name := ctx.GetStringFlag("name")
 	if v, ok := ctx.(*bcr.Context); ok {
 		if len(v.Args) == 0 {
-			return ctx.SendEphemeral(
-				fmt.Sprintf("You didn't give any pronouns to show! Try ``%vlist-pronouns`` for a list of all pronouns.", bot.Config.Bot.Prefixes[0]))
+			return ctx.SendEphemeral("You didn't give any pronouns to show! Try ``/list pronouns`` for a list of all pronouns.")
 		}
 
 		pronouns = v.Args[0]
@@ -33,15 +32,14 @@ func (bot *Bot) use(ctx bcr.Contexter) (err error) {
 	}
 
 	if pronouns == "" {
-		return ctx.SendEphemeral(
-			fmt.Sprintf("You didn't give any pronouns to show! Try ``%vlist-pronouns`` for a list of all pronouns.", bot.Config.Bot.Prefixes[0]))
+		return ctx.SendEphemeral("You didn't give any pronouns to show! Try ``/list pronouns`` for a list of all pronouns.")
 	}
 
 	sets, err := bot.DB.GetPronoun(strings.Split(pronouns, "/")...)
 	if err != nil {
 		if errors.Cause(err) == pgx.ErrNoRows {
 			return ctx.SendEphemeral(
-				fmt.Sprintf("Couldn't find any pronoun sets from your input. Try `%vlist-pronouns` for a list of all pronouns; if it's not on there, feel free to submit it with `%vsubmit-pronouns`!", bot.Config.Bot.Prefixes[0], bot.Config.Bot.Prefixes[0]))
+				"Couldn't find any pronoun sets from your input. Try `/list pronouns` for a list of all pronouns; if it's not on there, feel free to submit it with `/submit pronouns`!")
 		}
 		if err == db.ErrTooManyForms {
 			return ctx.SendEphemeral("You gave too many forms! Input up to five forms, separated with a slash (`/`).")

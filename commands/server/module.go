@@ -43,32 +43,5 @@ func Init(b *bot.Bot) (m string, out []*bcr.Command) {
 		Command:     bot.blacklistRemove,
 	})
 
-	prefixes := bot.Router.AddCommand(&bcr.Command{
-		Name:    "prefixes",
-		Aliases: []string{"prefix"},
-		Summary: "Show this server's prefixes",
-
-		Blacklistable: true,
-		Command:       bot.prefixes,
-	})
-
-	prefixes.AddSubcommand(&bcr.Command{
-		Name:    "add",
-		Summary: "Add the given prefix",
-		Usage:   "<prefix>",
-
-		Permissions: discord.PermissionManageGuild,
-		Command:     bot.addPrefix,
-	})
-
-	prefixes.AddSubcommand(&bcr.Command{
-		Name:    "remove",
-		Summary: "Remove the given prefix",
-		Usage:   "<prefix>",
-
-		Permissions: discord.PermissionManageGuild,
-		Command:     bot.removePrefix,
-	})
-
-	return "Server configuration commands", append(out, g, prefixes)
+	return "Server configuration commands", append(out, g)
 }

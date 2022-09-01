@@ -22,11 +22,11 @@ func (bot *Bot) perms(ctx bcr.Contexter) (err error) {
 func (bot *Bot) permText(ctx bcr.Contexter) string {
 	return fmt.Sprintf(`%v requires the following permissions to function correctly:
 - **Read Messages** & **Send Messages**: to respond to commands
-- **Read Message History**: for the %vsearch command to work
+- **Read Message History**: for the `+"`%v search`"+` command to work
 - **Manage Messages**: to delete reactions on menus
 - **Embed Links**: to send responses for most commands
 - **Add Reactions**: for menus to work
-- **Use External Emojis**: to use custom emotes in a couple of commands`, bot.Router.Bot.Username, bot.Config.Bot.Prefixes[0])
+- **Use External Emojis**: to use custom emotes in a couple of commands`, bot.Router.Bot.Username, bot.Router.Bot.Username)
 }
 
 func (bot *Bot) privacy(ctx bcr.Contexter) (err error) {
@@ -69,7 +69,7 @@ func (bot *Bot) privacyText(ctx bcr.Contexter) string {
 }
 
 func (bot *Bot) autopostText(ctx bcr.Contexter) string {
-	return fmt.Sprintf("To automatically post terms at a set interval, you can use the `/autopost` (or `%vautopost`) command. Check out `%vautopost help` for how to use it.\n\nNote: this command previously recommended using a bot such as YAGPDB.xyz to automatically post terms. This still works for now, but please switch over to the built-in command.", bot.Config.Bot.Prefixes[0], bot.Config.Bot.Prefixes[0])
+	return fmt.Sprintf("To automatically post terms at a set interval, you can use the `/autopost` (or `@%v autopost`) command. Check out `@%v autopost help` for how to use it.", bot.Router.Bot.Username, bot.Router.Bot.Username)
 }
 
 func (bot *Bot) help(ctx bcr.Contexter) (err error) {
@@ -98,7 +98,7 @@ func (bot *Bot) help(ctx bcr.Contexter) (err error) {
 			},
 			{
 				Name:  "For staff",
-				Value: "You can blacklist most commands, with the exception of `explain`, using the `blacklist` command.\nYou can also change the prefixes the bot uses with the `prefix` command.",
+				Value: fmt.Sprintf("You can blacklist most text commands, with the exception of `explain`, using the `blacklist` command.\nAdditionally, you can disable specific slash commands in Server Settings ➜ Integrations ➜ %v.", bot.Router.Bot.Username),
 			},
 		},
 		Footer: &discord.EmbedFooter{

@@ -18,6 +18,7 @@ func (bot *Bot) blacklistAdd(ctx *bcr.Context) (err error) {
 	channels, n := ctx.GreedyChannelParser(ctx.Args)
 	if n == 0 {
 		_, err = ctx.Send("None of the channels you gave were found.")
+		return
 	}
 
 	ch := make([]string, 0)
