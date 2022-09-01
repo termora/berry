@@ -95,11 +95,12 @@ func Init(b *bot.Bot) (m string, o []*bcr.Command) {
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
 		Name: "credits",
 
-		Summary:  "A list of people who helped create the bot",
+		Summary:  "A list of people who helped create the bot!",
 		Cooldown: 1 * time.Second,
 
 		Blacklistable: true,
 		SlashCommand:  bot.credits,
+		Options:       &[]discord.CommandOption{},
 	}))
 
 	o = append(o, bot.Router.AddCommand(&bcr.Command{
