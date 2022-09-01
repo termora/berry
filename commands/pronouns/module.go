@@ -112,7 +112,23 @@ func Init(b *bot.Bot) (m string, list []*bcr.Command) {
 		Usage:         "<pronoun set, space or slash separated>",
 		Blacklistable: true,
 		Cooldown:      time.Second,
-		Command:       bot.custom,
+		SlashCommand:  bot.custom,
+	})
+
+	bot.Router.AddCommand(&bcr.Command{
+		Name:          "custom-pronouns",
+		Summary:       "Show custom pronouns that aren't in the bot",
+		Usage:         "<pronoun set, space or slash separated>",
+		Blacklistable: true,
+		Cooldown:      time.Second,
+		SlashCommand:  bot.custom,
+		Options: &[]discord.CommandOption{
+			&discord.StringOption{
+				OptionName:  "set",
+				Description: "The pronouns to show (separated by /)",
+				Required:    true,
+			},
+		},
 	})
 
 	pronouns.AddSubcommand(bot.Router.AliasMust("list", []string{"l"}, []string{"list-pronouns"}, nil))

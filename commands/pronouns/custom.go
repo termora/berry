@@ -4,25 +4,28 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/db"
 )
 
-func (bot *Bot) custom(ctx *bcr.Context) (err error) {
-	set := ctx.Args
-	if len(set) != 5 {
-		set = strings.Split(ctx.RawArgs, "/")
+func (bot *Bot) custom(ctx bcr.Contexter) (err error) {
+	set := strings.Split(ctx.GetStringFlag("set"), "/")
+	if v, ok := ctx.(*bcr.Context); ok {
+		set = v.Args
 		if len(set) != 5 {
-			_, err = ctx.Send("You gave either too few or too many forms, please give exactly 5.")
-			return
+			set = strings.Split(v.RawArgs, "/")
 		}
 	}
 
+	if len(set) != 5 {
+		return ctx.SendX("You gave either too few or too many forms, please give exactly 5.")
+	}
+
 	if tmplCount == 0 {
-		_, err = ctx.Send("There are no examples available for pronouns! If you think this is in error, please join the bot support server and ask there.")
-		return err
+		return ctx.SendX("There are no examples available for pronouns! If you think this is in error, please join the bot support server and ask there.")
 	}
 
 	var (
@@ -63,6 +66,6 @@ func (bot *Bot) custom(ctx *bcr.Context) (err error) {
 		b.Reset()
 	}
 
-	_, err = ctx.PagedEmbed(e, false)
+	_, _, err = ctx.ButtonPages(e, 15*time.Minute)
 	return
 }
