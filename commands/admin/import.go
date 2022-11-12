@@ -26,6 +26,11 @@ func (bot *Bot) importFromMessage(ctx *bcr.Context) (err error) {
 		return
 	}
 
+	msg, err = bot.Helper.Message(msg.ChannelID, msg.ID)
+	if err != nil {
+		return ctx.SendX("Message not found. Are you sure I have access to that channel?")
+	}
+
 	t := &db.Term{}
 
 	// embeds are easy, just parse all of the fields
@@ -127,7 +132,7 @@ done:
 
 		cat, err := bot.DB.CategoryID(flag)
 		if err != nil {
-			_, err = ctx.Sendf("That category (``%v``) could not be found.", bcr.EscapeBackticks(flag))
+			return ctx.SendfX("That category (``%v``) could not be found.\n%v", bcr.EscapeBackticks(flag), bcr.AsCode(err.Error()))
 		}
 		t.Category = cat
 	}

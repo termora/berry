@@ -141,6 +141,9 @@ func New(
 			log.Errorf("Error creating helper: %v", err)
 		}
 		b.Helper = h
+	} else {
+		log.Warn("Helper token is NOT set! Admin commands may not work correctly.")
+		log.Warn("If the main bot has the message content intent, set bot.support_token to the same token as the main bot.")
 	}
 
 	return b
