@@ -124,7 +124,7 @@ func run(ctx *cli.Context) error {
 	mgr, err := shard.NewIdentifiedManager(gateway.IdentifyCommand{
 		Token:      "Bot " + c.Bot.Token,
 		Properties: gateway.DefaultIdentity,
-		Shard:      gateway.DefaultShard,
+		Shard:      &gateway.Shard{0, 3}, // just hardcode the number of shards it's fiiiiiine
 		Presence: &gateway.UpdatePresenceCommand{
 			Status: discord.OnlineStatus,
 			Activities: []discord.Activity{{
