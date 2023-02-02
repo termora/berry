@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"net/url"
 	"os"
 	"os/signal"
 	"reflect"
@@ -128,7 +129,7 @@ func run(ctx *cli.Context) error {
 		Presence: &gateway.UpdatePresenceCommand{
 			Status: discord.OnlineStatus,
 			Activities: []discord.Activity{{
-				Name: "/help",
+				Name: fmt.Sprintf("/help | %v", urlParse(c.Bot.Website)),
 				Type: discord.GameActivity,
 			}},
 		},
@@ -273,4 +274,12 @@ func eventThing(ctx *cli.Context, ch <-chan interface{}, out chan<- struct{}) {
 			break
 		}
 	}
+}
+
+func urlParse(s string) string {
+	u, err := url.Parse(s)
+	if err != nil {
+		return s
+	}
+	return u.Host
 }

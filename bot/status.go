@@ -54,6 +54,11 @@ func (bot *Bot) statusLoop(s *statusThing) {
 	showGuildCount := bot.Config.Bot.ShowGuildCount
 	tick := time.NewTicker(2 * time.Minute)
 
+	// TODO: fix status
+	log.Debugf("TEMP: not updating status, cancelling loop")
+
+	return
+
 	for {
 		select {
 		case <-s.stop:
