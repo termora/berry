@@ -13,7 +13,6 @@ services:
       - "./config.toml:/app/config.toml:ro"
     restart: unless-stopped
     depends_on:
-      - redis
       - postgres
     networks:
       - default
