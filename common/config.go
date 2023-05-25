@@ -38,9 +38,6 @@ func ReadConfig() Config {
 	if s := os.Getenv("TYPESENSE_APIKEY"); s != "" {
 		config.Core.TypesenseKey = s
 	}
-	if s := os.Getenv("REDIS"); s != "" {
-		config.Core.Redis = s
-	}
 	if s := os.Getenv("PORT"); s != "" {
 		// these are always run as separate processes, so it's easier to just have both use the same env var
 		config.Site.Port = s
@@ -72,8 +69,6 @@ type CoreConfig struct {
 	TypesenseKey string `toml:"typesense_key"`
 
 	Git string `toml:"git"`
-
-	Redis string `toml:"redis"` // optional
 
 	// UseSentry: when false, don't use Sentry for logging errors
 	UseSentry bool `toml:"-"`

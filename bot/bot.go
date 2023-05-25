@@ -16,7 +16,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/utils/ws"
 	"github.com/getsentry/sentry-go"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/mediocregopher/radix/v4"
 	"github.com/starshine-sys/bcr"
 	bcrbot "github.com/starshine-sys/bcr/bot"
 	"github.com/termora/berry/common"
@@ -42,8 +41,6 @@ type Bot struct {
 	Helper       *helper.Helper
 	StartStopLog *webhook.Client
 
-	redis radix.Client
-
 	statuses []*statusThing
 }
 
@@ -59,13 +56,6 @@ func New(
 		Sentry:    hub,
 		UseSentry: hub != nil,
 		Guilds:    map[discord.GuildID]discord.Guild{},
-	}
-
-	if config.Core.Redis != "" {
-		client, err := (&radix.PoolConfig{}).New(context.Background(), "tcp", config.Core.Redis)
-		if err == nil {
-			b.redis = client
-		}
 	}
 
 	if config.Bot.StartStopLog.ID.IsValid() && config.Bot.StartStopLog.Token != "" {
@@ -86,7 +76,6 @@ func New(
 		state.AddHandler(b.MessageCreate)
 		state.AddHandler(b.InteractionCreate)
 		state.AddHandler(b.GuildCreate)
-		state.AddHandler(b.reminderInteraction) // TODO: remove once message content intent launches
 		state.PreHandler.AddSyncHandler(b.GuildDelete)
 
 		state.AddHandler(b.ready)

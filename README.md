@@ -28,7 +28,6 @@ If you're not using Docker, the following keys are also required or recommended:
 - `core.database_url`: the DSN for the PostgreSQL database (required)
 - `core.typesense_url`: the URL for the Typesense server (required)
 - `core.typesense_key`: the API key for the Typesense server (required)
-- `core.redis`: the URL for the Redis instance
 
 ## Running
 

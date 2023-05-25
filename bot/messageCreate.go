@@ -1,14 +1,11 @@
 package bot
 
 import (
-	"context"
 	"fmt"
-	"strings"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/getsentry/sentry-go"
-	"github.com/mediocregopher/radix/v4"
 	"github.com/starshine-sys/bcr"
 	"github.com/termora/berry/common/log"
 	"github.com/termora/berry/db"
@@ -94,7 +91,6 @@ func (bot *Bot) MessageCreate(m *gateway.MessageCreateEvent) {
 			log.Error(err)
 		}
 
-		bot.slashReminderMessage(ctx)
 		bot.Stats.IncCommand()
 	}
 }
@@ -106,55 +102,4 @@ func inSlice(slice []discord.UserID, s discord.UserID) bool {
 		}
 	}
 	return false
-}
-
-func (bot *Bot) slashReminderMessage(ctx *bcr.Context) {
-	if bot.redis == nil || strings.HasPrefix(ctx.Message.Content, "<@") {
-		return
-	}
-
-	var i int
-	err := bot.redis.Do(context.Background(), radix.Cmd(&i, "SISMEMBER", "termora:slash-reminders", ctx.Author.ID.String()))
-	if err != nil {
-		log.Error("redis error:", err)
-		return
-	}
-	if i == 1 {
-		return
-	}
-
-	e := discord.Embed{
-		Description: fmt.Sprintf(`**Note:** text prefixes (such as `+"`%v`"+`) will no longer be supported as of August 31st.
-Please use mentions (%v) or slash commands instead.
-This message will only show up once.`, ctx.Prefix, ctx.Bot.Mention()),
-		Color: db.EmbedColour,
-	}
-
-	_, err = ctx.SendComponents(discord.Components(&discord.ButtonComponent{
-		Style:    discord.SecondaryButtonStyle(),
-		CustomID: "delete-reminder",
-		Label:    "Got it, delete this message",
-	}), "", e)
-	if err != nil {
-		log.Error("error sending prefix reminder message:", err)
-		return
-	}
-
-	err = bot.redis.Do(context.Background(), radix.Cmd(&i, "SADD", "termora:slash-reminders", ctx.Author.ID.String()))
-	if err != nil {
-		log.Error("redis error:", err)
-		return
-	}
-}
-
-func (bot *Bot) reminderInteraction(ic *gateway.InteractionCreateEvent) {
-	data, ok := ic.Data.(*discord.ButtonInteraction)
-	if !ok {
-		return
-	}
-
-	if data.CustomID == "delete-reminder" && ic.Message != nil {
-		s, _ := bot.Router.StateFromGuildID(ic.GuildID)
-		_ = s.DeleteMessage(ic.Message.ChannelID, ic.Message.ID, "")
-	}
 }
